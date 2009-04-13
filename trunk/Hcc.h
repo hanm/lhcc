@@ -25,8 +25,8 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 ****************************************************************/
 
-#ifndef LLCC_INCLUDE_HEADER
-#define LLCC_INCLUDE_HEADER
+#ifndef __HCC_HCC_HEADER
+#define __HCC_HCC_HEADER
 
 #include <assert.h>
 #include <stdarg.h>
@@ -40,8 +40,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 #endif
 
 #define NUMBEROFELEMENTS(a) ((int)(sizeof(a)/sizeof(a[0])))
-#define ALLOC(p,a) ((p) = llcc_alloc(sizeof *(p), (a)))
-#define CALLOC(p,a) memset(ALLOC((p),(a)), 0, sizeof *(p))
+
 #define ROUNDUP(x,n) (((x)+((n)-1))&(~((n)-1)))
 #define ROUNDUP_(x,n) ((((x)+((n)-1))/(n))*(n)) // test only - bit mask is faster than div/mul
 
@@ -49,26 +48,6 @@ enum { PERM=0, FUNC, STMT };
 
 enum { CONSTANTS=1, LABELS, GLOBAL, PARAM, LOCAL }; 
 
-struct symbol 
-{
-	char *name;
-	int scope;
-	struct symbol* up;
-};
-
-const char* atom_string_number(const char* string, int length);
-const char* atom_string(const char* string);
-const char* atom_int(int n);
-
-void* llcc_alloc(unsigned long n, unsigned a);
-void llcc_free(unsigned a);
-
-
-struct symbol_table* make_symbol_table(int arena);
-void enter_scope(void);
-void exit_scope(void);
-struct symbol* add_symbol(const char* name, struct symbol_table** table, int scope_level, int arena);
-struct symbol* find_symbol(const char* name, struct symbol_table* table);
 
 #ifdef _DEBUG
 void llcc_test_symbol_table();

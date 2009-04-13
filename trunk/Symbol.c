@@ -25,20 +25,9 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 ****************************************************************/
 
+#include "Symbol.h"
+#include "ArenaAlloc.h"
 #include "Hcc.h"
-
-struct symbol_table
-{
-	int level;
-    struct symbol_table* previous;
-    struct entry 
-    {
-		struct symbol sym;
-		struct entry *link;
-	} *buckets[256]; // [tag] - choose a better value for bucket size
-	
-    struct symbol* all_symbols;
-};
 
 /*
  * scope level
