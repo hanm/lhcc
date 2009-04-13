@@ -173,6 +173,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Scanner.c"
+				>
+			</File>
+			<File
 				RelativePath=".\Symbol.c"
 				>
 			</File>
@@ -192,6 +196,10 @@
 			</File>
 			<File
 				RelativePath=".\Hcc.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Scanner.h"
 				>
 			</File>
 			<File
