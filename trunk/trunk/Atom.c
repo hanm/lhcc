@@ -25,6 +25,8 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 ****************************************************************/
 
+#include "Atom.h"
+#include "ArenaAlloc.h"
 #include "Hcc.h"
 #include <assert.h>
 #include <limits.h>

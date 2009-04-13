@@ -1,5 +1,6 @@
 #include "CuTest.h"
 #include "Hcc.h"
+#include "Atom.h"
 #include <string.h>
 
 #ifndef NULL 
