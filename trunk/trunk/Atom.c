@@ -91,7 +91,7 @@ const char* atom_string_number(const char* string, int length)
 	}
 
 	// allocate string into arena PERM - life time persist till compiler dies.
-    p = llcc_alloc(sizeof(*p) + length + 1, PERM);
+    p = hcc_alloc(sizeof(*p) + length + 1, PERM);
 	p->length = length;
 	p->string = (char *)(p + 1);
 

@@ -56,7 +56,7 @@ static struct block
 
 static struct block *freeblocks;
 
-void* llcc_alloc(unsigned long n, unsigned a)
+void* hcc_alloc(unsigned long n, unsigned a)
 {
     struct block *ap;
 
@@ -99,7 +99,7 @@ void* llcc_alloc(unsigned long n, unsigned a)
 	return ap->avail - n;
 }
 
-void llcc_free(unsigned a)
+void hcc_free(unsigned a)
 {
     assert(a < NUMBEROFELEMENTS(arena));
 	arena[a]->next = freeblocks;
