@@ -164,22 +164,58 @@
 			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
-			<File
-				RelativePath=".\ArenaAlloc.c"
+			<Filter
+				Name="infrastructure"
 				>
-			</File>
-			<File
-				RelativePath=".\Atom.c"
+				<Filter
+					Name="memory pool"
+					>
+					<File
+						RelativePath=".\ArenaAlloc.c"
+						>
+					</File>
+					<File
+						RelativePath=".\ArenaAlloc.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="atomic string"
+					>
+					<File
+						RelativePath=".\Atom.c"
+						>
+					</File>
+					<File
+						RelativePath=".\Atom.h"
+						>
+					</File>
+				</Filter>
+			</Filter>
+			<Filter
+				Name="lexical"
 				>
-			</File>
-			<File
-				RelativePath=".\Scanner.c"
+				<File
+					RelativePath=".\Scanner.c"
+					>
+				</File>
+				<File
+					RelativePath=".\Scanner.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="symbol table"
 				>
-			</File>
-			<File
-				RelativePath=".\Symbol.c"
-				>
-			</File>
+				<File
+					RelativePath=".\Symbol.c"
+					>
+				</File>
+				<File
+					RelativePath=".\Symbol.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -187,23 +223,7 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\ArenaAlloc.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Atom.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Hcc.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Scanner.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Symbol.h"
 				>
 			</File>
 		</Filter>
