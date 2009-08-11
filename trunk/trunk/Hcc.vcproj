@@ -47,7 +47,7 @@
 				WarnAsError="true"
 				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="4"
-				DisableSpecificWarnings="4267;4996;4090;4311"
+				DisableSpecificWarnings="4267;4996;4090;4311;4431;4013;4068;4146;4141;4127;4701;4706"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -213,6 +213,74 @@
 				</File>
 				<File
 					RelativePath=".\Symbol.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="preprocessor"
+				>
+				<File
+					RelativePath=".\preprocessor\arith.c"
+					>
+				</File>
+				<File
+					RelativePath=".\preprocessor\arith.h"
+					>
+				</File>
+				<File
+					RelativePath=".\preprocessor\assert.c"
+					>
+				</File>
+				<File
+					RelativePath=".\preprocessor\cpp.c"
+					>
+				</File>
+				<File
+					RelativePath=".\preprocessor\cpp.h"
+					>
+				</File>
+				<File
+					RelativePath=".\preprocessor\eval.c"
+					>
+				</File>
+				<File
+					RelativePath=".\preprocessor\hash.c"
+					>
+				</File>
+				<File
+					RelativePath=".\preprocessor\hash.h"
+					>
+				</File>
+				<File
+					RelativePath=".\preprocessor\lexer.c"
+					>
+				</File>
+				<File
+					RelativePath=".\preprocessor\macro.c"
+					>
+				</File>
+				<File
+					RelativePath=".\preprocessor\mem.c"
+					>
+				</File>
+				<File
+					RelativePath=".\preprocessor\mem.h"
+					>
+				</File>
+				<File
+					RelativePath=".\preprocessor\nhash.c"
+					>
+				</File>
+				<File
+					RelativePath=".\preprocessor\nhash.h"
+					>
+				</File>
+				<File
+					RelativePath=".\preprocessor\tune.h"
+					>
+				</File>
+				<File
+					RelativePath=".\preprocessor\ucppi.h"
 					>
 				</File>
 			</Filter>
