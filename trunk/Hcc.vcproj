@@ -171,11 +171,11 @@
 					Name="memory pool"
 					>
 					<File
-						RelativePath=".\ArenaAlloc.c"
+						RelativePath=".\arena.c"
 						>
 					</File>
 					<File
-						RelativePath=".\ArenaAlloc.h"
+						RelativePath=".\arena.h"
 						>
 					</File>
 				</Filter>
@@ -183,11 +183,11 @@
 					Name="atomic string"
 					>
 					<File
-						RelativePath=".\Atom.c"
+						RelativePath=".\atom.c"
 						>
 					</File>
 					<File
-						RelativePath=".\Atom.h"
+						RelativePath=".\atom.h"
 						>
 					</File>
 				</Filter>
@@ -196,11 +196,11 @@
 				Name="lexical"
 				>
 				<File
-					RelativePath=".\Scanner.c"
+					RelativePath=".\scanner.c"
 					>
 				</File>
 				<File
-					RelativePath=".\Scanner.h"
+					RelativePath=".\scanner.h"
 					>
 				</File>
 			</Filter>
@@ -208,11 +208,11 @@
 				Name="symbol table"
 				>
 				<File
-					RelativePath=".\Symbol.c"
+					RelativePath=".\symbol.c"
 					>
 				</File>
 				<File
-					RelativePath=".\Symbol.h"
+					RelativePath=".\symbol.h"
 					>
 				</File>
 			</Filter>
@@ -291,7 +291,7 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\Hcc.h"
+				RelativePath=".\hcc.h"
 				>
 			</File>
 		</Filter>
