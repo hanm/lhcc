@@ -43,7 +43,7 @@ void setupscanner()
 
     char* include_path[] = {"E:\\Program Files\\Microsoft Visual Studio 9.0\\VC\\include", 0};
     
-    char* compile_files[] = {"G:\\Share\\BloomFilter.h", "G:\\Share\\BloomFilter.c", 0};
+    char* compile_files[] = {"G:\\Share\\bloom-filter.h", "G:\\Share\\bloom-filter.c", 0};
     
     init_cpp();
 
@@ -58,13 +58,13 @@ void setupscanner()
 
     emit_dependencies = 0;
 
-    set_init_filename("[stdin]", 0);
+    set_init_filename("G:\\Share\\bloom-filter.h", 1);
 
     init_lexer_state(&ls);
     init_lexer_mode(&ls);
     ls.flags |= HANDLE_ASSERTIONS | HANDLE_PRAGMA | LINE_NUM;
 
-    ls.input = stdin;
+    ls.input = fopen("G:\\Share\\bloom-filter.h", "rb");
 
     for (i = 0; i < 2; i ++) add_incpath(compile_files[i]);
 
