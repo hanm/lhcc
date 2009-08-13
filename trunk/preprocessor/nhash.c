@@ -134,7 +134,7 @@ static hash_item_header *find_node(HTT *htt, unsigned u,
 {
 	hash_item_header *node = TREE(u);
 	hash_item_header *nodef = NULL;
-	int ls;
+	int ls = 0;
 
 	u &= ~1U;
 	while (node != NULL) {

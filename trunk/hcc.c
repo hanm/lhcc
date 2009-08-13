@@ -103,6 +103,6 @@ int main(int argc, char* argv[])
 {
     parsecmd(argc, argv);
 
-    compile(0);
+    setupscanner();
     return 0;
 }

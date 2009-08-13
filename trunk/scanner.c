@@ -41,40 +41,35 @@ void setupscanner()
         
     struct lexer_state ls;
 
+    char* include_path[] = {"E:\\Program Files\\Microsoft Visual Studio 9.0\\VC\\include", 0};
+    
+    char* compile_files[] = {"G:\\Share\\BloomFilter.h", "G:\\Share\\BloomFilter.c", 0};
+    
     init_cpp();
+
     (i); // TODO 
+
     no_special_macros = 0;
     emit_defines = emit_assertions = 0;
 
     init_tables(1);
 
-    /* step 4 -- no default include path */
-    init_include_path(0);
+    init_include_path(include_path);
 
-    /* step 5 -- no need to reset the two emit_* variables set in 2 */
     emit_dependencies = 0;
 
-    /* step 6 -- we work with stdin, this is not a real filename */
     set_init_filename("[stdin]", 0);
 
-    /* step 7 -- we make sure that assertions are on, and pragma are
-    handled */
     init_lexer_state(&ls);
     init_lexer_mode(&ls);
     ls.flags |= HANDLE_ASSERTIONS | HANDLE_PRAGMA | LINE_NUM;
 
-    /* step 8 -- input is from stdin */
     ls.input = stdin;
 
-    /* step 9 -- we do not have any macro to define, but we add any
-    argument as an include path */
- //   for (i = 1; i < argc; i ++) add_incpath(argv[i]);
+    for (i = 0; i < 2; i ++) add_incpath(compile_files[i]);
 
-    /* step 10 -- we are a lexer and we want CONTEXT tokens */
     enter_file(&ls, ls.flags);
 
-    /* read tokens until end-of-input is reached -- errors (non-zero
-    return values different from CPPERR_EOF) are ignored */
     while ((r = lex(&ls)) < CPPERR_EOF) {
         if (r) {
             /* error condition -- no token was retrieved */
