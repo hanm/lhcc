@@ -53,4 +53,6 @@ enum { CONSTANTS=1, LABELS, GLOBAL, PARAM, LOCAL };
 void llcc_test_symbol_table();
 #endif
 
+//#define _HCC_UT
+
 #endif
