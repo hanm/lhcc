@@ -25,7 +25,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 ****************************************************************/
 
-#include "Scanner.h"
+#include "scanner.h"
 
 int get_token()
 {
