@@ -28,5 +28,9 @@ OTHER DEALINGS IN THE SOFTWARE.
 #ifndef __HCC_CONFIG_H
 #define __HCC_CONFIG_H
 
-extern char** files;
+//
+// global variables on compiler configurations and operation modes
+//
+extern char** g_compiling_files;
+
 #endif
