@@ -168,6 +168,10 @@
 				RelativePath=".\hcc.c"
 				>
 			</File>
+			<File
+				RelativePath=".\hconfig.h"
+				>
+			</File>
 			<Filter
 				Name="infrastructure"
 				>
