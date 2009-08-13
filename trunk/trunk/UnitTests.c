@@ -1,5 +1,6 @@
 #include "CuTest.h"
 #include <stdio.h>
+#include "hcc.h"
 
 struct block {
 	struct block *next;
@@ -36,6 +37,7 @@ void run(void)
 	printf("%s\n", output->buffer);
 }
 
+#if defined(_HCC_UT)
 //
 // entry point
 //
@@ -45,3 +47,4 @@ int main()
 	run();
 	return 0;
 }
+#endif
