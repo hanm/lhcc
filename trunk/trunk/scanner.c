@@ -30,6 +30,10 @@ OTHER DEALINGS IN THE SOFTWARE.
 #include "preprocessor/mem.h"
 #include "preprocessor/cpp.h"
 
+static char** ptr_includefiles;
+static char** ptr_compilefiles;
+static struct lexer_state ls;
+
 int gettoken()
 {
 	return 0;
@@ -38,8 +42,6 @@ int gettoken()
 void setupscanner()
 {
     int i, r;
-        
-    struct lexer_state ls;
 
     char* include_path[] = {"E:\\Program Files\\Microsoft Visual Studio 9.0\\VC\\include", 0};
     
@@ -58,7 +60,7 @@ void setupscanner()
 
     emit_dependencies = 0;
 
-    set_init_filename("G:\\Share\\bloom-filter.h", 1);
+    set_init_filename("G:\\Share\\bloom-filter.c", 1);
 
     init_lexer_state(&ls);
     init_lexer_mode(&ls);
