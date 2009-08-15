@@ -33,4 +33,20 @@ OTHER DEALINGS IN THE SOFTWARE.
 //
 extern char** g_compiling_files;
 
+#ifdef _MSC_VER
+
+	#define HCC_MEM_CHECK_START _CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF ); \
+    _CrtSetReportMode( _CRT_WARN, _CRTDBG_MODE_FILE); \
+    _CrtSetReportFile( _CRT_WARN, _CRTDBG_FILE_STDOUT );
+
+	#define HCC_MEM_CHECK_END _CrtDumpMemoryLeaks(); 
+
+#else
+
+	#define HCC_MEM_CHECK_START
+	#define HCC_MEM_CHECK_END
+
+#endif
+
+
 #endif

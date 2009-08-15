@@ -28,8 +28,26 @@ OTHER DEALINGS IN THE SOFTWARE.
 #ifndef __HCC_SCANNER_H
 #define __HCC_SCANNER_H
 
+typedef struct scanner_context
+{
+	char* filename; /* file under compiling */
+	int number_of_include_pathes; 
+	char** include_pathes;
+	/* extend here */
+} t_scanner_context;
+
 int gettoken();
 
-void setupscanner();
+//
+// reset scanner to prepare for compiling next file
+// this method will initialize internal preprocessor and lexer (currently using ucpp)
+// and reset previous lexer state if the internal lexer is already initialized
+//
+void reset_scanner(t_scanner_context* sc);
+
+//
+// free internal lexer state and reclaim memory used in previous lexical analysis
+//
+void free_scanner();
 
 #endif

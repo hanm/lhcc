@@ -27,6 +27,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 #include "symbol.h"
 #include "arena.h"
+#include "assert.h"
 #include "Hcc.h"
 
 /*

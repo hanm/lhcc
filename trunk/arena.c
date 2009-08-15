@@ -25,6 +25,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 ****************************************************************/
 #include "arena.h"
+#include "assert.h"
 #include "Hcc.h"
 
 struct block {
