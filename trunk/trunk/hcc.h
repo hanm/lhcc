@@ -28,7 +28,6 @@ OTHER DEALINGS IN THE SOFTWARE.
 #ifndef __HCC_HCC_HEADER
 #define __HCC_HCC_HEADER
 
-#include <assert.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -52,7 +51,5 @@ enum { CONSTANTS=1, LABELS, GLOBAL, PARAM, LOCAL };
 #ifdef _DEBUG
 void llcc_test_symbol_table();
 #endif
-
-//#define _HCC_UT
 
 #endif

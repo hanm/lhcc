@@ -26,8 +26,9 @@ OTHER DEALINGS IN THE SOFTWARE.
 ****************************************************************/
 
 #include "hcc.h"
-// temp test solution
 #include "scanner.h"
+#include "hconfig.h"
+#include <crtdbg.h>
 
 static void displayhelp()
 {
@@ -101,8 +102,24 @@ static void compile(const char* filename)
 
 int main(int argc, char* argv[])
 {
-    parsecmd(argc, argv);
+	t_scanner_context sc;	
+	char* path = {"E:\\Program Files\\Microsoft Visual Studio 9.0\\VC\\include"};
 
-    setupscanner();
+	sc.filename = "G:\\bloom-filter.h";
+	sc.include_pathes = &path;
+	sc.number_of_include_pathes = 1;
+
+	HCC_MEM_CHECK_START
+    
+	(argc), (argv);
+
+	reset_scanner(&sc);
+
+	gettoken();
+	
+	free_scanner();
+	
+	HCC_MEM_CHECK_END
+
     return 0;
 }

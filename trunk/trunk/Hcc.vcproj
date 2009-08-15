@@ -40,6 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				PreprocessorDefinitions="_WIN32"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -175,6 +176,10 @@
 			<Filter
 				Name="infrastructure"
 				>
+				<File
+					RelativePath=".\assert.h"
+					>
+				</File>
 				<Filter
 					Name="memory pool"
 					>
@@ -199,6 +204,18 @@
 						>
 					</File>
 				</Filter>
+				<Filter
+					Name="symbol table"
+					>
+					<File
+						RelativePath=".\symbol.c"
+						>
+					</File>
+					<File
+						RelativePath=".\symbol.h"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="lexical"
@@ -209,18 +226,6 @@
 				</File>
 				<File
 					RelativePath=".\scanner.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="symbol table"
-				>
-				<File
-					RelativePath=".\symbol.c"
-					>
-				</File>
-				<File
-					RelativePath=".\symbol.h"
 					>
 				</File>
 			</Filter>
