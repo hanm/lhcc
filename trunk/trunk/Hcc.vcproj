@@ -228,6 +228,10 @@
 					RelativePath=".\scanner.h"
 					>
 				</File>
+				<File
+					RelativePath=".\tokendef.h"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="preprocessor"
