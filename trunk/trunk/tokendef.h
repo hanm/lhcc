@@ -42,7 +42,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 *****************************************************************/
 
 /* identifier */
-TK(ID, 32, "identifier");
+TK(ID, "identifier");
 
 /* 
 	KEYWORDS
@@ -59,45 +59,44 @@ TK(ID, 32, "identifier");
 
 	C99 restrict and ?? TODO
 */
-TK(FLOAT,     1,  "float")
-TK(DOUBLE,    2, "double")
-TK(CHAR,      3, "char")
-TK(SHORT,     4,  "short")
-TK(INT,       5, "int")
-TK(SIGNED,      6,    "signed")
-TK(UNSIGNED,  7,   "unsigned")
-TK(VOID,      8, "void")
-TK(LONG,     9, "long")
-// 10 ~ 19 left undefined extensible in future
+TK(FLOAT,  "float")
+TK(DOUBLE,  "double")
+TK(CHAR,  "char")
+TK(SHORT, "short")
+TK(INT,  "int")
+TK(SIGNED,       "signed")
+TK(UNSIGNED,   "unsigned")
+TK(VOID,      "void")
+TK(LONG,   "long")
 
-TK(STRUCT,    20,  "struct")
-TK(UNION,    21, "union")
-TK(ENUM,     22, "enum")
-// 23 ~ 29 left undefined extensible in future
 
-TK(CONST,    30, "const")
-TK(VOLATILE, 31, "volatile")
+TK(STRUCT,     "struct")
+TK(UNION,     "union")
+TK(ENUM,     "enum")
 
-TK(SIZEOF,      40,   "sizeof")
-TK(TYPEDEF,     41,   "typedef")
+TK(CONST,     "const")
+TK(VOLATILE, "volatile")
 
-TK(AUTO,        50,  "auto")
-TK(REGISTER,    51,    "register")
-TK(STATIC,      52,     "static")
-TK(EXTERN,     53 ,     "extern")
+TK(SIZEOF,        "sizeof")
+TK(TYPEDEF,       "typedef")
 
-TK(SWITCH,      56,   "switch")
-TK(CASE,        57,  "case")
-TK(BREAK,       58,    "break")
-TK(CONTINUE,    59,  "continue")
-TK(DEFAULT,     60,  "default")
-TK(DO,          61,      "do")
-TK(WHILE,       62,    "while")
-TK(FOR,         63,     "for")
-TK(IF,          64,   "if")
-TK(ELSE,        65,    "else")
-TK(GOTO,        66,   "goto")
-TK(RETURN,      67,     "return")
+TK(AUTO,         "auto")
+TK(REGISTER,       "register")
+TK(STATIC,       "static")
+TK(EXTERN,      "extern")
+
+TK(SWITCH,       "switch")
+TK(CASE,         "case")
+TK(BREAK,        "break")
+TK(CONTINUE,     "continue")
+TK(DEFAULT,     "default")
+TK(DO,           "do")
+TK(WHILE,       "while")
+TK(FOR,           "for")
+TK(IF,           "if")
+TK(ELSE,         "else")
+TK(GOTO,      "goto")
+TK(RETURN,      "return")
 
 //operators
 TK(COMMA,         ",")
