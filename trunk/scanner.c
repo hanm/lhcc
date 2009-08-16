@@ -35,6 +35,108 @@ static char** ptr_includefiles;
 static char** ptr_compilefiles;
 static struct lexer_state ls;
 
+enum TOKEN
+{
+#define TK(a, b) a,
+#include "tokendef.h"
+};
+
+/* 
+	lexical map 
+	
+	key - value of the "token type" unnamed enum defined in ucpp preprocessor 
+	value - value of the TOKEN enum defined in this file
+
+	this map is used to bridge between lexer and preprocessor
+
+*/
+static unsigned char lexical_map[256] = 
+{
+	TK_WHITESPACE,
+	TK_NEWLINE, 
+	0, /* comment left undefined */
+	TK_CONSTTODO,
+	TK_ID,
+	0,		/* non-C characters */
+	0,		/* a #pragma directive */
+	0,	/* new file or #line */
+	TK_CONSTTODO,		/* constant "xxx" */
+	TK_CONSTTODO,		/* constant 'xxx' */
+	TK_DIV,		/*	/	*/
+	TK_DIV_ASSIGN,	/*	/=	*/
+	TK_SUB,		/*	-	*/
+	TK_DEC,		/*	--	*/
+	TK_SUB_ASSIGN,	/*	-=	*/
+	TK_DEREFERENCE,		/*	->	*/
+	TK_ADD,		/*	+	*/
+	TK_INC,		/*	++	*/
+	TK_ADD_ASSIGN,		/*	+=	*/
+	TK_LESS,		/*	<	*/
+	TK_LESS_EQ,		/*	<=	*/
+	TK_LSHIFT,		/*	<<	*/
+	TK_LSHIFT_ASSIGN,		/*	<<=	*/
+	TK_GREAT,		/*	>	*/
+	TK_GREAT_EQ,		/*	>=	*/
+	TK_RSHIFT,		/*	>>	*/
+	TK_RSHIFT_ASSIGN,		/*	>>=	*/
+	TK_ASSIGN,		/*	=	*/
+	TK_EQUAL,		/*	==	*/
+#ifdef CAST_OP
+	CAST,		/*	=>	*/
+#endif
+	TK_COMP,		/*	~	*/
+	TK_UNEQUAL,		/*	!=	*/
+	TK_BITAND,		/*	&	*/
+	TK_AND,		/*	&&	*/
+	TK_BITAND_ASSIGN,		/*	&=	*/
+	TK_BITOR,		/*	|	*/
+	TK_OR,		/*	||	*/
+	TK_BITOR_ASSIGN,		/*	|=	*/
+	TK_MOD,		/*	%	*/
+	TK_MOD_ASSIGN,		/*	%=	*/
+	TK_MUL,		/*	*	*/
+	TK_MUL_ASSIGN,		/*	*=	*/
+	TK_BITXOR,		/*	^	*/
+	TK_BITXOR_ASSIGN,		/*	^=	*/
+	TK_NOT,		/*	!	*/
+	TK_LBRACE,		/*	{	*/
+	TK_RBRACE,		/*	}	*/
+	TK_LBRACKET,		/*	[	*/
+	TK_RBRACKET,		/*	]	*/
+	TK_LPAREN,		/*	(	*/
+	TK_RPAREN,		/*	)	*/
+	TK_COMMA,		/*	,	*/
+	TK_QUESTION,		/*	?	*/
+	TK_SEMICOLON,		/*	;	*/
+	TK_COLON,		/*	:	*/
+	TK_DOT,		/*	.	*/
+	TK_ELLIPSE,		/*	...	*/
+	0,		/*	#	*/
+	0,		/*	##	*/
+
+	0,	/* optional space to separate tokens in text output */
+
+	0,			/* there begin digraph tokens */
+
+	/* for DIG_*, do not change order, unless checking undig() in cpp.c */
+	0,	/*	<:	*/
+	0,	/*	:>	*/
+	0,	/*	<%	*/
+	0,	/*	%>	*/
+	0,	/*	%:	*/
+	0,	/*	%:%:	*/
+
+	0,		/* digraph tokens end here */
+
+	0,		/* reserved words will go there */
+
+	0,	/* special token for representing macro arguments */
+
+	TK_ADD,	/* unary + */
+	TK_SUB		/* unary - */
+
+};
+
 int gettoken()
 {
 	int r = 0;
@@ -89,6 +191,8 @@ int gettoken()
 				ls.ctok->type,
 				STRING_TOKEN(ls.ctok->type) ? ls.ctok->name
 				: operators_name[ls.ctok->type]);
+
+			printf("%d\n", lexical_map[ls.ctok->type]);
 		}
 	}
 
