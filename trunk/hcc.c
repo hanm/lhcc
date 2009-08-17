@@ -115,7 +115,7 @@ int main(int argc, char* argv[])
 
 	reset_scanner(&sc);
 
-	gettoken();
+    while (gettoken() != TK_END);
 	
 	free_scanner();
 	
