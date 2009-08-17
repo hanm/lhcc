@@ -221,6 +221,10 @@
 				Name="lexical"
 				>
 				<File
+					RelativePath=".\keywords.h"
+					>
+				</File>
+				<File
 					RelativePath=".\scanner.c"
 					>
 				</File>
