@@ -223,7 +223,7 @@ static int identify_keyword(char* id)
 {
     tKW* p = NULL;
     int retval = TK_ID;
-    int index = (*id) & (~0x20) - 'A'; // convert *id to upper case letter if needed and calc diff as index (starting 0)
+    int index = (*id &~0x20) - 'A'; // convert *id to upper case letter if needed and calc diff as index (starting 0)
   
     if (index >= 26)
     {
@@ -247,77 +247,125 @@ static int identify_keyword(char* id)
 
 int gettoken()
 {
-	int r = 0;
     char* token = NULL;
+    int retval = TK_ID;
+    int r = lex(&ls);
 
-	while ((r = lex(&ls)) < CPPERR_EOF) 
-	{
-		if (r) 
-		{
-			/* error condition -- no token was retrieved */
-			continue;
-		}
+    /*
+    * lex() reads the next token from the processed stream and stores it
+    * into ls->ctok.
+    * return value: non zero on error (including CPPERR_EOF, which is not
+    * quite an error)
+    */
+    if (r == CPPERR_EOF)
+    {
+        // end of file
+        return TK_END;
+    }
+    else if (r)
+    {
+        // error - TODO what kind of error?
+        assert(0); // TODO
+    }
+    
+    /* we print each token: its numerical value, and its
+    string content; if this is a PRAGMA token, the
+    string content is in fact a compressed token list,
+    that we uncompress and print. */
+    if (ls.ctok->type == PRAGMA) 
+    {
+        unsigned char *c = (unsigned char *)(ls.ctok->name);
 
-		/* we print each token: its numerical value, and its
-		string content; if this is a PRAGMA token, the
-		string content is in fact a compressed token list,
-		that we uncompress and print. */
-		if (ls.ctok->type == PRAGMA) 
-		{
-			unsigned char *c = (unsigned char *)(ls.ctok->name);
+        printf("line %ld: <#pragma>\n", ls.line);
+        for (; *c; c ++) 
+        {
+            int t = *c;
 
-			printf("line %ld: <#pragma>\n", ls.line);
-			for (; *c; c ++) 
-			{
-				int t = *c;
-
-				if (STRING_TOKEN(t)) 
-				{
-					printf("  <%2d>  ", t);
-					for (c ++; *c != PRAGMA_TOKEN_END;
-						c ++) putchar(*c);
-						putchar('\n');
-				} 
-				else 
-				{
-					printf("  <%2d>  `%s'\n", t,
-						operators_name[t]);
-				}
-			}
-		} 
-		else if (ls.ctok->type == CONTEXT) 
-		{
-			printf("new context: file '%s', line %ld\n",
-				ls.ctok->name, ls.ctok->line);
-		} 
-		else if (ls.ctok->type == NEWLINE) 
-		{
-			printf("[newline]\n");
-		} 
-		else 
-		{
-            
-			printf("line %ld: <%2d>  `%s'\n", ls.ctok->line,
-				ls.ctok->type,
-				STRING_TOKEN(ls.ctok->type) ? ls.ctok->name
-				: operators_name[ls.ctok->type]);
-
-			//printf("%d\n", lexical_map[ls.ctok->type]);
-
-            token = STRING_TOKEN(ls.ctok->type) ? ls.ctok->name
-				: operators_name[ls.ctok->type];
-            
-            if (identify_keyword(token) == TK_ID)
+            if (STRING_TOKEN(t)) 
             {
-                printf("identifier: %s\n", token);
-            }
-            else
+                printf("  <%2d>  ", t);
+                for (c ++; *c != PRAGMA_TOKEN_END;
+                    c ++) putchar(*c);
+                    putchar('\n');
+            } 
+            else 
             {
-                printf("keyword: %d\n", identify_keyword(token));
+                printf("  <%2d>  `%s'\n", t,
+                    operators_name[t]);
             }
+        }
+    } 
+    else if (ls.ctok->type == CONTEXT) 
+    {
+        printf("new context: file '%s', line %ld\n",
+            ls.ctok->name, ls.ctok->line);
+    } 
+    else if (ls.ctok->type == NEWLINE) 
+    {
+        printf("[newline]\n");
+    } 
+    else 
+    {
+        if (STRING_TOKEN(ls.ctok->type))
+        {
+            token = ls.ctok->name;
 
-		}
-	}
+            /* NUMBER, NAME, STRING, CHAR*/
+            /* Lexer is not interested in bunch, pragma and context */
+            switch (ls.ctok->type)
+            {
+            case NUMBER :
+                {
+                    printf("number const : %s\n", ls.ctok->name);
+                    retval = TK_CONSTTODO;
+                    break;
+                }
+            case NAME:
+                {
+                    retval = identify_keyword(token);
 
-	return 0;
+                    if (retval == TK_ID)
+                    {
+                        printf("identifier: %s\n", token);
+                    }
+                    else
+                    {
+                        printf("keyword: %s\n", token);
+                    }
+
+                    break;
+                }
+            case STRING:
+                {
+                    printf("string const : %s\n", ls.ctok->name);
+                    retval = TK_CONSTTODO;
+                    break;
+                }
+            case CHAR:
+                {
+                    printf("char const : %s\n", ls.ctok->name);
+                    retval = TK_CONSTTODO;
+                    break;
+                }
+            }
+        }
+        else
+        {
+            retval = lexical_map[ls.ctok->type];
+
+            printf("line %ld: <%2d>  `%s'\n", ls.ctok->line,
+                ls.ctok->type,
+                STRING_TOKEN(ls.ctok->type) ? ls.ctok->name
+                : operators_name[ls.ctok->type]);
+        }
+
+        /*
+        printf("line %ld: <%2d>  `%s'\n", ls.ctok->line,
+            ls.ctok->type,
+            STRING_TOKEN(ls.ctok->type) ? ls.ctok->name
+            : operators_name[ls.ctok->type]);
+*/
+    }
+
+    return retval;
 }
