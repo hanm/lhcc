@@ -28,6 +28,13 @@ OTHER DEALINGS IN THE SOFTWARE.
 #ifndef __HCC_SCANNER_H
 #define __HCC_SCANNER_H
 
+enum TOKEN
+{
+#define TK(a, b) a,
+#include "tokendef.h"
+#undef TK
+};
+
 typedef struct scanner_context
 {
 	char* filename; /* file under compiling */
