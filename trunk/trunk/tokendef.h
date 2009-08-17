@@ -104,6 +104,11 @@ TK(TK_ID, "identifier")
 /* constants */
 TK(TK_CONSTTODO, "constants")
 
+TK(TK_CONST_INTEGER,     "const_integer")
+TK(TK_CONST_FLOAT,    "const_float")
+TK(TK_CONST_STRING_LITERAL,    "const_string_literal")
+TK(TK_CONST_CHAR_LITERAL,   "const_char_literal")
+
 /* operator */
 TK(TK_COMMA,         ",")
 TK(TK_QUESTION,      "?")
