@@ -252,10 +252,9 @@ static int identify_integer_value(char* start, int length, int base)
     unsigned long value = 0;
     char* current = start;
     int i = 0;
+    int overflow = 0;
 
     HCC_ASSERT(start);
-    (length);
-    (base);
 
     for (; length > 0; length -- , current ++)
     {
@@ -264,19 +263,58 @@ static int identify_integer_value(char* start, int length, int base)
             if ( (*current >= 'A' && *current <= 'F') ||
                  (*current >= 'a' && *current <= 'f'))
             {
-                i = (*current & ~0x20) - 'A' + 10;
+                i = (*current & ~0x20) - 'A' + 10; // convert to upper 
+            }
+            else if (HCC_ISDECIMAL_DIGIT(*current)) 
+            {
+                i = *current - '0';
             }
             else
             {
-                i = *current - '0';
+                // TODO - error signal illegal hexdecimal digit
+                break;
+            }
+
+            if (value &~(~0UL >> 4))
+            {
+                overflow = 1;
+                // TODO - error signal
+            }
+            else
+            {
+                value = (value<<4) + i;
+            }
+        }
+        else if (8 == base)
+        {
+            HCC_ASSERT(HCC_ISOCT_DIGIT(*current));
+        
+            i = *current - '0';
+            if (value &~(~0UL >> 3))
+            {
+                overflow = 1;
+            }
+            else
+            {
+                value = (value<<3) + i;
             }
         }
         else
         {
+            HCC_ASSERT(base == 10);
+            HCC_ASSERT(HCC_ISDECIMAL_DIGIT(*current));
+            
             i = *current - '0';
-        }
 
-        value = i + value * base;
+            if (value > (~0UL - i)/10)
+            {
+                overflow = 1;
+            }
+            else
+            {
+                value = value * 10 + i;
+            }
+        }
     }
 
     fprintf(stderr, "value is %d\n", value);
@@ -301,6 +339,9 @@ static int identify_numerical_value(char* number)
         return identify_float_value(number);
     }
 
+    // TODO - here we need to verify the valid suffixes
+    // ul, UL, uL, Ul. and detect invalid hex number, oct number, and decimal number
+    // currently number like 0xXYZ will survive the crossfire which is not right
     if ('0' == *number && 
         ('x' == number[1] ||
          'X' == number[1]))

@@ -103,11 +103,11 @@ static void compile(const char* filename)
 int main(int argc, char* argv[])
 {
 	t_scanner_context sc;	
-	char* path = {"E:\\Program Files\\Microsoft Visual Studio 9.0\\VC\\include"};
+    char* path[2] = {"E:\\Program Files\\Microsoft Visual Studio 9.0\\VC\\include", "G:\\"};
 
-	sc.filename = "G:\\main.c";
-	sc.include_pathes = &path;
-	sc.number_of_include_pathes = 1;
+	sc.filename = "G:\\bloom-filter.c";
+	sc.include_pathes = path;
+	sc.number_of_include_pathes = 2;
 
 	HCC_MEM_CHECK_START
     
