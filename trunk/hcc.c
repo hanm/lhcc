@@ -105,7 +105,7 @@ int main(int argc, char* argv[])
 	t_scanner_context sc;	
     char* path[2] = {"E:\\Program Files\\Microsoft Visual Studio 9.0\\VC\\include", "G:\\"};
 
-	sc.filename = "G:\\bloom-filter.c";
+	sc.filename = "G:\\trie.c";
 	sc.include_pathes = path;
 	sc.number_of_include_pathes = 2;
 
