@@ -225,6 +225,8 @@ static int identify_keyword(char* id)
     int retval = TK_ID;
     int index = (*id &~0x20) - 'A'; // convert *id to upper case letter if needed and calc diff as index (starting 0)
   
+    HCC_ASSERT(id);
+
     if (index >= 26)
     {
         return TK_ID;
@@ -244,6 +246,104 @@ static int identify_keyword(char* id)
 
     return retval; 
 }
+
+static int identify_integer_value(char* start, int length, int base)
+{
+    unsigned long value = 0;
+    char* current = start;
+    int i = 0;
+
+    HCC_ASSERT(start);
+    (length);
+    (base);
+
+    for (; length > 0; length -- , current ++)
+    {
+        if (16 == base)
+        {
+            if ( (*current >= 'A' && *current <= 'F') ||
+                 (*current >= 'a' && *current <= 'f'))
+            {
+                i = (*current & ~0x20) - 'A' + 10;
+            }
+            else
+            {
+                i = *current - '0';
+            }
+        }
+        else
+        {
+            i = *current - '0';
+        }
+
+        value = i + value * base;
+    }
+
+    fprintf(stderr, "value is %d\n", value);
+    return TK_CONST_INTEGER;
+}
+
+static int identify_float_value(char* number)
+{
+    HCC_ASSERT(number);
+    return TK_CONST_FLOAT;
+}
+
+static int identify_numerical_value(char* number)
+{
+    int base = 10;
+    char* begin = number;
+
+    HCC_ASSERT(number);
+    
+    if ('.' == *number)
+    {
+        return identify_float_value(number);
+    }
+
+    if ('0' == *number && 
+        ('x' == number[1] ||
+         'X' == number[1]))
+    {
+        base = 16;
+        begin += 2;
+        number += 2;
+
+        while (HCC_ISHEX_DIGIT(*number))
+        {
+            number ++;
+        }
+    }
+    else if ('0' == *number)
+    {
+        base = 8;
+        begin ++;
+        number ++;
+
+        while (HCC_ISOCT_DIGIT(*number))
+        {
+            number ++;
+        }
+    }
+    else
+    {
+        number ++;
+        while (HCC_ISDECIMAL_DIGIT(*number))
+        {
+            number ++;
+        }
+    }
+
+    if (base == 16 || (*number != '.' && *number != 'e' && *number != 'E'))
+    {
+        return identify_integer_value(begin, (int)(number - begin), base); 
+    }
+    else
+    {
+        return identify_float_value(begin);
+    }
+}
+
 
 int gettoken()
 {
@@ -317,6 +417,7 @@ int gettoken()
             case NUMBER :
                 {
                     printf("number const : %s\n", ls.ctok->name);
+                    identify_numerical_value(ls.ctok->name);
                     retval = TK_CONSTTODO;
                     break;
                 }
