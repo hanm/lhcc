@@ -323,6 +323,8 @@ static int identify_integer_value(char* start, int length, int base)
         }
     }
 
+    // TODO - integrate type system and symbol table here
+
     fprintf(stderr, "value is %d\n", value);
     return TK_CONST_INTEGER;
 }
@@ -330,6 +332,10 @@ static int identify_integer_value(char* start, int length, int base)
 static int identify_float_value(char* number)
 {
     HCC_ASSERT(number);
+
+
+
+    // TODO - type system (float or double)
     return TK_CONST_FLOAT;
 }
 
