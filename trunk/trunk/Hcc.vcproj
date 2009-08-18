@@ -218,7 +218,7 @@
 				</Filter>
 			</Filter>
 			<Filter
-				Name="lexical"
+				Name="scanner"
 				>
 				<File
 					RelativePath=".\keywords.h"
@@ -302,6 +302,18 @@
 				</File>
 				<File
 					RelativePath=".\preprocessor\ucppi.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="parser"
+				>
+				<File
+					RelativePath=".\parser.c"
+					>
+				</File>
+				<File
+					RelativePath=".\parser.h"
 					>
 				</File>
 			</Filter>
