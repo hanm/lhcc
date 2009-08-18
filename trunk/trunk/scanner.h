@@ -35,6 +35,10 @@ enum TOKEN
 #undef TK
 };
 
+#define HCC_ISDECIMAL_DIGIT(n) (n >= '0' && n <= '9')
+#define HCC_ISOCT_DIGIT(n)       (n >= '0' && n <= '7')
+#define HCC_ISHEX_DIGIT(n)        (HCC_ISDECIMAL_DIGIT(n) || (n >= 'A' && n <= 'F') || (n >= 'a' && n <= 'f'))
+
 typedef struct scanner_context
 {
 	char* filename; /* file under compiling */
