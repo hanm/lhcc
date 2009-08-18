@@ -26,7 +26,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 ****************************************************************/
 
 #include "hcc.h"
-#include "scanner.h"
+#include "clexer.h"
 #include "hconfig.h"
 #include <crtdbg.h>
 
@@ -105,7 +105,7 @@ int main(int argc, char* argv[])
 	t_scanner_context sc;	
     char* path[2] = {"E:\\Program Files\\Microsoft Visual Studio 9.0\\VC\\include", "G:\\"};
 
-	sc.filename = "G:\\main.c";
+	sc.filename = "G:\\trie.c";
 	sc.include_pathes = path;
 	sc.number_of_include_pathes = 2;
 
@@ -113,11 +113,11 @@ int main(int argc, char* argv[])
     
 	(argc), (argv);
 
-	reset_scanner(&sc);
+	reset_clexer(&sc);
 
     while (gettoken() != TK_END);
 	
-	free_scanner();
+	free_clexer();
 	
 	HCC_MEM_CHECK_END
 

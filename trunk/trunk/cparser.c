@@ -25,40 +25,9 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 ****************************************************************/
 
-#ifndef __HCC_SCANNER_H
-#define __HCC_SCANNER_H
+#include "cparser.h"
 
-enum TOKEN
+static int recursive_descent_parsing()
 {
-#define TK(a, b) a,
-#include "tokendef.h"
-#undef TK
-};
-
-#define HCC_ISDECIMAL_DIGIT(n) (n >= '0' && n <= '9')
-#define HCC_ISOCT_DIGIT(n)       (n >= '0' && n <= '7')
-#define HCC_ISHEX_DIGIT(n)        (HCC_ISDECIMAL_DIGIT(n) || (n >= 'A' && n <= 'F') || (n >= 'a' && n <= 'f'))
-
-typedef struct scanner_context
-{
-	char* filename; /* file under compiling */
-	int number_of_include_pathes; 
-	char** include_pathes;
-	/* extend here */
-} t_scanner_context;
-
-int gettoken();
-
-//
-// reset scanner to prepare for compiling next file
-// this method will initialize internal preprocessor and lexer (currently using ucpp)
-// and reset previous lexer state if the internal lexer is already initialized
-//
-void reset_scanner(t_scanner_context* sc);
-
-//
-// free internal lexer state and reclaim memory used in previous lexical analysis
-//
-void free_scanner();
-
-#endif
+    return 0;
+}
