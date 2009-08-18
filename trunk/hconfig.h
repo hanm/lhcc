@@ -48,5 +48,12 @@ extern char** g_compiling_files;
 
 #endif
 
+#define HCC_MSWINDOWS
+
+#ifdef HCC_MSWINDOWS
+#ifndef _WIN32
+#define _WIN32
+#endif
+#endif
 
 #endif
