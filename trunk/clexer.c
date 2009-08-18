@@ -25,7 +25,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 ****************************************************************/
 
-#include "scanner.h"
+#include "clexer.h"
 #include "keywords.h"
 #include "hcc.h"
 #include "assert.h"
@@ -131,7 +131,7 @@ static unsigned char lexical_map[256] =
 
 };
 
-void reset_scanner(t_scanner_context* sc)
+void reset_clexer(t_scanner_context* sc)
 {
 	// include file loop counter
 	int i = 0;
@@ -219,7 +219,7 @@ void reset_scanner(t_scanner_context* sc)
 #endif
 }
 
-void free_scanner()
+void free_clexer()
 {
 	wipeout();
 	free_lexer_state(&ls);
