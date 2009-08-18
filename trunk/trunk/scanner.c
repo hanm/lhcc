@@ -211,6 +211,12 @@ void reset_scanner(t_scanner_context* sc)
 	}
 
 	for (; i < sc->number_of_include_pathes; i ++) add_incpath(sc->include_pathes[i]);
+
+#if defined(_WIN32)
+    define_macro(&ls, "_WIN32");
+#elif defined (_WIN64)
+    define_macro(&ls, "_WIN64");
+#endif
 }
 
 void free_scanner()
