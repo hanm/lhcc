@@ -32,6 +32,8 @@ OTHER DEALINGS IN THE SOFTWARE.
 #include "preprocessor/mem.h"
 #include "preprocessor/cpp.h"
 
+#include <math.h>
+
 static char** ptr_includefiles;
 static char** ptr_compilefiles;
 static struct lexer_state ls;
@@ -331,9 +333,56 @@ static int identify_integer_value(char* start, int length, int base)
 
 static int identify_float_value(char* number)
 {
+    // TODO - is this the right type?
+    long double value = 0;
+
     HCC_ASSERT(number);
 
+    if ('.' == *number)
+    {
+        for (;;number ++)
+        {
+            if (!HCC_ISDECIMAL_DIGIT(*number)) 
+            {
+                break;
+            }
+        }
+    }
 
+    if ('e' == *number || 'E' == *number)
+    {
+        number ++;
+        if ('+' == *number || '-' == *number)
+        {
+            number ++;
+        }
+
+        if (HCC_ISDECIMAL_DIGIT(*number))
+        {
+            for (;; number ++)
+            {
+                if (!HCC_ISDECIMAL_DIGIT(*number))
+                {
+                    break;
+                }
+            }
+        }
+        else
+        {
+            // TODO - signal error
+            exit(1);
+        }
+    }
+
+    errno = 0;
+    value = strtod(number, NULL);
+    if (errno == ERANGE)
+    {
+        // TODO - warning out of range
+        exit(1);
+    }
+
+    fprintf(stderr, "float value %f\n", value);
 
     // TODO - type system (float or double)
     return TK_CONST_FLOAT;
