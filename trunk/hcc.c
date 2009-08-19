@@ -106,6 +106,7 @@ int main(int argc, char* argv[])
     char* path[2] = {"E:\\Program Files\\Microsoft Visual Studio 9.0\\VC\\include", "G:\\"};
 
 	sc.filename = "G:\\main.c";
+
 	sc.include_pathes = path;
 	sc.number_of_include_pathes = 2;
 
