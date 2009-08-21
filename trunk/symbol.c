@@ -38,18 +38,18 @@ OTHER DEALINGS IN THE SOFTWARE.
 */
 int scope_level = GLOBAL;
 
-#define TABLESIZE NUMBEROFELEMENTS(((struct symbol_table*)0)->buckets)
+#define TABLESIZE NUMBEROFELEMENTS(((t_symbol_table*)0)->buckets)
 
-static struct symbol_table global_symbol_tables[] = {{CONSTANTS}, {GLOBAL}, {GLOBAL}, {GLOBAL} };
+static t_symbol_table global_symbol_tables[] = {{CONSTANTS}, {GLOBAL}, {GLOBAL}, {GLOBAL} };
 
-struct symbol_table* constants = &global_symbol_tables[0];
-struct symbol_table* identifiers = &global_symbol_tables[1];
-struct symbol_table* types = &global_symbol_tables[2];
-struct symbol_table* externals = &global_symbol_tables[3];
+t_symbol_table* constants = &global_symbol_tables[0];
+t_symbol_table* identifiers = &global_symbol_tables[1];
+t_symbol_table* types = &global_symbol_tables[2];
+t_symbol_table* externals = &global_symbol_tables[3];
 
-struct symbol_table* make_symbol_table(int arena)
+t_symbol_table* make_symbol_table(int arena)
 {
-    struct symbol_table* table = NULL;
+    t_symbol_table* table = NULL;
     CALLOC(table, arena);
     
     return table;
@@ -69,18 +69,18 @@ void exit_scope()
 	scope_level --;
 }
 
-struct symbol* add_symbol(const char* name, struct symbol_table** table, int level, int arena)
+t_symbol* add_symbol(char* name, t_symbol_table** table, int level, int arena)
 {
-    struct symbol_table* tb = *table;
+    t_symbol_table* tb = *table;
     struct entry* p;
     unsigned long h = (unsigned long)name&(TABLESIZE-1); //[tag] - to do need a better hashing.. 
 
-    assert(level == 0 || level >= tb->level);
+    HCC_ASSERT(level == 0 || level >= tb->level);
 
     // we need a new table with deeper level than current table passed in..
     if (level > 0 && tb->level < level)
     {
-        struct symbol_table* new_tb = make_symbol_table(FUNC);
+        t_symbol_table* new_tb = make_symbol_table(FUNC);
         new_tb->previous = tb;
         new_tb->level = level;
 	    
@@ -95,36 +95,36 @@ struct symbol* add_symbol(const char* name, struct symbol_table** table, int lev
 
     CALLOC(p, arena);
 
-	p->sym.name = (char *)name;
-	p->sym.scope = level;
-    p->sym.up = tb->all_symbols;
-	tb->all_symbols = &p->sym;
-	p->link = tb->buckets[h];
+	p->symbol.name = (char *)name;
+	p->symbol.scope = level;
+    p->symbol.up = tb->all_symbols;
+	tb->all_symbols = &p->symbol;
+	p->next = tb->buckets[h];
 	tb->buckets[h] = p;
 
-	return &p->sym;
+	return &p->symbol;
 }
 
 
-struct symbol* find_symbol(const char* name, struct symbol_table* table)
+struct symbol* find_symbol(char* name, t_symbol_table* table)
 {
-	struct entry* p;
+	struct entry* p = NULL;
     unsigned long h = (unsigned long)name&(TABLESIZE-1); 
 
-	assert(!table);
-
+    HCC_ASSERT(table);
+    
 	for (;;)
 	{
 		if (!table->buckets)
 		{
-			for (p = table->buckets[h]; p; p = p->link)
+			for (p = table->buckets[h]; p; p = p->next)
 			{
 				/*
 				 * this only work if the string name coming from the atom table
 				*/
-				if (p->sym.name == name) 
+				if (p->symbol.name == name) 
 				{
-					return &p->sym;
+					return &p->symbol;
 				}
 			}
 		}
