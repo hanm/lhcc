@@ -28,31 +28,38 @@ OTHER DEALINGS IN THE SOFTWARE.
 #ifndef __HCC_SYMBOL_H
 #define __HCC_SYMBOL_H
 
-struct symbol 
+typedef struct token_coordinate
+{
+    char* file;
+    unsigned long x, y;
+} t_token_coordinate;
+
+typedef struct symbol 
 {
 	char *name;
 	int scope;
+    t_token_coordinate coordinate;
+
 	struct symbol* up;
-};
+} t_symbol;
 
-
-struct symbol_table
+typedef struct symbol_table
 {
 	int level;
     struct symbol_table* previous;
     struct entry 
     {
-		struct symbol sym;
-		struct entry *link;
-	} *buckets[256]; // [tag] - choose a better value for bucket size
+        t_symbol symbol;
+		struct entry *next;
+	} *buckets[256];
 	
     struct symbol* all_symbols;
-};
+} t_symbol_table;
 
-struct symbol_table* make_symbol_table(int arena);
+t_symbol_table* make_symbol_table(int arena);
 void enter_scope(void);
 void exit_scope(void);
-struct symbol* add_symbol(const char* name, struct symbol_table** table, int scope_level, int arena);
-struct symbol* find_symbol(const char* name, struct symbol_table* table);
+t_symbol* add_symbol(char* name, t_symbol_table** table, int scope_level, int arena);
+t_symbol* find_symbol(char* name, t_symbol_table* table);
 
 #endif
