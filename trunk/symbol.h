@@ -59,7 +59,12 @@ typedef struct symbol_table
 t_symbol_table* make_symbol_table(int arena);
 void enter_scope(void);
 void exit_scope(void);
+
+// add a symbol binded to %level to specific symbol table - if the table doesn't exit then create one.
 t_symbol* add_symbol(char* name, t_symbol_table** table, int scope_level, int arena);
+
+// search a symbol in symbol table - if the symbol is not there then search previous chained symbol tables if any
+// (it doesn't make sense to search next chained symbol table constrained by C binding rules)
 t_symbol* find_symbol(char* name, t_symbol_table* table);
 
 #endif
