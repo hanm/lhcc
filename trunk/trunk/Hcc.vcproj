@@ -216,6 +216,18 @@
 						>
 					</File>
 				</Filter>
+				<Filter
+					Name="type system"
+					>
+					<File
+						RelativePath=".\type.c"
+						>
+					</File>
+					<File
+						RelativePath=".\type.h"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="lexer"
