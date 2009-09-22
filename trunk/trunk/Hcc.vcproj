@@ -329,6 +329,18 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="ast"
+				>
+				<File
+					RelativePath=".\ast.c"
+					>
+				</File>
+				<File
+					RelativePath=".\ast.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
