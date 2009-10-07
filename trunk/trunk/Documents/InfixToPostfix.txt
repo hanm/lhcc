@@ -1,0 +1,20 @@
+Converting infix to postfix
+
+1.	Set postfix string to empty string
+2.	Create an empty operator stack
+3.	Repeat
+    3.1	Get the next token in the infix string
+    3.2	If next token is an operand (begins with digit), append it to postfix string
+    3.3	If next token is an operator
+       3.3.1	Process the next operator 
+Until at the end of the string
+
+3.3.1	Process the next operator (next op)
+
+repeat 
+    If operator stack is empty, push next op onto stack.
+    Else if precedence(next op) > precedence(top operator)  
+           Push next op onto the stack  (ensures higher precedence operators evaluated first)
+    Else 
+         Pop the operator stack and append operator to postfix string
+Until next op is pushed onto the stack.
