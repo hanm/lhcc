@@ -18,3 +18,245 @@ repeat
     Else 
          Pop the operator stack and append operator to postfix string
 Until next op is pushed onto the stack.
+ 
+Convert:
+
+x 每 y * a + b / c    becomes     x  y  a  *  -  b  c  /  +
+
+operator precedence:  *, /     2
+			+, -    1
+ 
+Let＊s consider the effect of parentheses:
+
+'('  indicates the start of an expression that is evaluated separately 每 just push it on the stack 每Acts like a fence to separate the subexpression.
+
+')' indicates the end of a subexpression. Pop off all operators and append them to postfix string until you reach a '(' and then pop '(' -- don't append ')' and '(' to postfix string.
+
+To have this happen seamlessly in the algorithm, give parentheses the lowest precedence (, )   -  0  precedence.
+
+3.3.1	Process the next operator (with parentheses)
+
+
+Set done to false
+Repeat
+   If operator stack is empty or next op is ＆(＆, push next op onto stack and set done to true
+   Else if precedence(next op) > precedence(top operator)  
+           Push next op onto the stack  (ensures higher precedence operators evaluated first)
+	   and set done to true
+   Else 
+           Pop the operator stack 
+           If operator popped is ＆(＆, set done to true 
+           Else append operator popped to postfix string
+Until done
+ 
+Convert:    3 + 5 * 6 每 7 * (8 + 5) to postfix
+
+Precedence:   *,  /     2
+                       +, -     1
+                       (, )      0
+
+postfix string is null string, operator stack is empty
+
+next character is 3, postfix is ※3§, next token is +, push it onto empty stack
+
+|  +
+
+next character is 5, postfix is ※3  5§, next character is *, push *
+
+|  +  *        
+
+next character is 6, postfix is ※3  5  6§, next character is -, pop *pop +
+postfix is ※3  5  6  *§, 
+|  +                  
+next character still -, pop +, postfix is ※3  5  6  *  +§, operator stack is empty, push -
+
+|  -
+
+next character is 7, postfix is ※3  5  6  *  +  7§, next character is *, push *
+next character is (, push ( onto stack but give it lowest precedence
+
+|  -  *  (
+
+next character is 8, postfix is ※3  5  6  *  +  7  8§ 
+next character is ＆+＊, push it onto stack
+
+|  -  *  (  +
+
+next character is 5, postfix is ※3  5  6  *  +  7  8  5※
+next character is ＆)＊, pop and append all operators to postfix string until matching ＆(＆ is on top of stack, then pop ＆(＆ and set done to true  
+
+postfix is ※3  5  6  *  +  7  8  5  +§
+
+|  -  *
+At end of string, keep popping stack until stack is empty
+
+Postfix form:        ※3   5  6  *  +  7  8  5  +  *   -※
+
+ 
+Expression evaluation assignment.  
+
+Using 2 stacks you can evaluate an infix expression in 1 pass without converting to postfix first:
+
+Algorithm
+1.	Create an empty operator stack
+2.	Create an empty operand stack
+3.	Repeat
+    3.1	Get the next token in the infix string
+    3.2	If next token is an operand, place it on the operand stack
+    3.3	If next token is an operator
+           3.3.1	Evaluate the operator (next op)
+       Until at the end of the string
+4.	while operator stack is not empty
+pop operator and operands (left and right), 
+evaluate left operator right 
+and push result onto operand stack
+5.	Pop result from operator stack
+
+
+3.3.1	 Evaluate the operator (next op)
+
+Algorithm
+Set done to false
+Repeat
+     If operator stack is empty or next op is ＆(＆, 
+          push next op onto stack and set done to true
+     Else if precedence(next op) > precedence(top operator)  
+          Push next op onto the stack  (ensures higher precedence operators evaluated first)
+          and set done to true
+     Else 
+           Pop the operator stack 
+           If operator popped is ＆(＆, 
+                 set done to true.
+           Else 
+                 pop right and left from operand stack
+                 evaluate left operator right
+                 push result onto operand stack
+until done
+ 
+Evaluate:    3 + 5 * 6 每 7 * (8 + 5) =   using an operator stack and an operand stack. Operator = denotes the end of the expression and has precedence of 每1.
+
+Stack affected  next character, action
+| 3 ,		3, push 3 
+| +		next op is +, push + 
+| 3  5     	5, push 5 
+| +  *		next op is *, push * 
+| 3  5  6		6, push 6 
+| +		next op is -, pop *
+| 3  30		6, 5 popped, evaluate 5 * 6, push 30
+| 		next op is -, pop +
+| 33		30, 3 popped, evaluate 3 + 30, push 33
+| -		next op is -, push 每 (stack is empty)
+| 33  7		6, push 7
+| -  * 		next op is *, push *
+| -  *  (		next op is (, push (
+| 33  7  8	8, push 8
+| -  *  (  +	next op is +, push +
+| 33  7  8  5	5, push 5
+| -  *  (  	next op is ＆)＊, pop +
+| 33  7  13	5, 8 popped, evaluate 8 + 5, push 13
+| -  *     	next op is ＆)＊, pop ＆(＆ and discard
+
+At end of string. One way to ※detect§ end of string is to use an operator symbol = with precedence of 每1.Because its precedence is < anything else, all operators will be popped from the operator stack and evaluated automatically. 
+
+| -          	next op is ＆=＊, pop * (at end of string)
+| 33  91		pop 13, 7, evaluate 7 * 13, push 91
+|    		next op is =, pop -
+| -58		91, 33 popped, evaluate 33 每 91, push -58
+| =		next op is =, operator stack is empty, push =
+|		pop result 每-51
+		Pop operator stack 每 it should be empty or there is an error.
+
+Assignment: Do this using the applet provided for expression evaluation. The applet has calls to method processOperator() and processDigit() which are part of class Calculator. Both methods take a character argument, the current character to be processed. Method processDigit() is called each time a digit character key is pressed. If the next character is a digit you should add it to the number being accumulated in numValue (10 * numValue + (int) token - (int) '0'). Method processOperator() is called each time a non-digit key is pressed. If the character just pressed is not a digit and the previous character was a digit, method processOperator() should push the number in numValue onto the operand stack and then process the operator .
+
+
+import java.applet.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.Stack;
+
+public class ExpressionEval extends Applet
+                            implements ActionListener {
+   private Button[][] buttons;    // array of Button objects.
+   private Label result = new Label();   // Label for result
+   private Label infix = new Label();   // Label for expression
+   private Label nextChar = new Label();  // Label for each char of expression
+   private String infixStr = "";  // expression being evaluated
+   protected Label operandLabel = new Label();  // Label for operand stack
+   protected Label operatorLabel = new Label(); // Label for operator stack
+   private Button reset;
+   Calculator calc = new Calculator();  // Calculator object
+
+   public void init() {
+       Label instruct = new Label("Press = to end expression");
+       add(instruct);
+       Panel map = new Panel();    // a panel in our applet
+       // characters to be used as button labels.
+       char [][] opMap = { {'0', '1', '2'},
+                           {'3', '4', '5'},
+                           {'6', '7', '8'},
+                           {'9', ' ', '='},
+                           {'*', '/', '+'},
+                           {'-', '(', ')'} };
+
+    // Create an array of buttons of the proper dimensions.
+    buttons = new Button[opMap.length][opMap[0].length];
+
+    // Create the 6 x 3 grid of buttons
+    map.setLayout(new GridLayout(buttons.length, buttons[0].length));
+
+    // Create and label each button, add it to applet,
+    //   and register applet as listener.
+    for (int r = 0; r < buttons.length; r++)
+       for (int c = 0; c < buttons[r].length; c++) {
+             // create labelled button - take label from array opMap
+             buttons[r][c] = new Button("" + opMap[r][c]);
+             map.add(buttons[r][c]);              // add to panel
+             buttons[r][c].addActionListener(this);
+       }
+    add(map);
+    nextChar.setText("________________________________________");
+    add(nextChar);
+    infix.setText("________________________________________");
+    add(infix);
+    operandLabel.setText("___________________________________________");
+    add(operandLabel);
+    operatorLabel.setText("___________________________________________");
+    add(operatorLabel);
+    result.setText("___________________________________________");
+    add(result);
+    reset = new Button("Reset");
+    add(reset);
+    reset.addActionListener(this);
+   } // init
+
+   public void clear() {
+
+
+
+
+
+   }
+
+   public void actionPerformed(ActionEvent e) {
+      Button b = (Button)e.getSource(); // Gets the button pressed,
+      if (b == reset) {
+
+
+         return;
+      }
+
+      char token = (b.getLabel()).charAt(0); // token is label character
+      infixStr = infixStr + token;       // Append it to expression
+      nextChar.setText("Character is " + token);
+      infix.setText("Expression so far: " + infixStr);
+
+      // Process the token
+      if (token >= '0' && token <= '9')
+        calc.processDigit(token);
+      else {
+        String message = calc.processOperator(token, this);
+        result.setText(message);
+      }
+   }
+}
+
