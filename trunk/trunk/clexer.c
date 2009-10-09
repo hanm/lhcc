@@ -231,14 +231,15 @@ static int identify_keyword(char* id)
 {
     tKW* p = NULL;
     int retval = TK_ID;
-    int index = (*id &~0x20) - 'A'; // convert *id to upper case letter if needed and calc diff as index (starting 0)
+	int index = 0;
+	if (*id != '_')
+	{
+		// convert *id to upper case letter if needed and calc diff as index (starting 0)
+		// deal special case "_" seperately which will generate index out of bounds (26)
+		index = (*id &~0x20) - 'A'; 
+	}
   
     HCC_ASSERT(id);
-
-    if (index >= 26)
-    {
-        return TK_ID;
-    }
 
     p = kw_table[index];
     while (p->name)
