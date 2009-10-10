@@ -102,7 +102,8 @@ static void compile(const char* filename)
 
 int main(int argc, char* argv[])
 {
-	t_scanner_context sc;	
+	t_scanner_context sc;
+    int token = 0;
     char* path[2] = {"E:\\Program Files\\Microsoft Visual Studio 9.0\\VC\\include", "G:\\"};
 
 	sc.filename = "G:\\bloom-filter.c";
@@ -116,8 +117,44 @@ int main(int argc, char* argv[])
 
 	reset_clexer(&sc);
 
-    while (gettoken() != TK_END);
-	
+    while ((token = get_token()) != TK_END)
+    {
+#ifdef HCC_TEST_LEXER_CLIENT
+        switch(token)
+        {
+        case TK_CONST_INTEGER :
+            {
+                printf("integer const : %s\n", ctok); 
+                break;
+            }
+        case TK_CONST_FLOAT :
+            {
+                printf("float const: %s\n", ctok);
+                break;
+            }
+        case TK_ID:
+            {
+                printf("identifier: %s\n", ctok);
+                break;
+            }
+        case TK_CONST_STRING_LITERAL:
+            {
+                printf("string literal : %s\n", ctok);
+                break;
+            }
+        case TK_CONST_CHAR_LITERAL:
+            {
+                printf("char literal : %s\n", ctok);
+                break;
+            }
+        default:
+            {
+                // others
+            }
+        }
+#endif
+    }
+
 	free_clexer();
 	
 	HCC_MEM_CHECK_END

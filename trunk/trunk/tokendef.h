@@ -103,6 +103,7 @@ TK(TK_ID, "identifier")
 
 /* constants */
 TK(TK_CONSTTODO, "constants")
+TK(TK_CONST_NUMBER, "const_number")
 
 TK(TK_CONST_INTEGER,     "const_integer")
 TK(TK_CONST_FLOAT,    "const_float")
