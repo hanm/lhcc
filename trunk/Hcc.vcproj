@@ -180,6 +180,10 @@
 					RelativePath=".\assert.h"
 					>
 				</File>
+				<File
+					RelativePath=".\trace.h"
+					>
+				</File>
 				<Filter
 					Name="memory pool"
 					>

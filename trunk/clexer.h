@@ -28,6 +28,8 @@ OTHER DEALINGS IN THE SOFTWARE.
 #ifndef __HCC_SCANNER_H
 #define __HCC_SCANNER_H
 
+#include "symbol.h"
+
 enum TOKEN
 {
 #define TK(a, b) a,
@@ -47,6 +49,11 @@ typedef struct clexer_context
 	char** include_pathes;
 	/* extend here */
 } t_scanner_context;
+
+// current symbol
+t_symbol* csym;
+// current token
+char* ctok;
 
 int gettoken();
 
