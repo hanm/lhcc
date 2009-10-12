@@ -153,6 +153,18 @@ int main(int argc, char* argv[])
             }
         }
 #endif
+        /*
+        note for mapping to op tokens it can be defined like this
+            
+        char* token_mapping[] = 
+        {
+            #define TK(a, b) b
+            #include "tokendef.h"
+            #undef TK
+        }
+
+        the implicit ordering of token enum (indexes) binds the token enum with token string representation
+        */
     }
 
 	free_clexer();

@@ -54,6 +54,11 @@ OTHER DEALINGS IN THE SOFTWARE.
  *
  *
  */
+
+/*
+ * History
+ * 10/12/2009 - add trace enable/disable to lexer
+ */
 static char** ptr_includefiles;
 static char** ptr_compilefiles;
 static struct lexer_state ls;
@@ -351,7 +356,7 @@ static int identify_integer_value(char* start, int length, int base)
 
     // TODO - integrate type system and symbol table here
 
-    fprintf(stderr, "value is %d\n", value);
+    HCC_TRACE("value is %d\n", value);
     return TK_CONST_INTEGER;
 }
 
@@ -524,15 +529,19 @@ int get_token()
     } 
     else if (ls.ctok->type == CONTEXT) 
     {
+#ifdef HCC_TRACE_ENABLE
         printf("new context: file '%s', line %ld\n",
             ls.ctok->name, ls.ctok->line);
+#endif
 
         // hack!
         retval = TK_WHITESPACE;
     } 
     else if (ls.ctok->type == NEWLINE) 
     {
+#ifdef HCC_TRACE_ENABLE
         printf("[newline]\n");
+#endif
 
         retval = TK_NEWLINE;
     } 
@@ -585,10 +594,12 @@ int get_token()
         {
             retval = lexical_map[ls.ctok->type];
 
+#ifdef HCC_TRACE_ENABLE
             printf("line %ld: <%2d>  `%s'\n", ls.ctok->line,
                 ls.ctok->type,
                 STRING_TOKEN(ls.ctok->type) ? ls.ctok->name
                 : operators_name[ls.ctok->type]);
+#endif
         }
 
         /*

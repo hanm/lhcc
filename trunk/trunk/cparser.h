@@ -28,4 +28,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 #ifndef __HCC_PARSER_H
 #define __HCC_PARSER_H
 
+// current parser token
+int cptoken;
+
 #endif
