@@ -232,6 +232,18 @@
 						>
 					</File>
 				</Filter>
+				<Filter
+					Name="error handling"
+					>
+					<File
+						RelativePath=".\error.c"
+						>
+					</File>
+					<File
+						RelativePath=".\error.h"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="lexer"

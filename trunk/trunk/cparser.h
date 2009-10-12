@@ -28,7 +28,10 @@ OTHER DEALINGS IN THE SOFTWARE.
 #ifndef __HCC_PARSER_H
 #define __HCC_PARSER_H
 
-// current parser token
-int cptoken;
+// look ahead token
+int look_ahead;
+
+void initialize_parser();
+void match(int token);
 
 #endif
