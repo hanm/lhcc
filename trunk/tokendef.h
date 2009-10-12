@@ -25,9 +25,6 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 ****************************************************************/
 
-#ifndef __HCC_TK_DEF
-#define __HCC_TK_DEF
-
 /****************************************************************
 
 							~~~~~~~~~~~TK Category ~~~~~~~~~~~
@@ -164,5 +161,3 @@ TK(TK_CRETURN, "\r")
 TK(TK_NEWLINE,       "\n")
 
 TK(TK_END,           "EOF")
-
-#endif

@@ -25,31 +25,9 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 ****************************************************************/
 
-#include "clexer.h"
-#include "cparser.h"
+#ifndef __HCC_ERROR_HANDLING
+#define __HCC_TRACE_HANDLING
 
-static char* tokens[] = 
-{
-#define TK(a, b) b,
-#include "tokendef.h"
-#undef TK
-    "END OF TOKEN" // syntactic suguar
-};
+void error(char* expect_token, char* actual_token);
 
-void initialize_parser()
-{
-	look_ahead = get_token();
-}
-
-// todo static
-void match(int token)
-{  
-	if (look_ahead == token)
-    {
-		look_ahead = get_token();
-    }
-    else
-    {
-		error(tokens[token], tokens[look_ahead]);
-    }
-}
+#endif

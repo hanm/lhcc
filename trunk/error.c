@@ -25,31 +25,39 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 ****************************************************************/
 
-#include "clexer.h"
-#include "cparser.h"
+#include "error.h"
+#include <string.h>
 
-static char* tokens[] = 
+void error(char* expect_token, char* actual_token)
 {
-#define TK(a, b) b,
-#include "tokendef.h"
-#undef TK
-    "END OF TOKEN" // syntactic suguar
-};
+	char* exp;
+	char* actual;
 
-void initialize_parser()
-{
-	look_ahead = get_token();
-}
+	if (strcmp(expect_token, "\r") == 0)
+	{
+		exp = "carriage return";
+	}
+	else if (strcmp(expect_token, "\n") == 0)
+	{
+		exp = "new line";
+	}
+	else
+	{
+		exp = expect_token;
+	}
 
-// todo static
-void match(int token)
-{  
-	if (look_ahead == token)
-    {
-		look_ahead = get_token();
-    }
-    else
-    {
-		error(tokens[token], tokens[look_ahead]);
-    }
+	if (strcmp(actual_token, "\r") == 0)
+	{
+		actual = "carriage return";
+	}
+	else if (strcmp(actual_token, "\n") == 0)
+	{
+		actual = "new line";
+	}
+	else
+	{
+		actual = actual_token;
+	}
+
+	printf("Error : expect token %s but got token %s \n", exp, actual);
 }

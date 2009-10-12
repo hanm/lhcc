@@ -27,6 +27,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 #include "hcc.h"
 #include "clexer.h"
+#include "cparser.h"
 #include "hconfig.h"
 #include <crtdbg.h>
 
@@ -117,6 +118,8 @@ int main(int argc, char* argv[])
 
 	reset_clexer(&sc);
 
+	initialize_parser();
+	match(TK_AND);
     while ((token = get_token()) != TK_END)
     {
 #ifdef HCC_TEST_LEXER_CLIENT
