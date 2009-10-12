@@ -25,9 +25,28 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 ****************************************************************/
 
+#include "clexer.h"
 #include "cparser.h"
 
-static int recursive_descent_parsing()
+static char* tokens[] = 
 {
-    return 0;
+#define TK(a, b) b,
+#include "tokendef.h"
+#undef TK
+    "END OF TOKEN" // todo - kind embarrsing
+};
+
+static void match(int token)
+{
+    (token);
+    
+    if (cptoken == token)
+    {
+        cptoken = gettoken();
+    }
+    else
+    {
+        printf("Error : expect token %s but got token %s ", tokens[token], tokens[cptoken]);
+		exit(1);
+    }
 }

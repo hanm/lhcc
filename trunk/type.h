@@ -25,8 +25,8 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 ****************************************************************/
 
-#ifndef __HCC_SCANNER_H
-#define __HCC_SCANNER_H
+#ifndef __HCC_TYPE_H
+#define __HCC_TYPE_H
 
 typedef struct type
 {
