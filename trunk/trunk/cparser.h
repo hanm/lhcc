@@ -436,5 +436,6 @@ int look_ahead;
 void initialize_parser();
 void match(int token);
 void primary_expression();
-
+void postfix_expression();
+void expression();
 #endif
