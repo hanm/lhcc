@@ -36,9 +36,11 @@ static char* tokens[] =
     "END OF TOKEN" // syntactic suguar
 };
 
+#define GET_NEXT_TOKEN look_ahead = get_token()
+
 void initialize_parser()
 {
-	look_ahead = get_token();
+	GET_NEXT_TOKEN;
 }
 
 // todo static
@@ -46,10 +48,87 @@ void match(int token)
 {  
 	if (look_ahead == token)
     {
-		look_ahead = get_token();
+        GET_NEXT_TOKEN;
     }
     else
     {
 		error(tokens[token], tokens[look_ahead]);
     }
+}
+
+/*
+primary_expression
+        : IDENTIFIER
+        | CONSTANT
+        | STRING_LITERAL
+        | '(' expression ')'
+        ;
+*/
+void primary_expression()
+{
+    switch (look_ahead)
+    {
+    case TK_ID :
+        GET_NEXT_TOKEN;
+        break;
+    case TK_CONST_FLOAT :
+    case TK_CONST_INTEGER :
+        GET_NEXT_TOKEN;
+        break;
+    case TK_CONST_CHAR_LITERAL :
+    case TK_CONST_STRING_LITERAL:
+        GET_NEXT_TOKEN;
+        break;
+    case TK_LPAREN :
+        expression();
+        match(TK_RPAREN);
+    default :
+        error(&coord, "expect identifier, constant, string literal or (");
+    }
+}
+
+/*
+postfix_expression
+        : primary_expression
+        | postfix_expression '[' expression ']'
+        | postfix_expression '(' ')'
+        | postfix_expression '(' argument_expression_list ')'
+        | postfix_expression '.' IDENTIFIER
+        | postfix_expression PTR_OP IDENTIFIER
+        | postfix_expression INC_OP
+        | postfix_expression DEC_OP
+        ;
+
+argument-expression-list: argument-expression
+                                        argument-expression-list, argument-expression
+*/
+void postfix_expression()
+{
+    primary_expression();
+
+    for (;;)
+    {
+        switch (look_ahead)
+        {
+        case TK_LBRACKET :
+            {
+                expression();
+                match(TK_RBRACKET);
+                break;
+            }
+        case TK_LPAREN :
+            {
+                GET_NEXT_TOKEN;
+                if (look_ahead != TK_RPAREN)
+                {
+                    
+                }
+            }
+        }
+    }
+}
+
+void expression()
+{
+    
 }

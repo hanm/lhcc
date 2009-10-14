@@ -41,6 +41,12 @@ enum TOKEN
 #define HCC_ISOCT_DIGIT(n)       (n >= '0' && n <= '7')
 #define HCC_ISHEX_DIGIT(n)        (HCC_ISDECIMAL_DIGIT(n) || (n >= 'A' && n <= 'F') || (n >= 'a' && n <= 'f'))
 
+typedef struct src_coordinate
+{
+    char* filename;
+    int line;
+    int column;
+} t_coordinate;
 
 typedef struct clexer_context
 {
@@ -54,6 +60,8 @@ typedef struct clexer_context
 t_symbol* csym;
 // current token
 char* ctok;
+// current token coordinate (file, line, column)
+t_coordinate coord;
 
 int gettoken();
 

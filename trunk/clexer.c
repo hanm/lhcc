@@ -610,5 +610,8 @@ int get_token()
         */
     }
 
+    coord.line = ls.ctok->line; 
+    // todo - column and file name (should be set in translation unit)
+
     return retval;
 }

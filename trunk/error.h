@@ -27,7 +27,8 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 #ifndef __HCC_ERROR_HANDLING
 #define __HCC_TRACE_HANDLING
+#include "clexer.h" // for token coordinate
 
 void error(char* expect_token, char* actual_token);
-
+void syntax_error(t_coordinate* coordinate, char* error_msg);
 #endif

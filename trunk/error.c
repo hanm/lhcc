@@ -61,3 +61,8 @@ void error(char* expect_token, char* actual_token)
 
 	printf("Error : expect token %s but got token %s \n", exp, actual);
 }
+
+void syntax_error(t_coordinate* coordinate, char* error_msg)
+{
+    printf("Syntax Error on line: %d : %s", coordinate->line, error_msg);
+}
