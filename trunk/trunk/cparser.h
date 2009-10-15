@@ -437,5 +437,7 @@ void initialize_parser();
 void match(int token);
 void primary_expression();
 void postfix_expression();
+void unary_expression();
 void expression();
+void assignment_expression();
 #endif

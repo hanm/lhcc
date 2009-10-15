@@ -80,6 +80,7 @@ void primary_expression()
         GET_NEXT_TOKEN;
         break;
     case TK_LPAREN :
+        GET_NEXT_TOKEN;
         expression();
         match(TK_RPAREN);
     default :
@@ -98,9 +99,9 @@ postfix_expression
         | postfix_expression INC_OP
         | postfix_expression DEC_OP
         ;
-
-argument-expression-list: argument-expression
-                                        argument-expression-list, argument-expression
+argument_expression_list : assignment_expression
+                                        | argument_expression_list ',' assignment_expression
+                                        ;
 */
 void postfix_expression()
 {
@@ -112,6 +113,7 @@ void postfix_expression()
         {
         case TK_LBRACKET :
             {
+                GET_NEXT_TOKEN;
                 expression();
                 match(TK_RBRACKET);
                 break;
@@ -121,11 +123,51 @@ void postfix_expression()
                 GET_NEXT_TOKEN;
                 if (look_ahead != TK_RPAREN)
                 {
-                    
+                    assignment_expression();
+                    while (look_ahead == TK_COMMA)
+                    {
+                        GET_NEXT_TOKEN;
+                        assignment_expression();
+                    }
                 }
+                match(TK_RPAREN);
+                break;
             }
+        case TK_DOT :
+        case TK_ARROW :
+            {
+                GET_NEXT_TOKEN;
+                match(TK_ID);
+            }
+        case TK_INC :
+        case TK_DEC :
+            {
+                GET_NEXT_TOKEN;
+            }
+        default:
+            return;
         }
     }
+}
+
+/*
+unary_expression
+        : postfix_expression
+        | '++' unary_expression
+        | '--' unary_expression
+        | unary_operator cast_expression
+        | SIZEOF unary_expression
+        | SIZEOF '(' type_name ')'
+        ;
+*/
+void unary_expression()
+{
+    
+}
+
+void assignment_expression()
+{
+    
 }
 
 void expression()
