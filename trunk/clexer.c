@@ -91,7 +91,7 @@ static unsigned char lexical_map[256] =
 	TK_SUB,		/*	-	*/
 	TK_DEC,		/*	--	*/
 	TK_SUB_ASSIGN,	/*	-=	*/
-	TK_DEREFERENCE,		/*	->	*/
+	TK_ARROW,		/*	->	*/
 	TK_ADD,		/*	+	*/
 	TK_INC,		/*	++	*/
 	TK_ADD_ASSIGN,		/*	+=	*/
