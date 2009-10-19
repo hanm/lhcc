@@ -159,11 +159,43 @@ unary_expression
         | SIZEOF unary_expression
         | SIZEOF '(' type_name ')'
         ;
+
+unary_operator
+        : '&'
+        | '*'
+        | '+'
+        | '-'
+        | '~'
+        | '!'
+        ;
+
+cast_expression
+        : unary_expression
+        | '(' type_name ')' cast_expression
+        ;
 */
 void unary_expression()
 {
-    
+	switch (look_ahead)
+	{
+	case TK_INC :
+	case TK_DEC :
+	case TK_BITAND :
+	case TK_MUL :
+	case TK_ADD :
+	case TK_SUB :
+	case TK_COMP :
+	case TK_NOT :
+		{
+			GET_NEXT_TOKEN;
+
+			unary_expression();
+		}
+	}
 }
+
+
+
 
 void assignment_expression()
 {
