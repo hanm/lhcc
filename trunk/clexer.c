@@ -547,7 +547,11 @@ int get_token()
     } 
     else 
     {
-        ctok = ls.ctok->name;
+		//
+		// TODO - extract exact token value (category float, double, string, etc)
+		// and build the value here..
+		//
+		lexeme_value.s = ls.ctok->name;
 
         if (STRING_TOKEN(ls.ctok->type))
         {
@@ -563,15 +567,15 @@ int get_token()
                 }
             case NAME:
                 {
-                    retval = identify_keyword(ctok);
+					retval = identify_keyword(ls.ctok->name);
 
                     if (retval == TK_ID)
                     {
-                        HCC_TRACE("identifier: %s\n", ctok);
+                        HCC_TRACE("identifier: %s\n", ls.ctok->name);
                     }
                     else
                     {
-                        HCC_TRACE("keyword: %s\n", ctok);
+                        HCC_TRACE("keyword: %s\n", ls.ctok->name);
                     }
 
                     break;
