@@ -56,10 +56,16 @@ typedef struct clexer_context
 	/* extend here */
 } t_scanner_context;
 
-// current symbol
-t_symbol* csym;
-// current token
-char* ctok;
+typedef union lexeme_value
+{
+	int i;
+	float f;
+	double d;
+	char* s;
+} t_lexeme_value;
+
+t_lexeme_value lexeme_value;
+
 // current token coordinate (file, line, column)
 t_coordinate coord;
 
