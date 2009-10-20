@@ -83,6 +83,7 @@ void* hcc_alloc(unsigned long n, unsigned a)
         {
             unsigned m = sizeof (union header) + n + ROUNDUP(10*1024, sizeof (union align));
             ap->next = malloc(m);
+			memset(ap->next, 0, m);
             ap = ap->next;
             if (ap == NULL) 
             {
@@ -119,7 +120,7 @@ void hcc_free_all()
     // todo - elegant solution
     for (n; n < arenas; n ++)
     {
-        cblock = arena[n];
+		cblock = &first[n];
 
         while (cblock != NULL)
         {
