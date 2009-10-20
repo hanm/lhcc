@@ -60,7 +60,7 @@ typedef union lexeme_value
 {
 	int i;
 	float f;
-	double d;
+	long double d;
 	char* s;
 } t_lexeme_value;
 

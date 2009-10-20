@@ -66,3 +66,13 @@ void syntax_error(t_coordinate* coordinate, char* error_msg)
 {
     printf("Syntax Error on line: %d : %s", coordinate->line, error_msg);
 }
+
+void warning(t_coordinate* coordinate, char* warning_msg)
+{
+    printf("Warning : line %d %s", coordinate->line, warning_msg);
+}
+
+void lexeme_error(t_coordinate* coordinate, char* error_msg)
+{
+    printf("Lexeme error : line %d %s", coordinate->line, error_msg);
+}

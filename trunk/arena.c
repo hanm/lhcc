@@ -108,3 +108,27 @@ void hcc_free(unsigned a)
 	first[a].next = NULL;
 	arena[a] = &first[a];
 }
+
+void hcc_free_all()
+{
+    int arenas = NUMBEROFELEMENTS(arena);
+    int n = 0;
+    struct block* cblock = NULL;
+    struct block* nblock = NULL;
+
+    // todo - elegant solution
+    for (n; n < arenas; n ++)
+    {
+        cblock = arena[n];
+
+        while (cblock != NULL)
+        {
+            nblock = cblock->next;
+            if (cblock->limit != NULL)
+            {
+                free(cblock);
+            }
+            cblock = nblock;
+        }
+    }
+}

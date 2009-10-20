@@ -29,6 +29,8 @@ OTHER DEALINGS IN THE SOFTWARE.
 #include "keywords.h"
 #include "hcc.h"
 #include "assert.h"
+#include "error.h"
+#include "atom.h"
 #include "preprocessor/mem.h"
 #include "preprocessor/cpp.h"
 
@@ -308,14 +310,14 @@ static int identify_integer_value(char* start, int length, int base)
             }
             else
             {
-                // TODO - error signal illegal hexdecimal digit
+                lexeme_error(&coord, "illegal hex character detected!");
                 break;
             }
 
             if (value &~(~0UL >> 4))
             {
                 overflow = 1;
-                // TODO - error signal
+                warning(&coord, "overflow detected for hex integer!");
             }
             else
             {
@@ -330,6 +332,7 @@ static int identify_integer_value(char* start, int length, int base)
             if (value &~(~0UL >> 3))
             {
                 overflow = 1;
+                warning(&coord, "overflow detected for oct integer!");
             }
             else
             {
@@ -346,6 +349,7 @@ static int identify_integer_value(char* start, int length, int base)
             if (value > (~0UL - i)/10)
             {
                 overflow = 1;
+                warning(&coord, "overflow detected for decimal integer!");
             }
             else
             {
@@ -354,9 +358,9 @@ static int identify_integer_value(char* start, int length, int base)
         }
     }
 
-    // TODO - integrate type system and symbol table here
-
     HCC_TRACE("value is %d\n", value);
+
+    lexeme_value.i = value;
     return TK_CONST_INTEGER;
 }
 
@@ -398,8 +402,9 @@ static int identify_float_value(char* number)
         }
         else
         {
-            // TODO - signal error
-            exit(1);
+            lexeme_error(&coord, "incorrect float constant detected!");
+            // todo - here the upper modules should know how to recover 
+            return 0;
         }
     }
 
@@ -407,13 +412,15 @@ static int identify_float_value(char* number)
     value = strtod(number, NULL);
     if (errno == ERANGE)
     {
-        // TODO - warning out of range
-        exit(1);
+        warning(&coord, "float value out of range!");
     }
 
     fprintf(stderr, "float value %f\n", value);
 
-    // TODO - type system (float or double)
+    // todo - here maybe do one step further to identify that is it a double, or float?
+    // right now the value is just assigned to double which is garanteed to hold on both a double and a float
+    // so it doesn't hurt, so far...
+    lexeme_value.d = value;
     return TK_CONST_FLOAT;
 }
 
@@ -547,16 +554,15 @@ int get_token()
     } 
     else 
     {
-		//
-		// TODO - extract exact token value (category float, double, string, etc)
-		// and build the value here..
-		//
-		lexeme_value.s = ls.ctok->name;
+         coord.line = ls.ctok->line; 
+        // todo - column and file name (should be set in translation unit)
 
         if (STRING_TOKEN(ls.ctok->type))
         {
             /* NUMBER, NAME, STRING, CHAR*/
-            /* Lexer is not interested in bunch, pragma and context */
+            // here lexer does proper categorization for the lexeme
+            // it identifies number (integer or float), string/char literal, identifier
+            // the associated value of lexeme is stored in lexeme_value, for parser usage in next stage.
             switch (ls.ctok->type)
             {
             case NUMBER :
@@ -571,7 +577,8 @@ int get_token()
 
                     if (retval == TK_ID)
                     {
-                        HCC_TRACE("identifier: %s\n", ls.ctok->name);
+                        lexeme_value.s = atom_string(ls.ctok->name);
+                        HCC_TRACE("identifier: %s\n", lexeme_value.s);
                     }
                     else
                     {
@@ -583,12 +590,16 @@ int get_token()
             case STRING:
                 {
                     HCC_TRACE("string const : %s\n", ls.ctok->name);
+
+                    lexeme_value.s = atom_string(ls.ctok->name);
                     retval = TK_CONST_STRING_LITERAL;
                     break;
                 }
             case CHAR:
                 {
                     HCC_TRACE("char const : %s\n", ls.ctok->name);
+
+                    lexeme_value.s = atom_string(ls.ctok->name);
                     retval = TK_CONST_CHAR_LITERAL;
                     break;
                 }
@@ -613,9 +624,6 @@ int get_token()
             : operators_name[ls.ctok->type]);
         */
     }
-
-    coord.line = ls.ctok->line; 
-    // todo - column and file name (should be set in translation unit)
 
     return retval;
 }

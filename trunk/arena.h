@@ -31,6 +31,8 @@ OTHER DEALINGS IN THE SOFTWARE.
 void* hcc_alloc(unsigned long n, unsigned a);
 void hcc_free(unsigned a);
 
+void hcc_free_all();
+
 #define ALLOC(p,a) ((p) = hcc_alloc(sizeof *(p), (a)))
 #define CALLOC(p,a) memset(ALLOC((p),(a)), 0, sizeof *(p))
 

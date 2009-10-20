@@ -31,4 +31,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 void error(char* expect_token, char* actual_token);
 void syntax_error(t_coordinate* coordinate, char* error_msg);
+
+void lexeme_error(t_coordinate* coordinate, char* error_msg);
+void warning(t_coordinate*, char*);
 #endif
