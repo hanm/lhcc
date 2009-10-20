@@ -107,7 +107,7 @@ int main(int argc, char* argv[])
     int token = 0;
     char* path[2] = {"E:\\Program Files\\Microsoft Visual Studio 9.0\\VC\\include", "G:\\"};
 
-	sc.filename = "G:\\bloom-filter.c";
+	sc.filename = "G:\\Bloom-filter.c";
 
 	sc.include_pathes = path;
 	sc.number_of_include_pathes = 2;
@@ -171,7 +171,9 @@ int main(int argc, char* argv[])
     }
 
 	free_clexer();
-	
+
+    hcc_free_all();
+
 	HCC_MEM_CHECK_END
 
     return 0;
