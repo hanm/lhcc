@@ -438,6 +438,8 @@ void match(int token);
 void primary_expression();
 void postfix_expression();
 void unary_expression();
+void sizeof_expression();
 void expression();
 void assignment_expression();
+int is_typedef_name(int token);
 #endif

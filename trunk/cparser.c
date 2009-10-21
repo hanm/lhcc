@@ -138,11 +138,13 @@ void postfix_expression()
             {
                 GET_NEXT_TOKEN;
                 match(TK_ID);
+                break;
             }
         case TK_INC :
         case TK_DEC :
             {
                 GET_NEXT_TOKEN;
+                break;
             }
         default:
             return;
@@ -190,12 +192,39 @@ void unary_expression()
 			GET_NEXT_TOKEN;
 
 			unary_expression();
+
+            break;
 		}
+    case TK_LPAREN :
+        {
+            GET_NEXT_TOKEN;
+            if (is_typedef_name(look_ahead))
+            {
+                // todo - parse type name
+                GET_NEXT_TOKEN;
+                match(TK_RPAREN);
+            }
+            else
+            {
+                postfix_expression();
+            }
+
+            break;
+        }
+    case TK_SIZEOF :
+        {
+            sizeof_expression();
+            break;
+        }
+    default :
+        postfix_expression();
 	}
 }
 
-
-
+void sizeof_expression()
+{
+    // todo - after correct the junk in unary_expression..
+}
 
 void assignment_expression()
 {
@@ -205,4 +234,19 @@ void assignment_expression()
 void expression()
 {
     
+}
+
+
+int is_typedef_name(int token)
+{
+    if (token >= TK_FLOAT && token <= TK_EXTERN) return 1;
+
+    if (token == TK_ID)
+    {
+        // todo - here need to look up symbol table and check type flag.
+        // for now just return false
+        return 0;
+    }
+
+    return 0;
 }
