@@ -374,14 +374,37 @@ void conditional_expression()
     }
 }
 
+/*
+ *assignment-expression: conditional-expression
+ *unary-expression assignment-operator assignment-expression
+*/
 void assignment_expression()
 {
-    
+    //
+    // todo - this sounds not conform with grammar described above
+    // the parser always asusme it encurs a conditional expression
+    // 
+    conditional_expression();
+
+    if (look_ahead >= TK_ASSIGN && look_ahead <= TK_MOD_ASSIGN)
+    {
+        GET_NEXT_TOKEN;
+        assignment_expression();
+    }
 }
 
 void expression()
 {
-    // todo - hell?
+    //
+    // todo - guard here?
+    // 
+    assignment_expression();
+
+    while (look_ahead == TK_COMMA)
+    {
+        GET_NEXT_TOKEN;
+        assignment_expression();
+    }
 }
 
 int is_typedef_name(int token)
