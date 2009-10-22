@@ -439,7 +439,22 @@ void primary_expression();
 void postfix_expression();
 void unary_expression();
 void sizeof_expression();
-void expression();
+
+void mul_expression();
+void add_expression();
+void shift_expression();
+void rel_expression();
+void eql_expression();
+void and_expression();
+void xor_expression();
+void or_expression();
+void logical_and_expression();
+void logical_or_expression();
+void conditional_expression();
 void assignment_expression();
+
+void expression();
+
 int is_typedef_name(int token);
+
 #endif

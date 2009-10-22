@@ -223,7 +223,155 @@ void unary_expression()
 
 void sizeof_expression()
 {
-    // todo - after correct the junk in unary_expression..
+    GET_NEXT_TOKEN;
+    
+    if (look_ahead == TK_LPAREN)
+    {
+        GET_NEXT_TOKEN;
+        if (is_typedef_name(look_ahead))
+        {
+            // todo - parse typename
+            GET_NEXT_TOKEN;
+        }
+        else
+        {
+            expression();
+        }
+
+        match(TK_RPAREN);
+    }
+    else
+    {
+        unary_expression();
+    }
+}
+
+void mul_expression()
+{
+    unary_expression();
+
+    while (look_ahead == TK_MUL ||
+        look_ahead == TK_DIV ||
+        look_ahead == TK_MOD)
+    {
+        GET_NEXT_TOKEN;
+        unary_expression();
+    }
+}
+
+void add_expression()
+{
+    mul_expression();
+
+    while (look_ahead == TK_ADD || look_ahead == TK_SUB)
+    {
+        GET_NEXT_TOKEN;
+        mul_expression();
+    }
+}
+
+void shift_expression()
+{
+    add_expression();
+
+    while (look_ahead == TK_LSHIFT || look_ahead == TK_RSHIFT)
+    {
+        GET_NEXT_TOKEN;
+        add_expression();
+    }
+}
+
+void rel_expression()
+{
+    shift_expression();
+
+    while (look_ahead == TK_GREAT ||
+        look_ahead == TK_GREAT_EQ ||
+        look_ahead == TK_LESS ||
+        look_ahead == TK_LESS_EQ)
+    {
+        GET_NEXT_TOKEN;
+        shift_expression();
+    }
+}
+
+void eql_expression()
+{
+    rel_expression();
+
+    while (look_ahead == TK_EQUAL || look_ahead == TK_UNEQUAL)
+    {
+        GET_NEXT_TOKEN;
+        rel_expression();
+    }
+}
+
+void and_expression()
+{
+    eql_expression();
+
+    while (look_ahead == TK_BITAND)
+    {
+        GET_NEXT_TOKEN;
+        eql_expression();
+    }
+}
+
+void xor_expression()
+{
+    and_expression();
+
+    while (look_ahead == TK_BITXOR)
+    {
+        GET_NEXT_TOKEN;
+        and_expression();
+    }
+}
+
+void or_expression()
+{
+    xor_expression();
+
+    while (look_ahead == TK_BITOR)
+    {
+        GET_NEXT_TOKEN;
+        xor_expression();
+    }
+}
+
+void logical_and_expression()
+{
+    or_expression();
+
+    while (look_ahead == TK_AND)
+    {
+        GET_NEXT_TOKEN;
+        or_expression();
+    }
+}  
+
+void logical_or_expression()
+{
+    logical_and_expression();
+
+    while (look_ahead == TK_OR)
+    {
+        GET_NEXT_TOKEN;
+        logical_and_expression();
+    }
+}
+
+void conditional_expression()
+{
+    logical_or_expression();
+
+    if (look_ahead == TK_QUESTION)
+    {
+        GET_NEXT_TOKEN;
+        expression();
+        match(TK_COLON);
+        conditional_expression();
+    }
 }
 
 void assignment_expression()
@@ -233,9 +381,8 @@ void assignment_expression()
 
 void expression()
 {
-    
+    // todo - hell?
 }
-
 
 int is_typedef_name(int token)
 {
