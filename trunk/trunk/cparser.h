@@ -435,11 +435,14 @@ int look_ahead;
 
 void initialize_parser();
 void match(int token);
+
+//
+// expressions
+//
 void primary_expression();
 void postfix_expression();
 void unary_expression();
 void sizeof_expression();
-
 void mul_expression();
 void add_expression();
 void shift_expression();
@@ -452,8 +455,37 @@ void logical_and_expression();
 void logical_or_expression();
 void conditional_expression();
 void assignment_expression();
-
 void expression();
+
+//
+// general statements
+//
+void statement();
+void compound_statement();
+void expression_statement();
+
+//
+// selection statements
+//
+void if_statement(); 
+void switch_statement();
+
+//
+// iteration statements
+//
+void while_statement();
+void do_while_statement();
+void for_statement();
+
+//
+// jump statements
+//
+void break_statement();
+void continue_statement();
+void goto_statement();
+void return_statement();
+
+void labeled_statement();
 
 int is_typedef_name(int token);
 

@@ -484,6 +484,38 @@ void expression()
     }
 }
 
+/*
+statement
+        : labeled_statement
+        | compound_statement
+        | expression_statement
+        | selection_statement
+        | iteration_statement
+        | jump_statement
+        ;
+*/
+void statement()
+{
+
+}
+
+/*
+expression_statement
+        : ';'
+        | expression ';'
+        ;
+*/
+void expression_statement()
+{
+	if (look_ahead != TK_SEMICOLON)
+	{
+		expression();
+	}
+	match(TK_SEMICOLON);
+}
+
+
+
 int is_typedef_name(int token)
 {
     if (token >= TK_FLOAT && token <= TK_EXTERN) return 1;
