@@ -246,6 +246,15 @@ void sizeof_expression()
     }
 }
 
+/*
+
+multiplicative_expression
+        : cast_expression
+        | multiplicative_expression '*' cast_expression
+        | multiplicative_expression '/' cast_expression
+        | multiplicative_expression '%' cast_expression
+        ;
+*/
 void mul_expression()
 {
     unary_expression();
@@ -259,6 +268,13 @@ void mul_expression()
     }
 }
 
+/*
+additive_expression
+        : multiplicative_expression
+        | additive_expression '+' multiplicative_expression
+        | additive_expression '-' multiplicative_expression
+        ;
+*/
 void add_expression()
 {
     mul_expression();
@@ -270,6 +286,13 @@ void add_expression()
     }
 }
 
+/*
+shift_expression
+        : additive_expression
+        | shift_expression '<<' additive_expression
+        | shift_expression '>>' additive_expression
+        ;
+*/
 void shift_expression()
 {
     add_expression();
@@ -281,6 +304,15 @@ void shift_expression()
     }
 }
 
+/*
+relational_expression
+        : shift_expression
+        | relational_expression '<' shift_expression
+        | relational_expression '>' shift_expression
+        | relational_expression '<=' shift_expression
+        | relational_expression '>=' shift_expression
+        ;
+*/
 void rel_expression()
 {
     shift_expression();
@@ -295,6 +327,13 @@ void rel_expression()
     }
 }
 
+/*
+equality_expression
+        : relational_expression
+        | equality_expression '==' relational_expression
+        | equality_expression '!=' relational_expression
+        ;
+*/
 void eql_expression()
 {
     rel_expression();
@@ -306,6 +345,12 @@ void eql_expression()
     }
 }
 
+/*
+and_expression
+        : equality_expression
+        | and_expression '&' equality_expression
+        ;
+*/
 void and_expression()
 {
     eql_expression();
@@ -317,6 +362,12 @@ void and_expression()
     }
 }
 
+/*
+exclusive_or_expression
+        : and_expression
+        | exclusive_or_expression '^' and_expression
+        ;
+*/
 void xor_expression()
 {
     and_expression();
@@ -328,6 +379,12 @@ void xor_expression()
     }
 }
 
+/*
+inclusive_or_expression
+        : exclusive_or_expression
+        | inclusive_or_expression '|' exclusive_or_expression
+        ;
+*/
 void or_expression()
 {
     xor_expression();
@@ -339,6 +396,12 @@ void or_expression()
     }
 }
 
+/*
+logical_and_expression
+        : inclusive_or_expression
+        | logical_and_expression '&&' inclusive_or_expression
+        ;
+*/
 void logical_and_expression()
 {
     or_expression();
@@ -350,6 +413,12 @@ void logical_and_expression()
     }
 }  
 
+/*
+logical_or_expression
+        : logical_and_expression
+        | logical_or_expression '||' logical_and_expression
+        ;
+*/
 void logical_or_expression()
 {
     logical_and_expression();
@@ -361,6 +430,12 @@ void logical_or_expression()
     }
 }
 
+/*
+conditional_expression
+        : logical_or_expression
+        | logical_or_expression '?' expression ':' conditional_expression
+        ;
+*/
 void conditional_expression()
 {
     logical_or_expression();
@@ -375,8 +450,10 @@ void conditional_expression()
 }
 
 /*
- *assignment-expression: conditional-expression
- *unary-expression assignment-operator assignment-expression
+assignment_expression
+        : conditional_expression
+        | unary_expression assignment_operator assignment_expression
+        ;
 */
 void assignment_expression()
 {
