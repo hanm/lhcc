@@ -69,7 +69,15 @@ t_lexeme_value lexeme_value;
 // current token coordinate (file, line, column)
 t_coordinate coord;
 
-int gettoken();
+//
+// get next token
+//
+int get_token();
+
+//
+// peek next token but doesn't consume it (so lexer's internal state is kept intact in this case.. comparing with get_token)
+//
+int peek_token();
 
 //
 // reset scanner to prepare for compiling next file
