@@ -469,6 +469,8 @@ void expression_statement();
 //
 void if_statement(); 
 void switch_statement();
+void case_statement();
+void default_statement();
 
 //
 // iteration statements
