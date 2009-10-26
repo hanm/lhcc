@@ -68,6 +68,9 @@ static struct lexer_state ls;
 // current symbol
 static struct symbol sym;
 
+static int current_token_code;
+static int peek_token_code;
+
 /* 
 	Lexical Map
 	
@@ -177,6 +180,9 @@ void reset_clexer(t_scanner_context* sc)
 	//
 	//wipeout();
 	free_lexer_state(&ls);
+
+	current_token_code = TK_NULL;
+	peek_token_code = TK_NULL;
 
 	//
 	// initialize static tables of preprocessor ucpp
@@ -488,6 +494,13 @@ int get_token()
     int retval = TK_ID;
     int r = lex(&ls);
 
+	if (peek_token_code != TK_NULL)
+	{
+		int temp = peek_token_code;
+		peek_token_code = TK_NULL;
+		return temp;
+	}
+
     /*
     * lex() reads the next token from the processed stream and stores it
     * into ls->ctok.
@@ -625,5 +638,15 @@ int get_token()
         */
     }
 
+	current_token_code = retval;
     return retval;
+}
+
+int peek_token()
+{
+	int backup_token = current_token_code;
+	peek_token_code = get_token();
+	current_token_code = backup_token;
+
+	return peek_token_code;
 }
