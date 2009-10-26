@@ -496,7 +496,50 @@ statement
 */
 void statement()
 {
-
+    switch (look_ahead)
+    {
+    case TK_ID :
+        labeled_statement();
+        break;
+    case TK_SWITCH :
+        switch_statement();
+        break;
+    case TK_CASE :
+        case_statement();
+        break;
+    case TK_DEFAULT :
+        default_statement();
+        break;
+    case TK_IF :
+        if_statement();
+        break;
+    case TK_DO :
+        do_while_statement();
+        break;
+    case TK_WHILE :
+        while_statement();
+        break;
+    case TK_FOR :
+        for_statement();
+        break;
+    case TK_BREAK :
+        break_statement();
+        break;
+    case TK_CONTINUE :
+        continue_statement();
+        break;
+    case TK_RETURN :
+        return_statement();
+        break;
+    case TK_GOTO :
+        goto_statement();
+        break;
+    case TK_LBRACE :
+        compound_statement();
+        break;
+    default:
+        expression_statement();
+    }
 }
 
 /*
@@ -514,7 +557,70 @@ void expression_statement()
 	match(TK_SEMICOLON);
 }
 
+void labeled_statement()
+{
 
+}
+
+void switch_statement()
+{
+
+}
+
+void case_statement()
+{
+
+}
+
+void default_statement()
+{
+
+}
+
+void if_statement()
+{
+
+}
+
+void do_while_statement()
+{
+
+}
+
+void while_statement()
+{
+
+}
+
+void for_statement()
+{
+
+}
+
+void break_statement()
+{
+
+}
+
+void continue_statement()
+{
+
+}
+
+void return_statement()
+{
+
+}
+
+void goto_statement()
+{
+
+}
+
+void compound_statement()
+{
+
+}
 
 int is_typedef_name(int token)
 {
