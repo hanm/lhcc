@@ -161,3 +161,5 @@ TK(TK_CRETURN, "\r")
 TK(TK_NEWLINE,       "\n")
 
 TK(TK_END,           "EOF")
+
+TK(TK_NULL, "null")
