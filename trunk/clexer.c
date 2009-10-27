@@ -644,9 +644,15 @@ int get_token()
 
 int peek_token()
 {
+    // save and restore current token code and lexeme value..
+    // TODO - save coordinate and symbol entry?
 	int backup_token = current_token_code;
+    t_lexeme_value backup_lexeme_value = lexeme_value;
+
 	peek_token_code = get_token();
+
 	current_token_code = backup_token;
+    lexeme_value = backup_lexeme_value;
 
 	return peek_token_code;
 }

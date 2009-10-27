@@ -449,6 +449,11 @@ void conditional_expression()
     }
 }
 
+void constant_expression()
+{
+    conditional_expression(); 
+}
+
 /*
 assignment_expression
         : conditional_expression
@@ -499,7 +504,7 @@ void statement()
     switch (look_ahead)
     {
     case TK_ID :
-        labeled_statement();
+        expression_statement();
         break;
     case TK_SWITCH :
         switch_statement();
@@ -550,31 +555,41 @@ expression_statement
 */
 void expression_statement()
 {
-	if (look_ahead != TK_SEMICOLON)
-	{
-		expression();
-	}
-	match(TK_SEMICOLON);
+    if (look_ahead == TK_ID && peek_token() == TK_COLON)
+    {
+        labeled_statement();
+    }
+    else
+    {
+        expression();
+        match(TK_SEMICOLON);
+    }
 }
 
 void labeled_statement()
 {
-
+    match(TK_ID); match(TK_COLON);
+    statement();
 }
 
 void switch_statement()
 {
-
+    
 }
 
 void case_statement()
 {
-
+    match(TK_CASE); 
+    constant_expression();
+    match(TK_COLON);
+    statement();
 }
 
 void default_statement()
 {
-
+    match(TK_DEFAULT);
+    match(TK_COLON);
+    statement();
 }
 
 void if_statement()
@@ -599,22 +614,31 @@ void for_statement()
 
 void break_statement()
 {
-
+    match(TK_BREAK);
+    match(TK_SEMICOLON);
 }
 
 void continue_statement()
 {
-
+    match(TK_CONTINUE);
+    match(TK_SEMICOLON);
 }
 
 void return_statement()
 {
-
+    match(TK_RETURN);
+    if (look_ahead != TK_SEMICOLON)
+    {
+        expression();
+    }
+    match(TK_SEMICOLON);
 }
 
 void goto_statement()
 {
-
+    match(TK_GOTO);
+    match(TK_ID);
+    match(TK_SEMICOLON);
 }
 
 void compound_statement()
