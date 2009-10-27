@@ -122,6 +122,11 @@ int main(int argc, char* argv[])
 	match(TK_AND);
     while ((token = get_token()) != TK_END)
     {
+        /*
+        printf("token : %d\n", token);
+        printf("peek token : %d\n", peek_token());
+        */
+
 #ifdef HCC_TEST_LEXER_CLIENT
         switch(token)
         {

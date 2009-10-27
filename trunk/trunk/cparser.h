@@ -454,6 +454,7 @@ void or_expression();
 void logical_and_expression();
 void logical_or_expression();
 void conditional_expression();
+void constant_expression();
 void assignment_expression();
 void expression();
 

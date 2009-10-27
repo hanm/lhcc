@@ -76,6 +76,10 @@ int get_token();
 
 //
 // peek next token but doesn't consume it (so lexer's internal state is kept intact in this case.. comparing with get_token)
+// there is a twist here - peek token can't be invoked straight many times
+// the invokation should be interleaved with get_token to clean up the peek status
+// an alternative is to explicit clean up peek status by caller but since it's LL(1)
+// there is no need to do so for now..
 //
 int peek_token();
 
