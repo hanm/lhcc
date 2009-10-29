@@ -594,7 +594,17 @@ void default_statement()
 
 void if_statement()
 {
-
+    match(TK_IF);
+    match(TK_LPAREN);
+    
+    expression();
+    
+    match(TK_RPAREN);
+    statement();
+    if (look_ahead == TK_ELSE)
+    {
+        
+    }
 }
 
 void do_while_statement()
