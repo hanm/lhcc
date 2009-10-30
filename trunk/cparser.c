@@ -566,15 +566,17 @@ void expression_statement()
     }
 }
 
+/*
+labeled_statement
+        : IDENTIFIER ':' statement
+        | CASE constant_expression ':' statement
+        | DEFAULT ':' statement
+        ;
+*/
 void labeled_statement()
 {
     match(TK_ID); match(TK_COLON);
     statement();
-}
-
-void switch_statement()
-{
-    
 }
 
 void case_statement()
@@ -592,6 +594,24 @@ void default_statement()
     statement();
 }
 
+/*
+selection_statement
+        : IF '(' expression ')' statement
+        | IF '(' expression ')' statement ELSE statement
+        | SWITCH '(' expression ')' statement
+        ;
+*/
+void switch_statement()
+{
+    match(TK_SWITCH);
+
+    match(TK_LPAREN);
+    expression();
+    match(TK_RPAREN);
+
+    statement();
+}
+
 void if_statement()
 {
     match(TK_IF);
@@ -603,34 +623,95 @@ void if_statement()
     statement();
     if (look_ahead == TK_ELSE)
     {
-        
+        GET_NEXT_TOKEN;
+        statement();
     }
 }
 
+/*
+iteration_statement
+        : WHILE '(' expression ')' statement
+        | DO statement WHILE '(' expression ')' ';'
+        | FOR '(' expression_statement expression_statement ')' statement
+        | FOR '(' expression_statement expression_statement expression ')' statement
+        ;
+*/
 void do_while_statement()
 {
-
+    match(TK_DO);
+    
+    statement();
+    
+    match(TK_WHILE);
+    match(TK_LPAREN);
+    expression();
+    match(TK_RPAREN);
+    match(TK_SEMICOLON);
 }
 
 void while_statement()
 {
+    match(TK_WHILE);
+    match(TK_LPAREN);
+    expression();
+    match(TK_RPAREN);
 
+    statement();
 }
 
 void for_statement()
 {
+    match(TK_FOR);
+    match(TK_LPAREN);
 
+    if (look_ahead != TK_SEMICOLON)
+    {
+        expression();
+    }
+    match(TK_SEMICOLON);
+
+    if (look_ahead != TK_SEMICOLON)
+    {
+        expression();
+    }
+    match(TK_SEMICOLON);
+
+    if (look_ahead != TK_RPAREN)
+    {
+        expression();
+    }
+
+    match(TK_RPAREN);
+
+    statement();
 }
 
-void break_statement()
+/*
+jump_statement
+        : GOTO IDENTIFIER ';'
+        | CONTINUE ';'
+        | BREAK ';'
+        | RETURN ';'
+        | RETURN expression ';'
+        ;
+*/
+
+void goto_statement()
 {
-    match(TK_BREAK);
+    match(TK_GOTO);
+    match(TK_ID);
     match(TK_SEMICOLON);
 }
 
 void continue_statement()
 {
     match(TK_CONTINUE);
+    match(TK_SEMICOLON);
+}
+
+void break_statement()
+{
+    match(TK_BREAK);
     match(TK_SEMICOLON);
 }
 
@@ -644,13 +725,14 @@ void return_statement()
     match(TK_SEMICOLON);
 }
 
-void goto_statement()
-{
-    match(TK_GOTO);
-    match(TK_ID);
-    match(TK_SEMICOLON);
-}
-
+/*
+compound_statement
+        : '{' '}'
+        | '{' statement_list '}'
+        | '{' declaration_list '}'
+        | '{' declaration_list statement_list '}'
+        ;
+*/
 void compound_statement()
 {
 
