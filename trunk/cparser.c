@@ -489,6 +489,10 @@ void expression()
     }
 }
 
+// declarations
+
+
+
 /*
 statement
         : labeled_statement
