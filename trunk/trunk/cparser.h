@@ -490,6 +490,20 @@ void return_statement();
 
 void labeled_statement();
 
+//
+// declarations
+//
+void declaration();
+void declaration_specifiers();
+void init_declarator_list();
+void init_declarator();
+void initializer();
+void initializer_list();
+void declarator();
+void direct_declarator();
+void abstract_declarator();
+void direct_abstract_declarator();
+
 int is_typedef_name(int token);
 
 #endif

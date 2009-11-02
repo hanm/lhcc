@@ -742,6 +742,62 @@ void compound_statement()
 
 }
 
+/*
+declaration
+        : declaration_specifiers ';'
+        | declaration_specifiers init_declarator_list ';'
+        ;
+*/
+void declaration()
+{
+    
+}
+
+void declaration_specifiers()
+{
+
+}
+
+void init_declarator_list()
+{
+
+}
+
+void init_declarator()
+{
+
+}
+
+void initializer()
+{
+
+}
+
+void initializer_list()
+{
+
+}
+
+void declarator()
+{
+
+}
+
+void direct_declarator()
+{
+
+}
+
+void abstract_declarator()
+{
+
+}
+
+void direct_abstract_declarator()
+{
+
+}
+
 int is_typedef_name(int token)
 {
     if (token >= TK_FLOAT && token <= TK_EXTERN) return 1;
