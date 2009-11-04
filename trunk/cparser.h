@@ -504,6 +504,12 @@ void direct_declarator();
 void abstract_declarator();
 void direct_abstract_declarator();
 
+void struct_or_union_specifier();
+void struct_declaration_list();
+void struct_declarator();
+void enum_specifier();
+
 int is_typedef_name(int token);
+int is_typedef(char* token_name);
 
 #endif
