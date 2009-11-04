@@ -27,6 +27,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 #include "clexer.h"
 #include "cparser.h"
+#include "assert.h"
 
 static char* tokens[] = 
 {
@@ -755,7 +756,54 @@ void declaration()
 
 void declaration_specifiers()
 {
-
+    for(;;)
+    {
+        switch(look_ahead)
+        {
+        case TK_AUTO:
+        case TK_REGISTER:
+        case TK_EXTERN:
+        case TK_STATIC:
+        case TK_TYPEDEF:
+            // storage specifiers
+            GET_NEXT_TOKEN;
+            break;
+        case TK_CONST:
+        case TK_VOLATILE:
+            // TODO - C99 restrict
+            // type qualifiers
+            GET_NEXT_TOKEN;
+            break;
+        case TK_FLOAT:
+        case TK_DOUBLE:
+        case TK_CHAR:
+        case TK_SHORT:
+        case TK_INT:
+        case TK_SIGNED:
+        case TK_UNSIGNED:
+        case TK_VOID:
+        case TK_LONG:
+            // "native" type specifiers
+            GET_NEXT_TOKEN;
+            break;
+        case TK_ID:
+            if (is_typedef(lexeme_value.s))
+            {
+                // TYPEDEF names
+                GET_NEXT_TOKEN;
+            }
+            break;
+        case TK_STRUCT:
+        case TK_UNION:
+            struct_or_union_specifier();
+            break;
+        case TK_ENUM:
+            enum_specifier();
+            break;
+        default:
+            return;
+        }
+    }
 }
 
 void init_declarator_list()
@@ -799,6 +847,91 @@ void direct_abstract_declarator()
 
 }
 
+/*
+struct_or_union_specifier
+	: struct_or_union IDENTIFIER '{' struct_declaration_list '}'
+	| struct_or_union '{' struct_declaration_list '}'
+	| struct_or_union IDENTIFIER
+	;
+*/
+void struct_or_union_specifier()
+{
+    HCC_ASSERT(look_ahead == TK_STRUCT || look_ahead == TK_UNION);
+
+    GET_NEXT_TOKEN;
+    if (look_ahead  == TK_ID)
+    {
+        GET_NEXT_TOKEN;
+    }
+
+    if (look_ahead == TK_LBRACE)
+    {
+        GET_NEXT_TOKEN;
+        struct_declaration_list();
+        match(TK_RBRACE);
+    }
+}
+
+/*
+struct_declaration_list
+	: struct_declaration
+	| struct_declaration_list struct_declaration
+	;
+
+struct_declaration
+	: specifier_qualifier_list struct_declarator_list ';'
+	;
+
+struct_declarator_list
+	: struct_declarator
+	| struct_declarator_list ',' struct_declarator
+	;
+*/
+void struct_declaration_list()
+{
+    do
+    {
+        // TODO - this should exclude storage specifiers
+        declaration_specifiers();
+        struct_declarator();
+        
+        while (look_ahead == TK_COMMA)
+        {
+            GET_NEXT_TOKEN;
+            struct_declarator();
+        }
+
+        match(TK_SEMICOLON);
+    }
+    while (look_ahead != TK_RBRACE);
+}
+
+/*
+struct_declarator
+	: declarator
+	| ':' constant_expression
+	| declarator ':' constant_expression
+	;
+*/
+void struct_declarator()
+{
+    if (look_ahead != TK_COLON)
+    {
+        declarator();
+    }
+
+    if (look_ahead == TK_COLON)
+    {
+        GET_NEXT_TOKEN;
+        constant_expression();
+    }
+}
+
+void enum_specifier()
+{
+    
+}
+
 int is_typedef_name(int token)
 {
     if (token >= TK_FLOAT && token <= TK_EXTERN) return 1;
@@ -810,5 +943,12 @@ int is_typedef_name(int token)
         return 0;
     }
 
+    return 0;
+}
+
+int is_typedef(char* name)
+{
+    // TODO
+    (name);
     return 0;
 }
