@@ -499,7 +499,6 @@ void declaration();
 void declaration_specifiers();
 void init_declarator_list();
 void init_declarator();
-void initializer();
 void initializer_list();
 void declarator();
 void direct_declarator();
