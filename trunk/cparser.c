@@ -816,14 +816,38 @@ void init_declarator()
 
 }
 
-void initializer()
-{
+/*
+initializer
+	: assignment_expression
+	| '{' initializer_list '}'
+	| '{' initializer_list ',' '}'
+	;
 
-}
-
+initializer_list
+	: initializer
+	| initializer_list ',' initializer
+	;
+*/
 void initializer_list()
 {
+	if (cparser_token == TK_LBRACE)
+	{
+		GET_NEXT_TOKEN;
+		initializer_list();
 
+		while (cparser_token == TK_COMMA)
+		{
+			GET_NEXT_TOKEN;
+			if (cparser_token == TK_RBRACE) break;
+			initializer_list();
+		}
+
+		match(TK_RBRACE);
+	}
+	else
+	{
+		assignment_expression();
+	}
 }
 
 
