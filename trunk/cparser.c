@@ -891,8 +891,7 @@ void struct_declaration_list()
 {
     do
     {
-        // TODO - this should exclude storage specifiers
-        declaration_specifiers();
+		specifiers_qualifier_list();
         struct_declarator();
         
         while (cparser_token == TK_COMMA)
@@ -927,6 +926,57 @@ void struct_declarator()
     }
 }
 
+/*
+specifier_qualifier_list
+	: type_specifier specifier_qualifier_list
+	| type_specifier
+	| type_qualifier specifier_qualifier_list
+	| type_qualifier
+	;
+*/
+void specifiers_qualifier_list()
+{
+    for(;;)
+    {
+        switch(cparser_token)
+        {
+        case TK_CONST:
+        case TK_VOLATILE:
+            // TODO - C99 restrict
+            // type qualifiers
+            GET_NEXT_TOKEN;
+            break;
+        case TK_FLOAT:
+        case TK_DOUBLE:
+        case TK_CHAR:
+        case TK_SHORT:
+        case TK_INT:
+        case TK_SIGNED:
+        case TK_UNSIGNED:
+        case TK_VOID:
+        case TK_LONG:
+            // "native" type specifiers
+            GET_NEXT_TOKEN;
+            break;
+        case TK_ID:
+            if (is_typedef(lexeme_value.s))
+            {
+                // TYPEDEF names
+                GET_NEXT_TOKEN;
+            }
+            break;
+        case TK_STRUCT:
+        case TK_UNION:
+            struct_or_union_specifier();
+            break;
+        case TK_ENUM:
+            enum_specifier();
+            break;
+        default:
+            return;
+        } // end switch
+    } // end for
+}
 
 /*
 enum_specifier
