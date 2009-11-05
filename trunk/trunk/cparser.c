@@ -37,7 +37,7 @@ static char* tokens[] =
     "END OF TOKEN" // syntactic suguar
 };
 
-#define GET_NEXT_TOKEN look_ahead = get_token()
+#define GET_NEXT_TOKEN cparser_token = get_token()
 
 void initialize_parser()
 {
@@ -47,13 +47,13 @@ void initialize_parser()
 // todo static
 void match(int token)
 {  
-	if (look_ahead == token)
+	if (cparser_token == token)
     {
         GET_NEXT_TOKEN;
     }
     else
     {
-		error(tokens[token], tokens[look_ahead]);
+		error(tokens[token], tokens[cparser_token]);
     }
 }
 
@@ -67,7 +67,7 @@ primary_expression
 */
 void primary_expression()
 {
-    switch (look_ahead)
+    switch (cparser_token)
     {
     case TK_ID :
         GET_NEXT_TOKEN;
@@ -110,7 +110,7 @@ void postfix_expression()
 
     for (;;)
     {
-        switch (look_ahead)
+        switch (cparser_token)
         {
         case TK_LBRACKET :
             {
@@ -122,10 +122,10 @@ void postfix_expression()
         case TK_LPAREN :
             {
                 GET_NEXT_TOKEN;
-                if (look_ahead != TK_RPAREN)
+                if (cparser_token != TK_RPAREN)
                 {
                     assignment_expression();
-                    while (look_ahead == TK_COMMA)
+                    while (cparser_token == TK_COMMA)
                     {
                         GET_NEXT_TOKEN;
                         assignment_expression();
@@ -179,7 +179,7 @@ cast_expression
 */
 void unary_expression()
 {
-	switch (look_ahead)
+	switch (cparser_token)
 	{
 	case TK_INC :
 	case TK_DEC :
@@ -199,7 +199,7 @@ void unary_expression()
     case TK_LPAREN :
         {
             GET_NEXT_TOKEN;
-            if (is_typedef_name(look_ahead))
+            if (is_typedef_name(cparser_token))
             {
                 // todo - parse type name
                 GET_NEXT_TOKEN;
@@ -226,10 +226,10 @@ void sizeof_expression()
 {
     GET_NEXT_TOKEN;
     
-    if (look_ahead == TK_LPAREN)
+    if (cparser_token == TK_LPAREN)
     {
         GET_NEXT_TOKEN;
-        if (is_typedef_name(look_ahead))
+        if (is_typedef_name(cparser_token))
         {
             // todo - parse typename
             GET_NEXT_TOKEN;
@@ -260,9 +260,9 @@ void mul_expression()
 {
     unary_expression();
 
-    while (look_ahead == TK_MUL ||
-        look_ahead == TK_DIV ||
-        look_ahead == TK_MOD)
+    while (cparser_token == TK_MUL ||
+        cparser_token == TK_DIV ||
+        cparser_token == TK_MOD)
     {
         GET_NEXT_TOKEN;
         unary_expression();
@@ -280,7 +280,7 @@ void add_expression()
 {
     mul_expression();
 
-    while (look_ahead == TK_ADD || look_ahead == TK_SUB)
+    while (cparser_token == TK_ADD || cparser_token == TK_SUB)
     {
         GET_NEXT_TOKEN;
         mul_expression();
@@ -298,7 +298,7 @@ void shift_expression()
 {
     add_expression();
 
-    while (look_ahead == TK_LSHIFT || look_ahead == TK_RSHIFT)
+    while (cparser_token == TK_LSHIFT || cparser_token == TK_RSHIFT)
     {
         GET_NEXT_TOKEN;
         add_expression();
@@ -318,10 +318,10 @@ void rel_expression()
 {
     shift_expression();
 
-    while (look_ahead == TK_GREAT ||
-        look_ahead == TK_GREAT_EQ ||
-        look_ahead == TK_LESS ||
-        look_ahead == TK_LESS_EQ)
+    while (cparser_token == TK_GREAT ||
+        cparser_token == TK_GREAT_EQ ||
+        cparser_token == TK_LESS ||
+        cparser_token == TK_LESS_EQ)
     {
         GET_NEXT_TOKEN;
         shift_expression();
@@ -339,7 +339,7 @@ void eql_expression()
 {
     rel_expression();
 
-    while (look_ahead == TK_EQUAL || look_ahead == TK_UNEQUAL)
+    while (cparser_token == TK_EQUAL || cparser_token == TK_UNEQUAL)
     {
         GET_NEXT_TOKEN;
         rel_expression();
@@ -356,7 +356,7 @@ void and_expression()
 {
     eql_expression();
 
-    while (look_ahead == TK_BITAND)
+    while (cparser_token == TK_BITAND)
     {
         GET_NEXT_TOKEN;
         eql_expression();
@@ -373,7 +373,7 @@ void xor_expression()
 {
     and_expression();
 
-    while (look_ahead == TK_BITXOR)
+    while (cparser_token == TK_BITXOR)
     {
         GET_NEXT_TOKEN;
         and_expression();
@@ -390,7 +390,7 @@ void or_expression()
 {
     xor_expression();
 
-    while (look_ahead == TK_BITOR)
+    while (cparser_token == TK_BITOR)
     {
         GET_NEXT_TOKEN;
         xor_expression();
@@ -407,7 +407,7 @@ void logical_and_expression()
 {
     or_expression();
 
-    while (look_ahead == TK_AND)
+    while (cparser_token == TK_AND)
     {
         GET_NEXT_TOKEN;
         or_expression();
@@ -424,7 +424,7 @@ void logical_or_expression()
 {
     logical_and_expression();
 
-    while (look_ahead == TK_OR)
+    while (cparser_token == TK_OR)
     {
         GET_NEXT_TOKEN;
         logical_and_expression();
@@ -441,7 +441,7 @@ void conditional_expression()
 {
     logical_or_expression();
 
-    if (look_ahead == TK_QUESTION)
+    if (cparser_token == TK_QUESTION)
     {
         GET_NEXT_TOKEN;
         expression();
@@ -469,7 +469,7 @@ void assignment_expression()
     // 
     conditional_expression();
 
-    if (look_ahead >= TK_ASSIGN && look_ahead <= TK_MOD_ASSIGN)
+    if (cparser_token >= TK_ASSIGN && cparser_token <= TK_MOD_ASSIGN)
     {
         GET_NEXT_TOKEN;
         assignment_expression();
@@ -483,7 +483,7 @@ void expression()
     // 
     assignment_expression();
 
-    while (look_ahead == TK_COMMA)
+    while (cparser_token == TK_COMMA)
     {
         GET_NEXT_TOKEN;
         assignment_expression();
@@ -506,7 +506,7 @@ statement
 */
 void statement()
 {
-    switch (look_ahead)
+    switch (cparser_token)
     {
     case TK_ID :
         expression_statement();
@@ -560,7 +560,7 @@ expression_statement
 */
 void expression_statement()
 {
-    if (look_ahead == TK_ID && peek_token() == TK_COLON)
+    if (cparser_token == TK_ID && peek_token() == TK_COLON)
     {
         labeled_statement();
     }
@@ -626,7 +626,7 @@ void if_statement()
     
     match(TK_RPAREN);
     statement();
-    if (look_ahead == TK_ELSE)
+    if (cparser_token == TK_ELSE)
     {
         GET_NEXT_TOKEN;
         statement();
@@ -669,19 +669,19 @@ void for_statement()
     match(TK_FOR);
     match(TK_LPAREN);
 
-    if (look_ahead != TK_SEMICOLON)
+    if (cparser_token != TK_SEMICOLON)
     {
         expression();
     }
     match(TK_SEMICOLON);
 
-    if (look_ahead != TK_SEMICOLON)
+    if (cparser_token != TK_SEMICOLON)
     {
         expression();
     }
     match(TK_SEMICOLON);
 
-    if (look_ahead != TK_RPAREN)
+    if (cparser_token != TK_RPAREN)
     {
         expression();
     }
@@ -723,7 +723,7 @@ void break_statement()
 void return_statement()
 {
     match(TK_RETURN);
-    if (look_ahead != TK_SEMICOLON)
+    if (cparser_token != TK_SEMICOLON)
     {
         expression();
     }
@@ -758,7 +758,7 @@ void declaration_specifiers()
 {
     for(;;)
     {
-        switch(look_ahead)
+        switch(cparser_token)
         {
         case TK_AUTO:
         case TK_REGISTER:
@@ -856,15 +856,15 @@ struct_or_union_specifier
 */
 void struct_or_union_specifier()
 {
-    HCC_ASSERT(look_ahead == TK_STRUCT || look_ahead == TK_UNION);
+    HCC_ASSERT(cparser_token == TK_STRUCT || cparser_token == TK_UNION);
 
     GET_NEXT_TOKEN;
-    if (look_ahead  == TK_ID)
+    if (cparser_token  == TK_ID)
     {
         GET_NEXT_TOKEN;
     }
 
-    if (look_ahead == TK_LBRACE)
+    if (cparser_token == TK_LBRACE)
     {
         GET_NEXT_TOKEN;
         struct_declaration_list();
@@ -895,7 +895,7 @@ void struct_declaration_list()
         declaration_specifiers();
         struct_declarator();
         
-        while (look_ahead == TK_COMMA)
+        while (cparser_token == TK_COMMA)
         {
             GET_NEXT_TOKEN;
             struct_declarator();
@@ -903,7 +903,7 @@ void struct_declaration_list()
 
         match(TK_SEMICOLON);
     }
-    while (look_ahead != TK_RBRACE);
+    while (cparser_token != TK_RBRACE);
 }
 
 /*
@@ -915,21 +915,88 @@ struct_declarator
 */
 void struct_declarator()
 {
-    if (look_ahead != TK_COLON)
+    if (cparser_token != TK_COLON)
     {
         declarator();
     }
 
-    if (look_ahead == TK_COLON)
+    if (cparser_token == TK_COLON)
     {
         GET_NEXT_TOKEN;
         constant_expression();
     }
 }
 
+
+/*
+enum_specifier
+	: ENUM '{' enumerator_list '}'
+	| ENUM IDENTIFIER '{' enumerator_list '}'
+	| ENUM IDENTIFIER
+	;
+
+enumerator_list
+	: enumerator
+	| enumerator_list ',' enumerator
+	;
+*/
 void enum_specifier()
 {
-    
+    //
+    // this flag is to indicate that at least we have parsed either { , or ID
+    // which are the only legal suffix following enum keyword..
+    //
+    int flag = 0;
+
+    match(TK_ENUM);
+
+    if (cparser_token == TK_ID)
+    {
+        GET_NEXT_TOKEN;
+        flag = 1;
+    }
+
+    if (cparser_token == TK_LBRACE)
+    {
+        GET_NEXT_TOKEN;
+        enumerator();
+        while (cparser_token == TK_COMMA)
+        {
+            GET_NEXT_TOKEN;
+            enumerator();
+        }
+
+        match(TK_RBRACE);
+        flag = 1;
+    }
+
+    if (0 == flag)
+    {
+        syntax_error(&coord, "Error when parsing enum specifier : { or identifier expected");
+    }
+}
+
+
+/*
+enumerator
+	: IDENTIFIER
+	| IDENTIFIER '=' constant_expression
+	;
+*/
+void enumerator()
+{
+    if (cparser_token != TK_ID)
+    {
+        syntax_error(&coord, "enumerator must be identifier!");
+        return;
+    }
+
+    GET_NEXT_TOKEN;
+    if (cparser_token == TK_ASSIGN)
+    {
+        GET_NEXT_TOKEN;
+        constant_expression();
+    }
 }
 
 int is_typedef_name(int token)

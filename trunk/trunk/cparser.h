@@ -430,8 +430,8 @@ function_definition
 
 */
 
-// look ahead token
-int look_ahead;
+// current parser token
+int cparser_token;
 
 void initialize_parser();
 void match(int token);
@@ -508,6 +508,7 @@ void struct_or_union_specifier();
 void struct_declaration_list();
 void struct_declarator();
 void enum_specifier();
+void enumerator();
 
 int is_typedef_name(int token);
 int is_typedef(char* token_name);
