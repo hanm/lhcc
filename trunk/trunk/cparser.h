@@ -28,6 +28,8 @@ OTHER DEALINGS IN THE SOFTWARE.
 #ifndef __HCC_PARSER_H
 #define __HCC_PARSER_H
 
+// NOTE THIS IS A C89 COMPLIANT GRAMMAR
+// TODO - GET AN UPDATED C GRAMMAR
 /*
 primary_expression
         : IDENTIFIER
@@ -507,6 +509,7 @@ void direct_abstract_declarator();
 void struct_or_union_specifier();
 void struct_declaration_list();
 void struct_declarator();
+void specifiers_qualifier_list();
 void enum_specifier();
 void enumerator();
 
