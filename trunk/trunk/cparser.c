@@ -873,12 +873,48 @@ void initializer()
 	}
 }
 
+/*
+pointer
+	: '*'
+	| '*' type_qualifier_list
+	| '*' pointer
+	| '*' type_qualifier_list pointer
+	;
+*/
+void pointer()
+{
+	while (cparser_token == TK_MUL)
+	{
+		GET_NEXT_TOKEN;
+		while (cparser_token == TK_CONST || cparser_token == TK_VOLATILE)
+		{
+			GET_NEXT_TOKEN;
+		}
+	}
+}
 
-void declarator()
+void suffix_declarator()
 {
 
 }
 
+/*
+declarator
+	: pointer direct_declarator
+	| direct_declarator
+	;
+*/
+void declarator()
+{
+	if (cparser_token == TK_MUL)
+	{
+		pointer();
+		direct_declarator();
+		return;
+	}
+	
+	suffix_declarator();
+}
 
 /*
 direct_declarator
@@ -890,11 +926,10 @@ direct_declarator
 	| direct_declarator '(' identifier_list ')'
 	| direct_declarator '(' ')'
 	;
-
 */
 void direct_declarator()
 {
-	
+	// TODO - fix me
 }
 
 void abstract_declarator()

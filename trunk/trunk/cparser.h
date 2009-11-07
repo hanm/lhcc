@@ -499,6 +499,8 @@ void declaration();
 void declaration_specifiers();
 void init_declarator();
 void initializer();
+void pointer();
+void suffix_declarator();
 void declarator();
 void direct_declarator();
 void abstract_declarator();
