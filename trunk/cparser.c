@@ -751,7 +751,23 @@ declaration
 */
 void declaration()
 {
-    
+	declaration_specifiers();
+	if (cparser_token == TK_SEMICOLON)
+	{
+		GET_NEXT_TOKEN;
+		return;
+	}
+
+	// TODO - function defination
+	init_declarator();
+
+	while (cparser_token == TK_COMMA)
+	{
+		GET_NEXT_TOKEN;
+		init_declarator();
+	}
+
+	match(TK_SEMICOLON);
 }
 
 void declaration_specifiers()
@@ -806,6 +822,12 @@ void declaration_specifiers()
     }
 }
 
+/*
+init_declarator
+	: declarator
+	| declarator '=' initializer
+	;
+*/
 void init_declarator()
 {
 	declarator();
