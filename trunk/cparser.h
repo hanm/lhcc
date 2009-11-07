@@ -497,9 +497,8 @@ void labeled_statement();
 //
 void declaration();
 void declaration_specifiers();
-void init_declarator_list();
 void init_declarator();
-void initializer_list();
+void initializer();
 void declarator();
 void direct_declarator();
 void abstract_declarator();

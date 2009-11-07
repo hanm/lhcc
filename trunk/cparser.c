@@ -806,14 +806,15 @@ void declaration_specifiers()
     }
 }
 
-void init_declarator_list()
-{
-
-}
-
 void init_declarator()
 {
+	declarator();
 
+	if (cparser_token == TK_ASSIGN)
+	{
+		GET_NEXT_TOKEN;
+		initializer();
+	}
 }
 
 /*
@@ -828,18 +829,18 @@ initializer_list
 	| initializer_list ',' initializer
 	;
 */
-void initializer_list()
+void initializer()
 {
 	if (cparser_token == TK_LBRACE)
 	{
 		GET_NEXT_TOKEN;
-		initializer_list();
-
+		
+		initializer();
 		while (cparser_token == TK_COMMA)
 		{
 			GET_NEXT_TOKEN;
 			if (cparser_token == TK_RBRACE) break;
-			initializer_list();
+			initializer();
 		}
 
 		match(TK_RBRACE);
@@ -856,9 +857,22 @@ void declarator()
 
 }
 
+
+/*
+direct_declarator
+	: IDENTIFIER
+	| '(' declarator ')'
+	| direct_declarator '[' constant_expression ']'
+	| direct_declarator '[' ']'
+	| direct_declarator '(' parameter_type_list ')'
+	| direct_declarator '(' identifier_list ')'
+	| direct_declarator '(' ')'
+	;
+
+*/
 void direct_declarator()
 {
-
+	
 }
 
 void abstract_declarator()
