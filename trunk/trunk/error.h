@@ -29,6 +29,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 #define __HCC_TRACE_HANDLING
 #include "clexer.h" // for token coordinate
 
+//TODO - error needs to bind with lexical coordinate
 void error(char* expect_token, char* actual_token);
 void syntax_error(t_coordinate* coordinate, char* error_msg);
 

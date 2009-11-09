@@ -873,6 +873,11 @@ void initializer()
 	}
 }
 
+void parameter_type_list()
+{
+
+}
+
 /*
 pointer
 	: '*'
@@ -895,7 +900,38 @@ void pointer()
 
 void suffix_declarator()
 {
+    if (cparser_token == TK_LBRACKET)
+    {
+        GET_NEXT_TOKEN;
+        if (cparser_token != TK_RBRACKET)
+        {
+            constant_expression();
+        }
+        match(TK_RBRACKET);
+    }
+    else if (cparser_token == TK_LPAREN)
+    {
+        GET_NEXT_TOKEN;
+        
+        if (is_typedef(lexeme_value.s))
+        {
+            parameter_type_list();
+        }
+        else
+        {
+            if (cparser_token == TK_ID)
+            {
+                GET_NEXT_TOKEN;
+                while (cparser_token == TK_COMMA)
+                {
+                    GET_NEXT_TOKEN;
+                    match(TK_ID);
+                }
+            }
+        }
 
+        match(TK_RPAREN);
+    }
 }
 
 /*
@@ -909,11 +945,13 @@ void declarator()
 	if (cparser_token == TK_MUL)
 	{
 		pointer();
-		direct_declarator();
-		return;
 	}
-	
-	suffix_declarator();
+	direct_declarator();
+
+    while (cparser_token == TK_LPAREN || cparser_token == TK_LBRACKET)
+    {
+        suffix_declarator();
+    }
 }
 
 /*
@@ -929,7 +967,18 @@ direct_declarator
 */
 void direct_declarator()
 {
-	// TODO - fix me
+    // TODO - update comments to move suffix declarator to the place where it belongs to.
+    if (cparser_token == TK_LPAREN)
+    {
+        GET_NEXT_TOKEN;
+        declarator();
+        match(TK_RPAREN);
+    }
+    else
+    {
+        // TODO -??? install symbol??
+        match(TK_ID);
+    }
 }
 
 void abstract_declarator()
