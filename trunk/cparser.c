@@ -248,7 +248,6 @@ void sizeof_expression()
 }
 
 /*
-
 multiplicative_expression
         : cast_expression
         | multiplicative_expression '*' cast_expression
@@ -489,10 +488,6 @@ void expression()
         assignment_expression();
     }
 }
-
-// declarations
-
-
 
 /*
 statement
@@ -873,9 +868,44 @@ void initializer()
 	}
 }
 
+/*
+parameter_type_list
+	: parameter_list
+	| parameter_list ',' ELLIPSIS
+	;
+parameter_list
+	: parameter_declaration
+	| parameter_list ',' parameter_declaration
+	;
+*/
 void parameter_type_list()
 {
+	parameter_declaration();
 
+	while (cparser_token == TK_COMMA)
+	{
+		GET_NEXT_TOKEN;
+		if (cparser_token == TK_ELLIPSE)
+		{
+			GET_NEXT_TOKEN;
+			break;
+		}
+
+		parameter_declaration();
+	}
+}
+
+/*
+parameter_declaration
+	: declaration_specifiers declarator
+	| declaration_specifiers abstract_declarator
+	| declaration_specifiers
+	;
+*/
+void parameter_declaration()
+{
+	declaration_specifiers();
+	declarator(); // TODO - abstract declarator can be parsed also here.
 }
 
 /*
@@ -898,6 +928,14 @@ void pointer()
 	}
 }
 
+/*
+suffix_declarator
+	| '[' constant_expression ']'
+	| '[' ']'
+	|  '(' parameter_type_list ')'
+	|  '(' identifier_list ')'
+	|  '(' ')'
+*/
 void suffix_declarator()
 {
     if (cparser_token == TK_LBRACKET)
@@ -958,16 +996,10 @@ void declarator()
 direct_declarator
 	: IDENTIFIER
 	| '(' declarator ')'
-	| direct_declarator '[' constant_expression ']'
-	| direct_declarator '[' ']'
-	| direct_declarator '(' parameter_type_list ')'
-	| direct_declarator '(' identifier_list ')'
-	| direct_declarator '(' ')'
 	;
 */
 void direct_declarator()
 {
-    // TODO - update comments to move suffix declarator to the place where it belongs to.
     if (cparser_token == TK_LPAREN)
     {
         GET_NEXT_TOKEN;
@@ -981,14 +1013,57 @@ void direct_declarator()
     }
 }
 
+/*
+abstract_declarator
+	: pointer
+	| direct_abstract_declarator
+	| pointer direct_abstract_declarator
+	;
+*/
 void abstract_declarator()
 {
+	if (cparser_token == TK_MUL)
+	{
+		pointer();
+	}
+	direct_abstract_declarator();
 
+	//TODO - this needs refine.. 
+	while (cparser_token == TK_LPAREN || cparser_token == TK_LBRACKET)
+	{
+		suffix_declarator();
+	}
 }
 
+/*
+direct_abstract_declarator
+	: '(' abstract_declarator ')'
+*/
+/*
+suffix abstract declarator
+	| '[' ']'
+	| '[' constant_expression ']'
+	| direct_abstract_declarator '[' ']'
+	| direct_abstract_declarator '[' constant_expression ']'
+	| '(' ')'
+	| '(' parameter_type_list ')'
+	| direct_abstract_declarator '(' ')'
+	| direct_abstract_declarator '(' parameter_type_list ')'
+	;
+*/
 void direct_abstract_declarator()
 {
+	if (cparser_token == TK_LPAREN)
+	{
+		GET_NEXT_TOKEN;
+		abstract_declarator();
+		match(TK_RPAREN);
+	}
 
+	if (cparser_token == TK_ID)
+	{
+		syntax_error(&coord, "abstract declarator can't follow with an identifier!");
+	}
 }
 
 /*
@@ -1021,11 +1096,9 @@ struct_declaration_list
 	: struct_declaration
 	| struct_declaration_list struct_declaration
 	;
-
 struct_declaration
 	: specifier_qualifier_list struct_declarator_list ';'
 	;
-
 struct_declarator_list
 	: struct_declarator
 	| struct_declarator_list ',' struct_declarator
@@ -1128,7 +1201,6 @@ enum_specifier
 	| ENUM IDENTIFIER '{' enumerator_list '}'
 	| ENUM IDENTIFIER
 	;
-
 enumerator_list
 	: enumerator
 	| enumerator_list ',' enumerator
@@ -1169,7 +1241,6 @@ void enum_specifier()
         syntax_error(&coord, "Error when parsing enum specifier : { or identifier expected");
     }
 }
-
 
 /*
 enumerator
