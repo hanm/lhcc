@@ -500,6 +500,7 @@ void declaration_specifiers();
 void init_declarator();
 void initializer();
 void parameter_type_list();
+void parameter_declaration();
 void pointer();
 void suffix_declarator();
 void declarator();
