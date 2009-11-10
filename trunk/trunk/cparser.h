@@ -517,5 +517,6 @@ void enumerator();
 
 int is_typedef_name(int token);
 int is_typedef(char* token_name);
+int is_declaration_token(int token);
 
 #endif
