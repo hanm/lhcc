@@ -735,7 +735,29 @@ compound_statement
 */
 void compound_statement()
 {
+	match(TK_LBRACE);
 
+	while (cparser_token != TK_RBRACE && cparser_token != TK_END)
+	{
+		if (is_declaration_token(cparser_token))
+		{
+			if (cparser_token == TK_ID && peek_token() == TK_COLON)
+			{
+				// labeled statement
+				statement();
+			}
+			else
+			{
+				declaration();
+			}
+		}
+		else
+		{
+			statement();
+		}
+	}
+
+	match(TK_RBRACE);
 }
 
 /*
@@ -1283,4 +1305,13 @@ int is_typedef(char* name)
     // TODO
     (name);
     return 0;
+}
+
+int is_declaration_token(int token)
+{
+	//
+	// TODO - implement me
+	//
+	(token);
+	return 0;
 }
