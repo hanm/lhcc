@@ -515,8 +515,27 @@ void specifiers_qualifier_list();
 void enum_specifier();
 void enumerator();
 
+//
+// misc, entry points, etc
+//
+void translation_unit();
+void external_declaration();
+
+//
+// types utilities
+//
 int is_typedef_name(int token);
 int is_typedef(char* token_name);
-int is_declaration_token(int token);
+//
+// declarations are prefixed with type specifiers
+// which includes build in types and typedef 
+// identifier names
+//
+int is_current_token_declaration_token();
+//
+// declarators are prefixed with pointers,
+// left parenthesis, or identifiers
+//
+int is_current_token_declarator_token();
 
 #endif
