@@ -1286,6 +1286,41 @@ void enumerator()
     }
 }
 
+/*
+translation_unit
+	: external_declaration
+	| translation_unit external_declaration
+	;
+*/
+void translation_unit()
+{
+	while (cparser_token != TK_END)
+	{
+		external_declaration();
+	}
+}
+
+/*
+external_declaration
+	: function_definition
+	| declaration
+	;
+function_definition
+	: declaration_specifiers declarator declaration_list compound_statement
+	| declaration_specifiers declarator compound_statement
+	| declarator declaration_list compound_statement
+	| declarator compound_statement
+	;
+declaration
+	: declaration_specifiers ';'
+	| declaration_specifiers init_declarator_list ';'
+	;
+*/
+void external_declaration()
+{
+	
+}
+
 int is_typedef_name(int token)
 {
     if (token >= TK_FLOAT && token <= TK_EXTERN) return 1;
@@ -1349,3 +1384,18 @@ int is_current_token_declaration_token()
     
 	return 0;
 }
+
+int is_current_token_declarator_token()
+{
+	if (cparser_token == TK_MUL ||
+		cparser_token == TK_LPAREN ||
+		cparser_token == TK_ID)
+	{
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
