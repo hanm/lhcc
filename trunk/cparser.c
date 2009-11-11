@@ -739,7 +739,7 @@ void compound_statement()
 
 	while (cparser_token != TK_RBRACE && cparser_token != TK_END)
 	{
-		if (is_declaration_token(cparser_token))
+		if (is_current_token_declaration_token())
 		{
 			if (cparser_token == TK_ID && peek_token() == TK_COLON)
 			{
@@ -1307,11 +1307,45 @@ int is_typedef(char* name)
     return 0;
 }
 
-int is_declaration_token(int token)
+int is_current_token_declaration_token()
 {
-	//
-	// TODO - implement me
-	//
-	(token);
+    //
+    // native types
+    //
+    if (cparser_token == TK_AUTO ||
+        cparser_token == TK_EXTERN ||
+        cparser_token == TK_REGISTER ||
+        cparser_token == TK_STATIC ||
+        cparser_token == TK_TYPEDEF ||
+        cparser_token == TK_CONST ||
+        cparser_token == TK_VOLATILE ||
+        cparser_token == TK_SIGNED ||
+        cparser_token == TK_UNSIGNED ||
+        cparser_token == TK_SHORT ||
+        cparser_token == TK_LONG ||
+        cparser_token == TK_CHAR ||
+        cparser_token == TK_INT ||
+        cparser_token == TK_FLOAT ||
+        cparser_token == TK_DOUBLE ||
+        cparser_token == TK_ENUM ||
+        cparser_token == TK_STRUCT ||
+        cparser_token == TK_UNION ||
+        cparser_token == TK_VOID)
+    {
+        return 1;
+    }
+
+    //
+    // user defined types (typedef)
+    //
+    if (cparser_token == TK_ID)
+    {
+        //
+        // TODO - implement me by adding is type def check
+        // if it's a typedef name, return 1 otherwise 0
+        //
+        return 1;
+    }
+    
 	return 0;
 }
