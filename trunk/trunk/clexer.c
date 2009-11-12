@@ -658,6 +658,11 @@ int get_token()
 {
     int token = get_token_internal();
 
+    //
+    // TODO - tabs (vertical and horizontal) and form feed needs be filtered out
+    // update tokendef
+    // targets - \t, \v, \f
+    //
     while (token == TK_NEWLINE ||
         token == TK_CRETURN ||
         token == TK_WHITESPACE ||
