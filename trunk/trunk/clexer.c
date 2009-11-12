@@ -37,7 +37,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 #include <math.h>
 
 // enable trace in lexical analysis
-//#define HCC_TRACE_ENABLE
+#define HCC_TRACE_ENABLE
 #include "trace.h"
 
 /*
@@ -489,7 +489,7 @@ static int identify_numerical_value(char* number)
 }
 
 
-int get_token()
+static int get_token_internal()
 {
     int retval = TK_ID;
     int r = lex(&ls);
@@ -654,6 +654,21 @@ int get_token()
     return retval;
 }
 
+int get_token()
+{
+    int token = get_token_internal();
+
+    while (token == TK_NEWLINE ||
+        token == TK_CRETURN ||
+        token == TK_WHITESPACE ||
+        token == TK_POUND)
+    {
+        token = get_token_internal();
+        if (token == TK_END) break;
+    }
+
+    return token;
+}
 int peek_token()
 {
     // save and restore current token code and lexeme value..
