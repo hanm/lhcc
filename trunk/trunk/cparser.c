@@ -775,7 +775,7 @@ void declaration()
 		return;
 	}
 
-	// TODO - function defination
+	// TODO - function definition
 	init_declarator();
 
 	while (cparser_token == TK_COMMA)
@@ -1318,7 +1318,65 @@ declaration
 */
 void external_declaration()
 {
-	
+    if (is_current_token_declarator_token())
+    {
+        declarator();
+
+        if (cparser_token != TK_LBRACE)
+        {
+            // declaration list
+            while (is_current_token_declaration_token())
+            {
+                declaration();
+            }
+        }
+        
+        // function definition
+        compound_statement();
+    }
+
+    declaration_specifiers();
+    if (cparser_token == TK_SEMICOLON)
+    {
+        // an external declaration
+        // warning - this would be an empty declaration with just type specifiers but no variables
+        // TODO - warning here
+        GET_NEXT_TOKEN;
+        return;
+    }
+
+    declarator();
+    
+    if (cparser_token == TK_COMMA || cparser_token == TK_ASSIGN)
+    {
+        if (cparser_token == TK_ASSIGN)
+        {
+            GET_NEXT_TOKEN;
+            initializer();
+        }
+
+        while (cparser_token == TK_COMMA)
+        {
+            GET_NEXT_TOKEN;
+            init_declarator();
+        }
+
+        match(TK_SEMICOLON);
+    }
+    else
+    {
+        // function definition
+        if (is_current_token_declaration_token())
+        {
+            // declaration list
+            while (is_current_token_declaration_token())
+            {
+                declaration();
+            }
+        }
+
+        compound_statement();
+    }
 }
 
 int is_typedef_name(int token)

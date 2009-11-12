@@ -101,9 +101,9 @@ static void compile(const char* filename)
     }
 }
 
-int main(int argc, char* argv[])
+void test_lexer()
 {
-	t_scanner_context sc;
+    t_scanner_context sc;
     int token = 0;
     char* path[2] = {"E:\\Program Files\\Microsoft Visual Studio 9.0\\VC\\include", "G:\\"};
 
@@ -114,12 +114,10 @@ int main(int argc, char* argv[])
 
 	HCC_MEM_CHECK_START
     
-	(argc), (argv);
-
 	reset_clexer(&sc);
 
 	initialize_parser();
-	match(TK_AND);
+	
     while ((token = get_token()) != TK_END)
     {
         /*
@@ -180,6 +178,40 @@ int main(int argc, char* argv[])
     hcc_free_all();
 
 	HCC_MEM_CHECK_END
+}
+
+
+void test_parser()
+{
+    t_scanner_context sc;
+
+    char* path[2] = {"E:\\Program Files\\Microsoft Visual Studio 9.0\\VC\\include", "G:\\"};
+
+    sc.filename = "G:\\Bloom-filter.c";
+
+    sc.include_pathes = path;
+    sc.number_of_include_pathes = 2;
+
+    HCC_MEM_CHECK_START
+
+    reset_clexer(&sc);
+
+    initialize_parser();
+
+    translation_unit();
+
+    free_clexer();
+
+    hcc_free_all();
+
+    HCC_MEM_CHECK_END
+}
+
+int main(int argc, char* argv[])
+{
+    (argc), (argv);
+
+    test_parser();
 
     return 0;
 }

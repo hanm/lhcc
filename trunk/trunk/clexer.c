@@ -37,7 +37,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 #include <math.h>
 
 // enable trace in lexical analysis
-#define HCC_TRACE_ENABLE
+//#define HCC_TRACE_ENABLE
 #include "trace.h"
 
 /*
@@ -526,22 +526,34 @@ int get_token()
     {
         unsigned char *c = (unsigned char *)(ls.ctok->name);
 
-        printf("line %ld: <#pragma>\n", ls.line);
+#ifdef HCC_TRACE_ENABLE
+       printf("line %ld: <#pragma>\n", ls.line); 
+#endif
+
         for (; *c; c ++) 
         {
             int t = *c;
 
             if (STRING_TOKEN(t)) 
             {
+            #ifdef HCC_TRACE_ENABLE
                 printf("  <%2d>  ", t);
-                for (c ++; *c != PRAGMA_TOKEN_END;
-                    c ++) putchar(*c);
+            #endif
+
+                for (c ++; *c != PRAGMA_TOKEN_END; c ++)
+                {
+            #ifdef HCC_TRACE_ENABLE
+                    putchar(*c);
                     putchar('\n');
+            #endif
+                }
             } 
             else 
             {
+            #ifdef HCC_TRACE_ENABLE
                 printf("  <%2d>  `%s'\n", t,
                     operators_name[t]);
+            #endif
             }
         }
 
