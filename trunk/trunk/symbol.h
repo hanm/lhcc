@@ -27,6 +27,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 #ifndef __HCC_SYMBOL_H
 #define __HCC_SYMBOL_H
+#include "hcc.h"
 
 typedef struct token_coordinate
 {
@@ -36,11 +37,12 @@ typedef struct token_coordinate
 
 typedef struct symbol 
 {
-	char *name;
+	char *name; // symbol name - eg, literal string for an identifier
+    int storage; // stroage class - auto, register, extern, static, typedef, enum
 	int scope;
     t_token_coordinate coordinate;
 
-	struct symbol* up;
+	struct symbol* previous;
 } t_symbol;
 
 typedef struct symbol_table
@@ -51,7 +53,7 @@ typedef struct symbol_table
     {
         t_symbol symbol;
 		struct entry *next;
-	} *buckets[256];
+	} *buckets[HCC_HASH_SIZE];
 	
     struct symbol* all_symbols;
 } t_symbol_table;
@@ -60,7 +62,14 @@ t_symbol_table* make_symbol_table(int arena);
 void enter_scope(void);
 void exit_scope(void);
 
-// add a symbol binded to %level to specific symbol table - if the table doesn't exit then create one.
+t_symbol* install_symbol(char* name, t_symbol_table* table);
+
+//
+// add a symbol to symbol table chain. scope_level should be no less than table's level.. in other words, hcc
+// only calls this function in current or nested scope. This reflects the actual processing for parser that
+// outer scope is to be processed first then inner scope..etc
+//
+//
 t_symbol* add_symbol(char* name, t_symbol_table** table, int scope_level, int arena);
 
 // search a symbol in symbol table - if the symbol is not there then search previous chained symbol tables if any
