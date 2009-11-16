@@ -105,12 +105,13 @@ void test_lexer()
 {
     t_scanner_context sc;
     int token = 0;
-    char* path[2] = {"E:\\Program Files\\Microsoft Visual Studio 9.0\\VC\\include", "G:\\"};
+    char* path[3] = {"E:\\Program Files\\Microsoft Visual Studio 9.0\\VC\\include", 
+		"C:\\Program Files\\Microsoft Visual Studio 9.0\\VC\\include", "C:\\"};
 
-	sc.filename = "G:\\Bloom-filter.c";
+	sc.filename = "C:\\bloom-filter.c";
 
 	sc.include_pathes = path;
-	sc.number_of_include_pathes = 2;
+	sc.number_of_include_pathes = 3;
 
 	HCC_MEM_CHECK_START
     
@@ -185,9 +186,10 @@ void test_parser()
 {
     t_scanner_context sc;
 
-    char* path[2] = {"E:\\Program Files\\Microsoft Visual Studio 9.0\\VC\\include", "G:\\"};
+    char* path[3] = {"E:\\Program Files\\Microsoft Visual Studio 9.0\\VC\\include", 
+		"C:\\Program Files\\Microsoft Visual Studio 9.0\\VC\\include", "C:\\"};
 
-    sc.filename = "G:\\Bloom-filter.c";
+	sc.filename = "C:\\bloom-filter.c";
 
     sc.include_pathes = path;
     sc.number_of_include_pathes = 2;
