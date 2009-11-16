@@ -32,7 +32,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 /*
  * scope level
- * initial 0 (global)
+ * initially set to GLOABLE (enum value 3)
  * level ++ when entering scope
  * level -- when leaving scope
 */
@@ -42,10 +42,10 @@ int scope_level = GLOBAL;
 
 static t_symbol_table global_symbol_tables[] = {{CONSTANTS}, {GLOBAL}, {GLOBAL}, {GLOBAL} };
 
-t_symbol_table* constants = &global_symbol_tables[0];
-t_symbol_table* identifiers = &global_symbol_tables[1];
-t_symbol_table* types = &global_symbol_tables[2];
-t_symbol_table* externals = &global_symbol_tables[3];
+t_symbol_table* constants = &global_symbol_tables[0]; // store constants, string literals
+t_symbol_table* identifiers = &global_symbol_tables[1]; // store identifiers
+t_symbol_table* types = &global_symbol_tables[2]; // store typedefs
+t_symbol_table* externals = &global_symbol_tables[3]; // store external .. ??? [TODO]
 
 t_symbol_table* make_symbol_table(int arena)
 {
@@ -58,16 +58,29 @@ t_symbol_table* make_symbol_table(int arena)
 void enter_scope()
 {
 	scope_level ++;
-	/*
-	 * lazy table allocation - may save some time if there are actually no new symbol
-	*/
+	//
+	// I don't allocate a symbol table here because in practice when entering a scope
+    // there might be no need to create a new symbol context at all
+    // Many scopes are generated from C block statements where no new variable is declared/defined.
+    //
+    // This lazy initializatio would hopefully improve some performance since it reduced potential call
+    // into the memory alloc routine (even it had a memory pool..)
+	//
 }
 
 void exit_scope()
 {
-	identifiers = identifiers->previous;
+    //
+    // [TODO] - remove types also
+    //
+    if (scope_level == identifiers->level)
+    {
+	    identifiers = identifiers->previous;
+    }
+
 	scope_level --;
 }
+
 
 t_symbol* add_symbol(char* name, t_symbol_table** table, int level, int arena)
 {
@@ -75,10 +88,19 @@ t_symbol* add_symbol(char* name, t_symbol_table** table, int level, int arena)
     struct entry* p;
     unsigned long h = (unsigned long)name&(TABLESIZE-1); //[tag] - to do need a better hashing.. 
 
-    HCC_ASSERT(level == 0 || level >= tb->level);
+    HCC_ASSERT(name != NULL && table != NULL && arena >= 0);
+    HCC_ASSERT(level >= tb->level);
 
+    //
     // we need a new table with deeper level than current table passed in..
-    if (level > 0 && tb->level < level)
+    // this table may not be consecutive in terms of "level" index
+    // for example.. 
+    // gloabl
+    // void foo()
+    // {{{{{int a = 0;}}}}}
+    // note no symbol table will generated when entering the first four block scopes.
+    //
+    if (tb->level < level)
     {
         t_symbol_table* new_tb = make_symbol_table(FUNC);
         new_tb->previous = tb;
@@ -96,8 +118,8 @@ t_symbol* add_symbol(char* name, t_symbol_table** table, int level, int arena)
     CALLOC(p, arena);
 
 	p->symbol.name = (char *)name;
-	p->symbol.scope = level;
-    p->symbol.up = tb->all_symbols;
+    p->symbol.scope = level;
+    p->symbol.previous = tb->all_symbols;
 	tb->all_symbols = &p->symbol;
 	p->next = tb->buckets[h];
 	tb->buckets[h] = p;
@@ -105,6 +127,24 @@ t_symbol* add_symbol(char* name, t_symbol_table** table, int level, int arena)
 	return &p->symbol;
 }
 
+t_symbol* install_symbol(char* name, t_symbol_table* table)
+{
+    struct entry* p;
+    unsigned long h = (unsigned long)name&(TABLESIZE-1); 
+
+    HCC_ASSERT(name != NULL && table != NULL);
+
+    CALLOC(p, FUNC);
+
+	p->symbol.name = name;
+    p->symbol.scope = table->level;
+    p->symbol.previous = table->all_symbols;
+	table->all_symbols = &p->symbol;
+	p->next = table->buckets[h];
+	table->buckets[h] = p;
+
+	return &p->symbol;
+}
 
 struct symbol* find_symbol(char* name, t_symbol_table* table)
 {

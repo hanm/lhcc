@@ -40,6 +40,8 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 #define NUMBEROFELEMENTS(a) ((int)(sizeof(a)/sizeof(a[0])))
 
+#define HCC_HASH_SIZE 512
+
 #define ROUNDUP(x,n) (((x)+((n)-1))&(~((n)-1)))
 #define ROUNDUP_(x,n) ((((x)+((n)-1))/(n))*(n)) // test only - bit mask is faster than div/mul
 
