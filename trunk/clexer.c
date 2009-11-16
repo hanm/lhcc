@@ -242,6 +242,9 @@ void reset_clexer(t_scanner_context* sc)
 	init_lexer_mode(&ls);
 	ls.flags |= HANDLE_ASSERTIONS | HANDLE_PRAGMA | LINE_NUM | CPLUSPLUS_COMMENTS;
 
+	//
+	// TODO - get current dir and concatenate the names
+	//
 	ls.input = fopen(sc->filename, "rb");
 	if (ls.input == NULL)
 	{
