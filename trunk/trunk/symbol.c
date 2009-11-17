@@ -42,10 +42,10 @@ int scope_level = GLOBAL;
 
 static t_symbol_table global_symbol_tables[] = {{CONSTANTS}, {GLOBAL}, {GLOBAL}, {GLOBAL} };
 
-t_symbol_table* constants = &global_symbol_tables[0]; // store constants, string literals
-t_symbol_table* identifiers = &global_symbol_tables[1]; // store identifiers
-t_symbol_table* types = &global_symbol_tables[2]; // store typedefs
-t_symbol_table* externals = &global_symbol_tables[3]; // store external .. ??? [TODO]
+t_symbol_table* sym_table_constants = &global_symbol_tables[0]; // store constants, string literals
+t_symbol_table* sym_table_identifiers = &global_symbol_tables[1]; // store identifiers
+t_symbol_table* sym_table_types = &global_symbol_tables[2]; // store typedefs
+t_symbol_table* sym_table_externals = &global_symbol_tables[3]; // store external .. ??? [TODO]
 
 t_symbol_table* make_symbol_table(int arena)
 {
@@ -73,11 +73,12 @@ void exit_scope()
     //
     // [TODO] - remove types also
     //
-    if (scope_level == identifiers->level)
+    if (scope_level == sym_table_identifiers->level)
     {
-	    identifiers = identifiers->previous;
+		sym_table_identifiers = sym_table_identifiers->previous;
     }
 
+	HCC_ASSERT(scope_level > GLOBAL);
 	scope_level --;
 }
 

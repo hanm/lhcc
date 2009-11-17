@@ -35,14 +35,54 @@ typedef struct token_coordinate
     unsigned long x, y;
 } t_token_coordinate;
 
+//
+// symbol attribute - category
+// [TODO] may expand and grow from here
+//
+enum {
+	SC_TYPEDEF, // typedef names
+	SC_IDENTIFIER, // normal identifier
+	SC_FUNC, // function 
+	SC_CONST, // constant
+	SC_STRING, // string literals including char
+	SC_LABEL, // label
+	SC_ENUM_CONST // enum constant
+};
+
+//
+// [TODO] - polish - remove some unneed fields or add more..
+//
+typedef union value
+{
+	char sc;
+	unsigned char uc;
+	short ss;
+	unsigned short us;
+	int i;
+	unsigned int ui;
+	long l;
+	unsigned long ul;
+	float f;
+	double d;
+	long double ld;
+	void* p;
+} t_value;
+
 typedef struct symbol 
 {
 	char *name; // symbol name - eg, literal string for an identifier
     int storage; // stroage class - auto, register, extern, static, typedef, enum
-	int scope;
+	int scope; // symbol effective scope 
+	int category; // symbol category (class)
     t_token_coordinate coordinate;
 
 	struct symbol* previous;
+
+	union
+	{
+		t_value v;
+	} sym_value;
+
 } t_symbol;
 
 typedef struct symbol_table
