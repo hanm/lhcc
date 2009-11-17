@@ -81,7 +81,7 @@ typedef struct symbol
 	union
 	{
 		t_value v;
-	} sym_value;
+	} value;
 
 } t_symbol;
 

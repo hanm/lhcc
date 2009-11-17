@@ -45,10 +45,23 @@ OTHER DEALINGS IN THE SOFTWARE.
 #define ROUNDUP(x,n) (((x)+((n)-1))&(~((n)-1)))
 #define ROUNDUP_(x,n) ((((x)+((n)-1))/(n))*(n)) // test only - bit mask is faster than div/mul
 
+//
+// arena types 
+// PERM - life longs most from hcc starts to hcc ends
+// FUNC - life starts from entering function scope and ends when exits function
+// STMT - life starts from entering statement block and ends when exists statement block
+//
 enum { PERM=0, FUNC, STMT }; 
 
+//
+// scopes
+//
 enum { CONSTANTS=1, LABELS, GLOBAL, PARAM, LOCAL }; 
 
+//
+// storage classes
+//
+enum { STORAGE_AUTO=0, STORAGE_REGISTER, STORAGE_STATIC, STORAGE_EXTERN};
 
 #ifdef _DEBUG
 void llcc_test_symbol_table();
