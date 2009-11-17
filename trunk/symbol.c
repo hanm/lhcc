@@ -184,14 +184,26 @@ t_symbol* add_const(t_value val)
 
 	for (p = sym_table_constants->buckets[h]; p; p = p->next)
 	{
-		if (p->symbol.sym_value.v.p == val.p)
+		//
+		// [TODO] - currently it just choose arbitary fields to compare
+		// need hook up with type system
+		//
+		if (p->symbol.value.v.p == val.p)
 		{
 			return &p->symbol;
 		}
 	}
 
-	//
-	// [TODO] - not find, need install new constants
-	//
-	return NULL;
+	CALLOC(p, PERM);
+	p->symbol.name = ""; // [TODO] refer LCC for reference
+	p->symbol.scope = CONSTANTS;
+	p->symbol.storage = STORAGE_STATIC;
+	p->symbol.value.v = val;
+	p->next = sym_table_constants->buckets[h];
+	p->symbol.previous = sym_table_constants->all_symbols;
+	sym_table_constants->all_symbols = &p->symbol;
+	// [TODO] - type
+	// [TODO] - don't forget to check other fields recently added to symbol!!
+
+	return &p->symbol;
 }
