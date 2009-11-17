@@ -116,4 +116,13 @@ t_symbol* add_symbol(char* name, t_symbol_table** table, int scope_level, int ar
 // (it doesn't make sense to search next chained symbol table constrained by C binding rules)
 t_symbol* find_symbol(char* name, t_symbol_table* table);
 
+//
+// constant differ from normal identifier in such aspects that:
+// 1. In ANSI C all constants are in the same namespace and has no scope concepts
+// 2. Constants with same literal value share a single instance
+//
+// [TODO] - add type information
+//
+t_symbol* add_const(t_value val);
+
 #endif

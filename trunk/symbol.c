@@ -176,3 +176,22 @@ struct symbol* find_symbol(char* name, t_symbol_table* table)
 
 	return NULL;
 }
+
+t_symbol* add_const(t_value val)
+{
+	struct entry* p = NULL;
+	unsigned long h = (unsigned long)val.ul&(TABLESIZE-1); 
+
+	for (p = sym_table_constants->buckets[h]; p; p = p->next)
+	{
+		if (p->symbol.sym_value.v.p == val.p)
+		{
+			return &p->symbol;
+		}
+	}
+
+	//
+	// [TODO] - not find, need install new constants
+	//
+	return NULL;
+}
