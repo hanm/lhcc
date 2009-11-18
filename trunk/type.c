@@ -25,4 +25,49 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 ****************************************************************/
 
+#include "hcc.h"
 #include "type.h"
+
+#define __HCC_TYPE_TABLE_HASHSIZE 512
+
+//
+// table to manage types - identical type should share a single instance
+//
+static struct entry
+{
+	t_type type;
+	struct entry* next;
+}* type_table[__HCC_TYPE_TABLE_HASHSIZE];
+
+//
+static t_type* atomic_type(t_type* type, int code, int align, int size)
+{
+	struct entry* p;
+	unsigned long h = (code^((unsigned long)type>>3))& __HCC_TYPE_TABLE_HASHSIZE;
+
+	HCC_ASSERT(code >= 0 && align >= 0 && size >= 0);
+
+	for (p = type_table[h]; p; p = p->next)
+	{
+		if (type_equal(&p->type, type)) return &p->type;
+	}
+
+	CALLOC(p, PERM);
+	p->type.code = code;
+	p->type.align = align;
+	p->type.size = size;
+	p->next = type_table[h];
+	type_table[h] = p;
+	
+	return &p->type;
+}
+
+int type_equal(t_type* type_a, t_type* type_b)
+{
+	// [TODO] - implement me!!
+	(type_a);
+	(type_b);
+
+	return 1;
+}
+
