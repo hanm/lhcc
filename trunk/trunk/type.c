@@ -47,9 +47,25 @@ static t_type* atomic_type(t_type* type, int code, int align, int size)
 
 	HCC_ASSERT(code >= 0 && align >= 0 && size >= 0);
 
-	for (p = type_table[h]; p; p = p->next)
+	//
+	// Here function and zero sized (incomplete) array
+	// can't be identified simply by code, align, size, and sub type.
+	// So for function and incomplete array always allocate new type for them.
+	//
+	// [TODO] - how about enum, struct and union?? LCC also checks the symbol table..
+	//
+	if (code != TYPE_FUNCTION && (code != TYPE_ARRARY || size > 0))
 	{
-		if (type_equal(&p->type, type)) return &p->type;
+		for (p = type_table[h]; p; p = p->next)
+		{
+			if (p->type.code == code && 
+				p->type.align == align &&
+				p->type.size == size &&
+				p->type.link == type) 
+			{
+				return &p->type;
+			}
+		}
 	}
 
 	CALLOC(p, PERM);
@@ -60,14 +76,5 @@ static t_type* atomic_type(t_type* type, int code, int align, int size)
 	type_table[h] = p;
 	
 	return &p->type;
-}
-
-int type_equal(t_type* type_a, t_type* type_b)
-{
-	// [TODO] - implement me!!
-	(type_a);
-	(type_b);
-
-	return 1;
 }
 
