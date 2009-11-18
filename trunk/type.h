@@ -129,6 +129,5 @@ typedef struct function_type
 	t_param* param[1];
 } t_function;
 
-int type_equal(t_type* type_a, t_type* type_b);
 
 #endif
