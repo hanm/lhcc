@@ -29,6 +29,9 @@ OTHER DEALINGS IN THE SOFTWARE.
 #define __HCC_SYMBOL_H
 #include "hcc.h"
 
+//
+// Tooken coordinate
+//
 typedef struct token_coordinate
 {
     char* file;
@@ -68,6 +71,10 @@ typedef union value
 	void* p;
 } t_value;
 
+
+//
+// Symbol
+//
 typedef struct symbol 
 {
 	char *name; // symbol name - eg, literal string for an identifier
@@ -85,6 +92,10 @@ typedef struct symbol
 
 } t_symbol;
 
+
+//
+// Symbol Table
+//
 typedef struct symbol_table
 {
 	int level;
@@ -98,8 +109,11 @@ typedef struct symbol_table
     struct symbol* all_symbols;
 } t_symbol_table;
 
+
 t_symbol_table* make_symbol_table(int arena);
+
 void enter_scope(void);
+
 void exit_scope(void);
 
 t_symbol* install_symbol(char* name, t_symbol_table* table);
