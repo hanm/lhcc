@@ -135,11 +135,19 @@ void remove_types(int level)
 			{
 				break;
 			}
-			else if (current_entry->type.code == TYPE_FUNCTION ||
+			else if (current_entry->type.code != TYPE_FUNCTION &&
 				((t_symbol*)current_entry->type.symbolic_link)->scope >= level)
 			{
+				// heading next item in the hash chain
 				*bucket = current_entry->next;
+			}
+			else
+			{
+				// delete current item from hash chain
+				bucket = &current_entry->next;
 			}
 		}
 	}
-}
+
+	// [TODO] - possible optimizations here to avoid iterating hash table in some cases.
+} 

@@ -29,7 +29,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 #define __HCC_TYPE_H
 
 //
-// ANSI C build in types
+// ANSI C build in types and type qualifiers
 // 
 enum 
 {
@@ -43,6 +43,7 @@ enum
 	TYPE_UNSIGNED_LONG, // unsigned long, unsigned long int
 	TYPE_LONGLONG, // [TODO] - WARNING : long long is not ANSI C type
 	TYPE_UNSIGNED_LONGLONG, // AS ABOVE
+	TYPE_ENUM, // enum
 	TYPE_FLOAT, // float
 	TYPE_DOUBLE, // double
 	TYPE_LONGDOUBLE, // long double
@@ -52,9 +53,16 @@ enum
 	TYPE_UNION, // union
 	TYPE_FUNCTION, // function
 	TYPE_ARRARY, // array
-	TYPE_ENUM // enum
+	
+	// type qualifiers
+	TYPE_CONST, // constant
+	TYPE_VOLATILE, // volatile
+	TYPE_RESTRICT // restrict (C99)
 };
 
+//
+// Type
+//
 typedef struct type
 {
 	int code; // type code 
@@ -153,6 +161,41 @@ t_type* type_longdouble;
 t_type* type_ptr;
 t_type* type_void;
 
+#define QUALIFIED_TYPE(t) ((t)->code == TYPE_CONST \
+	|| (t)->code == TYPE_VOLATILE \
+	|| (t)->code == TYPE_RESTRICT)
+
+#define UNQUALIFY_TYPE(t) (QUALIFIED_TYPE(t)?(t)->type:(t))
+
+#define IS_VOLATILE_TYPE(t) ((t)->code == TYPE_VOLATILE)
+
+#define IS_CONST_TYPE(t) ((t)->code == TYPE_CONST)
+
+#define IS_RESTRICT_TYPE(t) ((t)->code == TYPE_RESTRICT)
+
+#define IS_ARRAY_TYPE(t) (UNQUALIFY_TYPE(t)->code == TYPE_ARRARY)
+
+#define IS_RECORD_TYPE(t) (UNQUALIFY_TYPE(t)->code == TYPE_STRUCT \
+	|| UNQUALIFY_TYPE(t)->code == TYPE_UNION)
+
+#define IS_STRUCT_TYPE(t) (UNQUALIFY_TYPE(t)->code == TYPE_STRUCT)
+
+#define IS_UNION_TYPE(t) (UNQUALIFY_TYPE(t)->code == TYPE_UNION)
+
+#define IS_FUNCTION_TYPE(t) (UNQUALIFY_TYPE(t)->code == TYPE_FUNCTION)
+
+#define IS_PTR_TYPE(t) (UNQUALIFY_TYPE(t)->code == TYPE_PTR)
+
+#define IS_CHAR_TYPE(t) (UNQUALIFY_TYPE(t)->code == TYPE_CHAR \
+	|| UNQUALIFY_TYPE(t)->code == TYPE_UNSIGNED_CHAR)
+
+#define IS_INTEGER_TYPE(t) (UNQUALIFY_TYPE(t)->code <= TYPE_ENUM \
+	&& UNQUALIFY_TYPE(t)->code >= TYPE_CHAR)
+
+#define IS_ARITHMETIC_TYPE(t) (UNQUALIFY_TYPE(t)->code <= TYPE_LONGDOUBLE \
+	&& UNQUALIFY_TYPE(t)->code >= TYPE_CHAR)
+
+#define IS_ENUM_TYPE(t) (UNQUALIFY_TYPE(t)->code == TYPE_ENUM)
 
 void type_system_initialize();
 
