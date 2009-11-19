@@ -37,6 +37,7 @@ void hcc_free_all();
 // allocate object p in arena a
 //
 #define ALLOC(p,a) ((p) = hcc_alloc(sizeof *(p), (a)))
+
 //
 // allocate object p and initialize it to zero in arena a
 //
