@@ -67,6 +67,11 @@ typedef struct type
 	// the link field here enable type struct to extends itself linearly.
 	struct type* link; 
 
+	// point to the symbol table entry for the type
+	// occasionally type needs to access the symbol table information like scope level
+	// etc. this field sets up the link between them.
+	void* symbolic_link;
+
 	//
 	// record/enum/function types
 	//
@@ -150,5 +155,7 @@ t_type* type_void;
 
 
 void type_system_initialize();
+
+void remove_types(int level);
 
 #endif
