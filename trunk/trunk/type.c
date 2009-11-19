@@ -27,6 +27,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 #include "hcc.h"
 #include "type.h"
+//#include "symbol.h"
 
 #define __HCC_TYPE_TABLE_HASHSIZE 512
 
@@ -78,3 +79,35 @@ static t_type* atomic_type(t_type* type, int code, int align, int size)
 	return &p->type;
 }
 
+/*
+//
+// install a specific type to type symbol table
+//
+static t_type* type_symbol_initialize(int code, char*name, int size, int align)
+{
+	add_symbol(name, &sym_table_types, GLOBAL, PERM);
+	return atomic_type(0, code, align, size);
+}
+*/
+
+void type_system_initialize()
+{
+	/*
+	t_type* type_char;
+t_type* type_unsigned_char;
+t_type* type_short;
+t_type* type_unsigned_short;
+t_type* type_int;
+t_type* type_unsigned_int;
+t_type* type_long;
+t_type* type_unsigned_long;
+t_type* type_longlong;
+t_type* type_unsigned_longlong;
+t_type* type_float;
+t_type* type_double;
+t_type* type_longdouble;
+t_type* type_ptr;
+t_type* type_void;
+	*/
+
+}

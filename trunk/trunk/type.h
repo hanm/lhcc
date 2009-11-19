@@ -129,5 +129,26 @@ typedef struct function_type
 	t_param* param[1];
 } t_function;
 
+//
+// build in types
+//
+t_type* type_char;
+t_type* type_unsigned_char;
+t_type* type_short;
+t_type* type_unsigned_short;
+t_type* type_int;
+t_type* type_unsigned_int;
+t_type* type_long;
+t_type* type_unsigned_long;
+t_type* type_longlong;
+t_type* type_unsigned_longlong;
+t_type* type_float;
+t_type* type_double;
+t_type* type_longdouble;
+t_type* type_ptr;
+t_type* type_void;
+
+
+void type_system_initialize();
 
 #endif
