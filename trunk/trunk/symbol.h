@@ -108,6 +108,10 @@ typedef struct symbol_table
     struct symbol* all_symbols;
 } t_symbol_table;
 
+extern t_symbol_table* sym_table_constants; // store constants, string literals
+extern t_symbol_table* sym_table_identifiers; // store identifiers
+extern t_symbol_table* sym_table_types;// store types
+extern t_symbol_table* sym_table_externals; // store external .. ??? [TODO]
 
 t_symbol_table* make_symbol_table(int arena);
 

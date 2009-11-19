@@ -27,23 +27,27 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 #include "hcc.h"
 #include "type.h"
-//#include "symbol.h"
+#include "symbol.h"
+#include "assert.h"
+#include "arena.h"
+#include "atom.h"
 
 #define __HCC_TYPE_TABLE_HASHSIZE 512
 
 //
-// table to manage types - identical type should share a single instance
+// this table exits simply to provide singleton of types
+// it would make sure identical type has only one runtime representation.
 //
-static struct entry
+static struct type_entry
 {
 	t_type type;
-	struct entry* next;
+	struct type_entry* next;
 }* type_table[__HCC_TYPE_TABLE_HASHSIZE];
 
-//
+
 static t_type* atomic_type(t_type* type, int code, int align, int size)
 {
-	struct entry* p;
+	struct type_entry* p;
 	unsigned long h = (code^((unsigned long)type>>3))& __HCC_TYPE_TABLE_HASHSIZE;
 
 	HCC_ASSERT(code >= 0 && align >= 0 && size >= 0);
@@ -79,35 +83,37 @@ static t_type* atomic_type(t_type* type, int code, int align, int size)
 	return &p->type;
 }
 
-/*
+
 //
 // install a specific type to type symbol table
+// and return a runtime representation for the type
 //
-static t_type* type_symbol_initialize(int code, char*name, int size, int align)
+static t_type* install_type_symbol(int code, char*name, int size, int align)
 {
-	add_symbol(name, &sym_table_types, GLOBAL, PERM);
-	return atomic_type(0, code, align, size);
+	t_symbol* symbol = add_symbol(name, &sym_table_types, GLOBAL, PERM);
+	t_type* type= atomic_type(0, code, align, size);
+	symbol->type = type;
+
+	return type;
 }
-*/
+
 
 void type_system_initialize()
 {
-	/*
-	t_type* type_char;
-t_type* type_unsigned_char;
-t_type* type_short;
-t_type* type_unsigned_short;
-t_type* type_int;
-t_type* type_unsigned_int;
-t_type* type_long;
-t_type* type_unsigned_long;
-t_type* type_longlong;
-t_type* type_unsigned_longlong;
-t_type* type_float;
-t_type* type_double;
-t_type* type_longdouble;
-t_type* type_ptr;
-t_type* type_void;
-	*/
-
+	// [TODO] double check type and alignments for Type
+	type_char = install_type_symbol(TYPE_CHAR, atom_string("char"), 1, 4);
+	type_unsigned_char = install_type_symbol(TYPE_UNSIGNED_CHAR, atom_string("unsigned char"), 1, 4);
+	type_short = install_type_symbol(TYPE_SHORT, atom_string("short"), 2, 4);
+	type_unsigned_short = install_type_symbol(TYPE_UNSIGNED_SHORT, atom_string("unsigned short"), 2, 4);
+	type_int = install_type_symbol(TYPE_INT, atom_string("int"), 4, 4);
+	type_unsigned_int = install_type_symbol(TYPE_UNSIGNED_INT, atom_string("unsigned int"), 4, 4);
+	type_long = install_type_symbol(TYPE_LONG, atom_string("long"), 4, 4);
+	type_unsigned_long = install_type_symbol(TYPE_UNSIGNED_LONG, atom_string("unsigned long"), 4, 4);
+	type_longlong = install_type_symbol(TYPE_LONGLONG, atom_string("long long"), 8, 8);
+	type_unsigned_longlong = install_type_symbol(TYPE_UNSIGNED_LONGLONG, atom_string("unsigned long long"), 8, 8);
+	type_float = install_type_symbol(TYPE_FLOAT, atom_string("float"), 4, 4);
+	type_double = install_type_symbol(TYPE_DOUBLE, atom_string("double"), 4, 4);
+	type_longdouble = install_type_symbol(TYPE_LONGDOUBLE, atom_string("long double"), 8, 8);
+	type_ptr = install_type_symbol(TYPE_PTR, atom_string("T*"), 4, 4);
+	type_void = install_type_symbol(TYPE_VOID, atom_string("void"), 0, 0);
 }
