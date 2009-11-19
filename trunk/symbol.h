@@ -28,6 +28,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 #ifndef __HCC_SYMBOL_H
 #define __HCC_SYMBOL_H
 #include "hcc.h"
+#include "type.h"
 
 //
 // Tooken coordinate
@@ -43,13 +44,13 @@ typedef struct token_coordinate
 // [TODO] may expand and grow from here
 //
 enum {
-	SC_TYPEDEF, // typedef names
-	SC_IDENTIFIER, // normal identifier
-	SC_FUNC, // function 
-	SC_CONST, // constant
-	SC_STRING, // string literals including char
-	SC_LABEL, // label
-	SC_ENUM_CONST // enum constant
+	SYMBOL_TYPEDEF, // typedef names
+	SYMBOL_IDENTIFIER, // normal identifier
+	SYMBOL_FUNC, // function 
+	SYMBOL_CONST, // constant
+	SYMBOL_STRING, // string literals including char
+	SYMBOL_LABEL, // label
+	SYMBOL_ENUM_CONST // enum constant
 };
 
 //
@@ -81,14 +82,12 @@ typedef struct symbol
     int storage; // stroage class - auto, register, extern, static, typedef, enum
 	int scope; // symbol effective scope 
 	int category; // symbol category (class)
+	t_type* type; // symbol type
     t_token_coordinate coordinate;
 
 	struct symbol* previous;
 
-	union
-	{
-		t_value v;
-	} value;
+	t_value value;
 
 } t_symbol;
 

@@ -188,7 +188,7 @@ t_symbol* add_const(t_value val)
 		// [TODO] - currently it just choose arbitary fields to compare
 		// need hook up with type system
 		//
-		if (p->symbol.value.v.p == val.p)
+		if (p->symbol.value.p == val.p)
 		{
 			return &p->symbol;
 		}
@@ -198,7 +198,7 @@ t_symbol* add_const(t_value val)
 	p->symbol.name = ""; // [TODO] refer LCC for reference
 	p->symbol.scope = CONSTANTS;
 	p->symbol.storage = STORAGE_STATIC;
-	p->symbol.value.v = val;
+	p->symbol.value = val;
 	p->next = sym_table_constants->buckets[h];
 	p->symbol.previous = sym_table_constants->all_symbols;
 	sym_table_constants->all_symbols = &p->symbol;
