@@ -174,6 +174,8 @@ t_type* pointer_type(t_type* pointed)
 
 t_type* dereference_type(t_type* type)
 {
+	HCC_ASSERT(type != NULL);
+
 	if (IS_PTR_TYPE(type))
 	{
 		type = type->link;
@@ -192,3 +194,43 @@ t_type* dereference_type(t_type* type)
 
 	return type;
 }
+
+
+t_type* make_array_type(t_type* type, int size)
+{
+	HCC_ASSERT(type != NULL);
+	HCC_ASSERT(size >= 0);
+	
+	if (IS_FUNCTION_TYPE(type))
+	{
+		type_error("illegal type usage : ANSI C doesn't have function array");
+		return NULL;
+	}
+
+	if (IS_VOID_TYPE(type))
+	{
+		type_error("illegal type usage : array elements can't be type void");
+		return NULL;
+	}
+
+	if (INT_MAX/type->size < size)
+	{
+		type_error("illegal array type : too many elements");
+		return NULL;
+	}
+
+	return atomic_type(type, TYPE_ARRARY, type->align, size * type->size, NULL); // array type has no symbolic link to symbol table
+}
+
+t_type* array_to_ptr_type(t_type* type)
+{
+	HCC_ASSERT(type != NULL);
+
+	if (IS_ARRAY_TYPE(type))
+	{
+		return pointer_type(type->link);
+	}
+
+	return NULL;
+}
+

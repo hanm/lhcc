@@ -197,8 +197,16 @@ t_type* type_void;
 
 #define IS_ENUM_TYPE(t) (UNQUALIFY_TYPE(t)->code == TYPE_ENUM)
 
+#define IS_VOID_TYPE(t) (UNQUALIFY_TYPE(type)->code == TYPE_VOID)
+
+//
+// initialize type system by initializing c build in types and install their on type symbol table
+//
 void type_system_initialize();
 
+//
+// remove types at specified scope level
+//
 void remove_types(int level);
 
 //
@@ -210,5 +218,16 @@ t_type* pointer_type(t_type* pointed);
 // dereference a pointer type
 //
 t_type* dereference_type(t_type* type);
+
+//
+// construct an array type with specified element type and array size
+//
+t_type* make_array_type(t_type* type, int size);
+
+//
+// get the ptr type out of an array type
+// in ANSI C, array can be used as a pointer in some cases
+//
+t_type* array_to_ptr_type(t_type* type);
 
 #endif
