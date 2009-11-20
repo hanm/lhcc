@@ -46,6 +46,19 @@ OTHER DEALINGS IN THE SOFTWARE.
 #define ROUNDUP_(x,n) ((((x)+((n)-1))/(n))*(n)) // test only - bit mask is faster than div/mul
 
 //
+// type size configurations
+//
+#define HCC_CHAR_SIZE 1
+#define HCC_SHORT_SIZE 2
+#define HCC_INT_SIZE 4
+#define HCC_LONG_SIZE 4
+#define HCC_LONGLONG_SIZE 8
+#define HCC_FLOAT_SIZE 4
+#define HCC_DOUBLE_SIZE 8
+#define HCC_LONG_DOUBLE_SIZE 8
+#define HCC_PTR_SIZE 4
+
+//
 // arena types 
 // PERM - life longs most from hcc starts to hcc ends
 // FUNC - life starts from entering function scope and ends when exits function

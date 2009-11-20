@@ -28,6 +28,8 @@ OTHER DEALINGS IN THE SOFTWARE.
 #include "error.h"
 #include <string.h>
 
+static int error_count = 0;
+
 void error(char* expect_token, char* actual_token)
 {
 	char* exp;
@@ -60,11 +62,15 @@ void error(char* expect_token, char* actual_token)
 	}
 
 	printf("Error : expect token %s but got token %s \n", exp, actual);
+
+	error_count ++;
 }
 
 void syntax_error(t_coordinate* coordinate, char* error_msg)
 {
     printf("Syntax Error on line: %d : %s", coordinate->line, error_msg);
+
+	error_count ++;
 }
 
 void warning(t_coordinate* coordinate, char* warning_msg)
@@ -75,4 +81,13 @@ void warning(t_coordinate* coordinate, char* warning_msg)
 void lexeme_error(t_coordinate* coordinate, char* error_msg)
 {
     printf("Lexeme error : line %d %s", coordinate->line, error_msg);
+
+	error_count ++;
+}
+
+void type_error(char* msg)
+{
+	printf("type error : %s\n", msg);
+
+	error_count ++;
 }

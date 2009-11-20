@@ -165,7 +165,7 @@ t_type* type_void;
 	|| (t)->code == TYPE_VOLATILE \
 	|| (t)->code == TYPE_RESTRICT)
 
-#define UNQUALIFY_TYPE(t) (QUALIFIED_TYPE(t)?(t)->type:(t))
+#define UNQUALIFY_TYPE(t) (QUALIFIED_TYPE(t)?(t)->link:(t))
 
 #define IS_VOLATILE_TYPE(t) ((t)->code == TYPE_VOLATILE)
 
@@ -200,5 +200,15 @@ t_type* type_void;
 void type_system_initialize();
 
 void remove_types(int level);
+
+//
+// construct a pointer type whose sub type is input parameter "pointed"
+//
+t_type* pointer_type(t_type* pointed);
+
+//
+// dereference a pointer type
+//
+t_type* dereference_type(t_type* type);
 
 #endif

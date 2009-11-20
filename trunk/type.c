@@ -31,6 +31,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 #include "assert.h"
 #include "arena.h"
 #include "atom.h"
+#include "error.h"
 
 #define __HCC_TYPE_TABLE_HASHSIZE 512
 
@@ -100,21 +101,34 @@ static t_type* install_type_symbol(int code, char*name, int size, int align)
 
 void type_system_initialize()
 {
-	// [TODO] double check type and alignments for Type
-	type_char = install_type_symbol(TYPE_CHAR, atom_string("char"), 1, 4);
-	type_unsigned_char = install_type_symbol(TYPE_UNSIGNED_CHAR, atom_string("unsigned char"), 1, 4);
-	type_short = install_type_symbol(TYPE_SHORT, atom_string("short"), 2, 4);
-	type_unsigned_short = install_type_symbol(TYPE_UNSIGNED_SHORT, atom_string("unsigned short"), 2, 4);
-	type_int = install_type_symbol(TYPE_INT, atom_string("int"), 4, 4);
-	type_unsigned_int = install_type_symbol(TYPE_UNSIGNED_INT, atom_string("unsigned int"), 4, 4);
-	type_long = install_type_symbol(TYPE_LONG, atom_string("long"), 4, 4);
-	type_unsigned_long = install_type_symbol(TYPE_UNSIGNED_LONG, atom_string("unsigned long"), 4, 4);
-	type_longlong = install_type_symbol(TYPE_LONGLONG, atom_string("long long"), 8, 8);
-	type_unsigned_longlong = install_type_symbol(TYPE_UNSIGNED_LONGLONG, atom_string("unsigned long long"), 8, 8);
-	type_float = install_type_symbol(TYPE_FLOAT, atom_string("float"), 4, 4);
-	type_double = install_type_symbol(TYPE_DOUBLE, atom_string("double"), 4, 4);
-	type_longdouble = install_type_symbol(TYPE_LONGDOUBLE, atom_string("long double"), 8, 8);
-	type_ptr = install_type_symbol(TYPE_PTR, atom_string("T*"), 4, 4);
+	type_char = install_type_symbol(TYPE_CHAR, atom_string("char"), HCC_CHAR_SIZE, HCC_CHAR_SIZE);
+	
+	type_unsigned_char = install_type_symbol(TYPE_UNSIGNED_CHAR, atom_string("unsigned char"), HCC_CHAR_SIZE, HCC_CHAR_SIZE);
+	
+	type_short = install_type_symbol(TYPE_SHORT, atom_string("short"), HCC_SHORT_SIZE, HCC_SHORT_SIZE);
+	
+	type_unsigned_short = install_type_symbol(TYPE_UNSIGNED_SHORT, atom_string("unsigned short"), HCC_SHORT_SIZE, HCC_SHORT_SIZE);
+	
+	type_int = install_type_symbol(TYPE_INT, atom_string("int"), HCC_INT_SIZE, HCC_INT_SIZE);
+	
+	type_unsigned_int = install_type_symbol(TYPE_UNSIGNED_INT, atom_string("unsigned int"), HCC_INT_SIZE, HCC_INT_SIZE);
+	
+	type_long = install_type_symbol(TYPE_LONG, atom_string("long"), HCC_LONG_SIZE, HCC_LONG_SIZE);
+	
+	type_unsigned_long = install_type_symbol(TYPE_UNSIGNED_LONG, atom_string("unsigned long"), HCC_LONG_SIZE, HCC_LONG_SIZE);
+	
+	type_longlong = install_type_symbol(TYPE_LONGLONG, atom_string("long long"), HCC_LONGLONG_SIZE, HCC_LONGLONG_SIZE);
+	
+	type_unsigned_longlong = install_type_symbol(TYPE_UNSIGNED_LONGLONG, atom_string("unsigned long long"), HCC_LONGLONG_SIZE, HCC_LONGLONG_SIZE);
+	
+	type_float = install_type_symbol(TYPE_FLOAT, atom_string("float"), HCC_FLOAT_SIZE, HCC_FLOAT_SIZE);
+	
+	type_double = install_type_symbol(TYPE_DOUBLE, atom_string("double"), HCC_DOUBLE_SIZE, HCC_DOUBLE_SIZE);
+	
+	type_longdouble = install_type_symbol(TYPE_LONGDOUBLE, atom_string("long double"), HCC_LONG_DOUBLE_SIZE, HCC_LONG_DOUBLE_SIZE);
+	
+	type_ptr = install_type_symbol(TYPE_PTR, atom_string("T*"), HCC_PTR_SIZE, HCC_PTR_SIZE);
+	
 	type_void = install_type_symbol(TYPE_VOID, atom_string("void"), 0, 0);
 }
 
@@ -151,3 +165,30 @@ void remove_types(int level)
 
 	// [TODO] - possible optimizations here to avoid iterating hash table in some cases.
 } 
+
+
+t_type* pointer_type(t_type* pointed)
+{
+	return atomic_type(pointed, TYPE_PTR, HCC_PTR_SIZE, HCC_PTR_SIZE, type_ptr->symbolic_link); 
+}
+
+t_type* dereference_type(t_type* type)
+{
+	if (IS_PTR_TYPE(type))
+	{
+		type = type->link;
+	}
+	else
+	{
+		type_error("expect pointer type : dereference can only be applied to a pointer type.");
+	}
+
+	// for pointer to enum need to get the unqualified member type
+	// (typically int_
+	if (IS_ENUM_TYPE(type))
+	{
+		type = UNQUALIFY_TYPE(type)->link;
+	}
+
+	return type;
+}
