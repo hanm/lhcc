@@ -186,7 +186,7 @@ t_type* dereference_type(t_type* type)
 	}
 
 	// for pointer to enum need to get the unqualified member type
-	// (typically int_
+	// typically this is int
 	if (IS_ENUM_TYPE(type))
 	{
 		type = UNQUALIFY_TYPE(type)->link;
@@ -234,3 +234,74 @@ t_type* array_to_ptr_type(t_type* type)
 	return NULL;
 }
 
+
+t_type* remove_type_qualifier(t_type* type)
+{
+	while(type != NULL)
+	{ 
+		if(type->code == TYPE_CONST 
+			|| type->code == TYPE_VOLATILE 
+			|| type->code == TYPE_RESTRICT) 
+		{ 
+			type = type->link;
+		} 
+		else 
+		{ 
+			break;
+		} 
+	}
+
+	return type;
+}
+
+t_type* qualify_type(t_type* type, int code)
+{
+	HCC_ASSERT(IS_TYPE_QUALIFIERS(code));
+	HCC_ASSERT(type != NULL);
+
+	if ((IS_CONST_TYPE(type) && code == TYPE_CONST) ||
+		(IS_VOLATILE_TYPE(type) && code == TYPE_VOLATILE) ||
+		(IS_RESTRICT_TYPE(type) && code == TYPE_RESTRICT))
+	{
+		type_error("illegal type qualifer usage: duplicate type qualifier");
+		return NULL;
+	}
+
+	if (IS_ARRAY_TYPE(type))
+	{
+		type = atomic_type(qualify_type(type, code), TYPE_ARRARY, type->align, type->size, NULL); // array has no symbolic link to symbol table
+	}
+	else
+	{
+		type = atomic_type(type, code, type->align, type->size, NULL); // [TODO] - null symbolic type link
+	}
+
+	return type;
+}
+
+
+t_type* make_function_type(t_type* type, t_param* parameter, int prototype, int ellipse)
+{
+	t_function* function = NULL;
+
+	HCC_ASSERT(type != NULL && parameter != NULL && prototype >= 0 && ellipse >= 0);
+
+	if (IS_ARRAY_TYPE(type) || IS_FUNCTION_TYPE(type))
+	{
+		// function can't have either array or function as its return type
+		type_error("illegal function return type");
+		return NULL;
+	}
+
+	// [TODO] function type align and size ; currently it's the same with ptr 
+	type = atomic_type(type, TYPE_FUNCTION, type_ptr->align, type_ptr->size, NULL);
+
+	CALLOC(function, sizeof *function);
+	function->ellipse = ellipse;
+	function->prototype = prototype;
+	function->parameter = parameter;
+	
+	type->u.function = function;
+
+	return type;
+}

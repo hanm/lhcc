@@ -130,6 +130,8 @@ typedef struct paremeter_type
 	char* name;
 	t_type* type;
 	int reg_qualified;
+
+	struct parameter_type* next;
 } t_param;
 
 //
@@ -139,7 +141,8 @@ typedef struct function_type
 {
 	int prototype;
 	int ellipse;
-	t_param* param[1];
+
+	t_param* parameter;
 } t_function;
 
 //
@@ -161,11 +164,20 @@ t_type* type_longdouble;
 t_type* type_ptr;
 t_type* type_void;
 
+//
+// remove the type qualifier for specified type
+//
+t_type* remove_type_qualifier(t_type* type);
+
+#define IS_TYPE_QUALIFIERS(t) ((t) == TYPE_CONST \
+	|| (t) == TYPE_VOLATILE \
+	|| (t) == TYPE_RESTRICT)
+
 #define QUALIFIED_TYPE(t) ((t)->code == TYPE_CONST \
 	|| (t)->code == TYPE_VOLATILE \
 	|| (t)->code == TYPE_RESTRICT)
 
-#define UNQUALIFY_TYPE(t) (QUALIFIED_TYPE(t)?(t)->link:(t))
+#define UNQUALIFY_TYPE(t) (QUALIFIED_TYPE(t)?remove_type_qualifier(t):(t))
 
 #define IS_VOLATILE_TYPE(t) ((t)->code == TYPE_VOLATILE)
 
@@ -229,5 +241,15 @@ t_type* make_array_type(t_type* type, int size);
 // in ANSI C, array can be used as a pointer in some cases
 //
 t_type* array_to_ptr_type(t_type* type);
+
+//
+// qualify specified type with code
+//
+t_type* qualify_type(t_type* type, int code);
+
+//
+// construct a function type
+//
+t_type* make_function_type(t_type* type, t_param* parameter, int prototype, int ellipse);
 
 #endif
