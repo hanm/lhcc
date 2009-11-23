@@ -254,8 +254,8 @@ t_type* make_function_type(t_type* type, t_param* parameter, int prototype, int 
 
 //
 // construct a record type
-// record_type - type of record could be one of enum, struct, union
-// name - name of struct/union/enum, could be null (anonymous struct/union)
+// record_type - type of record could be one of either a struct or union
+// name - name of struct/union, could be null (anonymous struct/union)
 //
 t_type* make_record_type(int record_type, char* name);
 
