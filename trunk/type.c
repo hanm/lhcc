@@ -305,3 +305,90 @@ t_type* make_function_type(t_type* type, t_param* parameter, int prototype, int 
 
 	return type;
 }
+
+
+t_type* make_record_type(int record_type, char* name)
+{
+    t_symbol* symbol = NULL;
+    t_record* record = NULL;
+    static int a = 0; // for anonymous record hcc generate the name
+
+    HCC_ASSERT(record_type == TYPE_ENUM || record_type == TYPE_STRUCT || record_type == TYPE_UNION);
+
+    if (name == NULL)
+    {
+        name = atom_int(a ++);
+    }
+    else
+    {
+        symbol = find_symbol(name, sym_table_types);
+        if (symbol != NULL)
+        {
+            // this implicitly means a new record type is only created in current scope (scope_level)
+            if (symbol->scope == scope_level || symbol->scope == PARAM && scope_level == PARAM + 1)
+            {
+                if (symbol->type->code == record_type && !symbol->defined)
+                {
+                    return symbol->type;               
+                }
+                else if (symbol->type->code == record_type && symbol->defined)
+                {
+                    type_error("\'record\' type redefinition");
+                    return NULL;
+                }
+            }
+        }
+    }
+
+    // after cross fire either the type is missing or not satisfy our needs
+    // so create a new one and set up links with sym table
+    // the fields of record will be added later and size/align will be adjusted accordingly.
+    symbol = add_symbol(name, &sym_table_types, scope_level, PERM);
+    symbol->type = atomic_type(NULL, record_type, 0, 0, symbol); // a new record type has align 0 and size 0
+    
+    // bind with record 
+    CALLOC(record, sizeof *record);
+    record->name = name;
+    record->fields = NULL;
+    symbol->type->u.record = record;
+    
+    return symbol->type;
+}
+
+
+t_field* make_field_type(t_type* field_type, char* name, t_type* record_type)
+{
+    t_field* current = NULL;
+    t_field** next = NULL;
+
+    // [TODO] - support unnamed bit field ; at this moment field requires a name
+    HCC_ASSERT(field_type != NULL && name != NULL && record_type != NULL);
+
+    next = &record_type->u.record->fields;
+    current = *next;
+
+    for (; current; next = &current->next, current = *next)
+    {
+        if (current->name == name) type_error("duplicate field name");
+    }
+
+    CALLOC(current, sizeof *current);
+    current->name = name;
+    current->type = field_type;
+    current->bits = 0;
+    current->offset = 0;
+    current->next = NULL;
+
+    return current;
+}
+
+int is_compatible_type(t_type* type1, t_type* type2)
+{
+    if (type1 == type2) return 1;
+    
+    type1 = UNQUALIFY_TYPE(type1);
+    type2 = UNQUALIFY_TYPE(type2);
+
+    
+    return 1;
+}
