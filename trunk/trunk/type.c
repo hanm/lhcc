@@ -382,13 +382,43 @@ t_field* make_field_type(t_type* field_type, char* name, t_type* record_type)
     return current;
 }
 
+
+static int is_compatible_function(t_type* type1, t_type* type2)
+{
+	// TODO - implement me
+	(type1);
+	(type2);
+	return 1;
+}
+
 int is_compatible_type(t_type* type1, t_type* type2)
 {
-    if (type1 == type2) return 1;
+    if (type1 == type2)
+	{
+		return 1;
+	}
     
     type1 = UNQUALIFY_TYPE(type1);
     type2 = UNQUALIFY_TYPE(type2);
 
-    
+	if (type1->code != type2->code)
+	{
+		return 0;
+	}
+
+	if (type1->code == TYPE_PTR)
+	{
+		return is_compatible_type(type1->link, type2->link);
+	}
+	else if (type1->code == TYPE_ARRARY)
+	{
+		return is_compatible_type(type1->link, type2->link) &&
+			(type1->size == type2->size || type1->size == 0 || type2->size == 0);
+	}
+	else if (type1->code == TYPE_FUNCTION)
+	{
+		return is_compatible_function(type1, type2);
+	}
+
     return 1;
 }
