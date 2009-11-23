@@ -30,6 +30,10 @@ OTHER DEALINGS IN THE SOFTWARE.
 #include "hcc.h"
 #include "type.h"
 
+// scope level
+extern int scope_level;
+
+
 //
 // Tooken coordinate
 //
@@ -83,6 +87,8 @@ typedef struct symbol
 	int scope; // symbol effective scope 
 	int category; // symbol category (class)
 	t_type* type; // symbol type
+
+    int defined; // symbol definition flag
     t_token_coordinate coordinate;
 
 	struct symbol* previous;

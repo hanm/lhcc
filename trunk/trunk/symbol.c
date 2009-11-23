@@ -199,6 +199,7 @@ t_symbol* add_const(t_value val)
 	p->symbol.scope = CONSTANTS;
 	p->symbol.storage = STORAGE_STATIC;
 	p->symbol.value = val;
+    p->symbol.defined = 1;
 	p->next = sym_table_constants->buckets[h];
 	p->symbol.previous = sym_table_constants->all_symbols;
 	sym_table_constants->all_symbols = &p->symbol;

@@ -102,7 +102,7 @@ typedef struct field_type
 	int offset; // field offset relative to start of the record.
 	int bits; // number of bits if the field is a bit field; otherwise 0 by default.
 	t_type* type; // field type.
-	struct field* next; // link to next field in the same record.
+	struct field_type* next; // link to next field in the same record.
 } t_field;
 
 //
@@ -251,5 +251,22 @@ t_type* qualify_type(t_type* type, int code);
 // construct a function type
 //
 t_type* make_function_type(t_type* type, t_param* parameter, int prototype, int ellipse);
+
+//
+// construct a record type
+// record_type - type of record could be one of enum, struct, union
+// name - name of struct/union/enum, could be null (anonymous struct/union)
+//
+t_type* make_record_type(int record_type, char* name);
+
+//
+// construct a field type and associate it with specified record type
+//
+t_field* make_field_type(t_type* field_type, char* name, t_type* record_type);
+
+//
+// check type compatibility
+// 
+int is_compatible_type(t_type*, t_type*); 
 
 #endif
