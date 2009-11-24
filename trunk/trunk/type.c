@@ -385,11 +385,77 @@ t_field* make_field_type(t_type* field_type, char* name, t_type* record_type)
 
 static int is_compatible_function(t_type* type1, t_type* type2)
 {
-	// TODO - implement me
-	(type1);
-	(type2);
-	return 1;
+    t_param* p1 = NULL;
+    t_param* p2 = NULL;
+
+    HCC_ASSERT(type1 != NULL && type2 != NULL && 
+        type1->code == TYPE_FUNCTION && 
+        type2->code == TYPE_FUNCTION &&
+        type1->u.function != NULL &&
+        type2->u.function != NULL);
+
+    // incompatible return type
+    if (!is_compatible_type(type1->link, type2->link))
+    {
+        return 0;
+    }
+    
+    // both functions have no prototype
+    // [TODO] they are compatible??
+    if (!type1->u.function->prototype && !type2->u.function->prototype)
+    {
+        return 1;
+    }
+
+    p1 = type1->u.function->parameter;
+    p2 = type2->u.function->parameter;
+
+    if (p1 && p2)
+    {
+        // both have prototype - iterate and check
+        // [TODO] stupid cast
+        for (; p1 && p2; p1 = (t_param*)p1->next, p2 = (t_param*)p2->next)
+        {
+            if (!is_compatible_type(p1->type, p2->type))
+            {
+                return 0;
+            }
+        }
+
+        return 1;
+
+    }
+    else if (!p1 && !p2)
+    {
+        // both have no prototype - implicitly compatible?? [TODO]
+        return 1;
+    }
+    else
+    {
+        if (is_variadic_function(p1 ? type1 : type2))
+        {
+            return 0;
+        }
+
+        // either p1 or p2 has to have prototype when the flow hits here..
+        if (!p1)
+        {
+            p1 = p2;
+        }
+
+        for (; p1; p1 = (t_param*)p1->next)
+        {
+            type1 = UNQUALIFY_TYPE(p1->type);
+            if (promote_type(type1) != type1)
+            {
+                return 0;
+            }
+        }
+
+        return 1;
+    }
 }
+
 
 int is_compatible_type(t_type* type1, t_type* type2)
 {
@@ -420,5 +486,42 @@ int is_compatible_type(t_type* type1, t_type* type2)
 		return is_compatible_function(type1, type2);
 	}
 
-    return 1;
+    return 0;
+}
+
+t_type* promote_type(t_type* type)
+{
+    HCC_ASSERT(type != NULL);
+    
+    if (type->code <= TYPE_UNSIGNED_SHORT)
+    {
+        return type_int;
+    }
+    else if (type->code == TYPE_FLOAT)
+    {
+        return type_double;
+    }
+
+    return type;
+}
+
+int is_variadic_function(t_type* type)
+{
+    // [TODO] here we need to make sure the ellipse flag is properly set
+    if (IS_FUNCTION_TYPE(type) && type->u.function->ellipse)
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+
+t_type* composite_type(t_type* type1, t_type* type2)
+{
+    (type1);
+    (type2);
+    return NULL;
 }
