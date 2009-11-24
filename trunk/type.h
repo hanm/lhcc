@@ -265,8 +265,36 @@ t_type* make_record_type(int record_type, char* name);
 t_field* make_field_type(t_type* field_type, char* name, t_type* record_type);
 
 //
-// check type compatibility
+// Check type compatibility
+//
+// To determine whether or not an implicit conversion is permissible, ANSI C
+// introduced the concept of compatible types. After promotion, using the appropriate
+// set of promotion rules, two non-pointer types are compatible if they have the same
+// size, signedness, and integer or float characteristic, or, in the case of aggregates, are of
+// the same structure or union type
 // 
+// Pointers are compatible if they point to compatible types. No default promotion rules
+// apply to pointers
+//
 int is_compatible_type(t_type*, t_type*); 
+
+//
+// promote type according to default argument promotion rules: 
+// short and char types (whether signed or unsigned) are passed as ints, 
+// other integral quantities are not changed, and floating
+// point quantities are passed as doubles. These rules are also used for arguments in the
+// variable-argument portion of a function whose prototype ends in ellipses (…)
+//
+t_type* promote_type(t_type* type);
+
+//
+// check if a function is a function of variable arity
+//
+int is_variadic_function(t_type* type);
+
+//
+// composite a new type from compatible types
+//
+t_type* composite_type(t_type* type1, t_type* type2);
 
 #endif
