@@ -33,6 +33,10 @@ OTHER DEALINGS IN THE SOFTWARE.
 // 
 enum 
 {
+	//
+	// caution - the relevant order of these fields matters
+	// as some macros and functions in type system depends on the order!
+	//
 	TYPE_CHAR, // signed char
 	TYPE_UNSIGNED_CHAR, // unsigned char
 	TYPE_SHORT, // short, signed short, short int, signed short int
@@ -47,7 +51,7 @@ enum
 	TYPE_FLOAT, // float
 	TYPE_DOUBLE, // double
 	TYPE_LONGDOUBLE, // long double
-	TYPE_PTR, // pointer
+	TYPE_PTR, // pointer /*scalar type ends */
 	TYPE_VOID, // void
 	TYPE_STRUCT, // struct
 	TYPE_UNION, // union
@@ -211,6 +215,8 @@ t_type* remove_type_qualifier(t_type* type);
 
 #define IS_VOID_TYPE(t) (UNQUALIFY_TYPE(type)->code == TYPE_VOID)
 
+#define IS_SCALAR_TYPE(t) (UNQUALIFY_TYPE(type)->code <= TYPE_PTR)
+
 //
 // initialize type system by initializing c build in types and install their on type symbol table
 //
@@ -283,7 +289,7 @@ int is_compatible_type(t_type*, t_type*);
 // short and char types (whether signed or unsigned) are passed as ints, 
 // other integral quantities are not changed, and floating
 // point quantities are passed as doubles. These rules are also used for arguments in the
-// variable-argument portion of a function whose prototype ends in ellipses (…)
+// variable-argument portion of a function whose prototype ends in ellipses (?
 //
 t_type* promote_type(t_type* type);
 

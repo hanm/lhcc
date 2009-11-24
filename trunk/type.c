@@ -521,7 +521,30 @@ int is_variadic_function(t_type* type)
 
 t_type* composite_type(t_type* type1, t_type* type2)
 {
-    (type1);
-    (type2);
-    return NULL;
+	int type_code = 0;
+	HCC_ASSERT(type1 != NULL && type2 != NULL && is_compatible_type(type1, type2));
+
+	if (type1 == type2)
+	{
+		return type1;
+	}
+
+	type_code = type1->code;
+	if (type_code == TYPE_PTR)
+	{
+		return pointer_type(composite_type(type1->link, type2->link));
+	}
+	else if (type_code == TYPE_ARRARY)
+	{
+		// [TODO]
+		return NULL;
+	}
+	else if (type_code == TYPE_FUNCTION)
+	{
+		// [TODO]
+		return NULL;
+	}
+	// QUALIFIED TYPE .. get off qualifier and ....
+
+	return NULL;
 }
