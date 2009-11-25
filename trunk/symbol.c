@@ -70,9 +70,12 @@ void enter_scope()
 
 void exit_scope()
 {
-    //
-    // [TODO] - remove types also
-    //
+	remove_types(scope_level);
+	if (sym_table_types->level == scope_level)
+	{
+		sym_table_types = sym_table_types->previous;
+	}
+
     if (scope_level == sym_table_identifiers->level)
     {
 		sym_table_identifiers = sym_table_identifiers->previous;
