@@ -279,6 +279,8 @@ t_field* make_field_type(t_type* field_type, char* name, t_type* record_type);
 // size, signedness, and integer or float characteristic, or, in the case of aggregates, are of
 // the same structure or union type
 // 
+// Two arithmetic types are compatible only if they are the same type.
+//
 // Pointers are compatible if they point to compatible types. No default promotion rules
 // apply to pointers
 //
@@ -302,5 +304,11 @@ int is_variadic_function(t_type* type);
 // composite a new type from compatible types
 //
 t_type* composite_type(t_type* type1, t_type* type2);
+
+//
+// check if two types have same type qualifier
+// for example, const volatile restrict would be treat the same set of qualifier as restrict volatile const.. etc.
+// 
+int has_same_type_qualifier(t_type* type1, t_type* type2);
 
 #endif

@@ -446,7 +446,7 @@ static int is_compatible_function(t_type* type1, t_type* type2)
         for (; p1; p1 = (t_param*)p1->next)
         {
             type1 = UNQUALIFY_TYPE(p1->type);
-            if (promote_type(type1) != type1)
+            if (promote_type(type1) != (IS_ENUM_TYPE(type1) ? type1->link : type1))
             {
                 return 0;
             }
@@ -464,6 +464,11 @@ int is_compatible_type(t_type* type1, t_type* type2)
 		return 1;
 	}
     
+    if (!has_same_type_qualifier(type1, type2))
+    {
+        return 0;
+    }
+
     type1 = UNQUALIFY_TYPE(type1);
     type2 = UNQUALIFY_TYPE(type2);
 
@@ -485,6 +490,9 @@ int is_compatible_type(t_type* type1, t_type* type2)
 	{
 		return is_compatible_function(type1, type2);
 	}
+    // [TODO] - consider compatible type for struct, union, and enum..
+    // or leave it to semantic check??
+    // http://www.serc.iisc.ernet.in/ComputingFacilities/systems/cluster/vac-7.0/html/language/ref/clrc03compatible_types.htm
 
     return 0;
 }
@@ -519,9 +527,44 @@ int is_variadic_function(t_type* type)
 }
 
 
+static int get_type_qualifiers(t_type* type)
+{
+    int m = 0;
+
+    while (type != NULL && IS_TYPE_QUALIFIERS(type->code))
+    {
+        if (type->code == TYPE_CONST)
+        {
+            m |= 0x01;
+        }
+        else if (type->code == TYPE_VOLATILE)
+        {
+            m |= 0x10;
+        }
+        else if (type->code == TYPE_RESTRICT)
+        {
+            m |= 0x100;
+        }
+
+        type = type->link;
+    }
+
+    return m;
+}
+
+
+int has_same_type_qualifier(t_type* type1, t_type* type2)
+{
+    HCC_ASSERT(type1 != NULL && type2 != NULL);
+    return get_type_qualifiers(type1) == get_type_qualifiers(type2); 
+}
+
+
 t_type* composite_type(t_type* type1, t_type* type2)
 {
 	int type_code = 0;
+
+    // note the assertion here - two types must be compatible before this func is called..
 	HCC_ASSERT(type1 != NULL && type2 != NULL && is_compatible_type(type1, type2));
 
 	if (type1 == type2)
@@ -536,15 +579,68 @@ t_type* composite_type(t_type* type1, t_type* type2)
 	}
 	else if (type_code == TYPE_ARRARY)
 	{
-		// [TODO]
-		return NULL;
-	}
+        // array are compatible if and only if both have same size or both are incomplete
+        // [TODO][Caution] - note here directly modify one of input parameters..
+        // if this is a problem fix it later.. the same apply to below for function composition
+        return type1->size == 0 ? type1 : type2;
+    }
 	else if (type_code == TYPE_FUNCTION)
 	{
-		// [TODO]
-		return NULL;
-	}
-	// QUALIFIED TYPE .. get off qualifier and ....
+        //
+		// For two function types, it is a function type that returns a composite of the two return types. 
+        // If both specify types for their parameters, each parameter type in the composite type is the 
+        // composite of the two corresponding parameter types. If only one specifies types for its parameters, 
+        // it determines the parameter types in the composite type. Otherwise, the composite type specifies no types for its parameters.
+        //
+ 
+        // return type
+        type1->link = composite_type(type1->link, type2->link);
 
-	return NULL;
+        if (type1->u.function->prototype && type2->u.function->prototype)
+        {
+            t_param* p1 = type1->u.function->parameter;
+            t_param* p2 = type2->u.function->parameter;
+
+            // both function would be compatible which implies they have same set of parameters
+            for (; p1; p1 = (t_param*)p1->next, p2 = (t_param*)p2->next)
+            {
+                p1->type = composite_type(p1->type, p2->type);
+            }
+
+            return type1;
+        }
+        else
+        {
+            return type1->u.function->prototype ? type1 : type2;
+        }
+	}
+    else if (IS_TYPE_QUALIFIERS(type_code))
+    {
+        int a = get_type_qualifiers(type1);
+        type1 = UNQUALIFY_TYPE(type1);
+        type2 = UNQUALIFY_TYPE(type2);
+        
+        type1 = composite_type(type1, type2);
+
+        if ( a & 0x01)
+        {
+            type1 = qualify_type(type1, TYPE_CONST);
+        }
+        
+        if (a & 0x10)
+        {
+            type1 = qualify_type(type1, TYPE_VOLATILE);
+        }
+
+        if (a & 0x100)
+        {
+            type1 = qualify_type(type1, TYPE_RESTRICT);
+        }
+        
+        return type1;
+    }
+
+    // THIS SHOULD NOT HAPPEN
+    HCC_ASSERT(0);
+    return NULL;
 }
