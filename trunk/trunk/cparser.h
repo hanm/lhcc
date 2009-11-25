@@ -433,7 +433,7 @@ function_definition
 */
 
 // current parser token
-int cparser_token;
+int cptk;
 
 void initialize_parser();
 void match(int token);
