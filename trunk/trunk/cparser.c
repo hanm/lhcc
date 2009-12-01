@@ -1350,6 +1350,12 @@ void external_declaration()
 
     declarator();
     
+	if (cptk == TK_SEMICOLON)
+	{
+		GET_NEXT_TOKEN;
+		return;
+	}
+
     if (cptk == TK_COMMA || cptk == TK_ASSIGN)
     {
         if (cptk == TK_ASSIGN)
@@ -1436,7 +1442,7 @@ int is_current_token_declarator_token()
 	}
 	else
 	{
-        return is_current_token_declaration_token();
+        return 0;
 	}
 }
 
