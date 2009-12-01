@@ -58,10 +58,10 @@ typedef struct clexer_context
 
 typedef union lexeme_value
 {
-	int i;
-	float f;
-	long double d;
-	char* s;
+	int integer_value;
+	float float_value;
+	long double double_value;
+	char* string_value;
 } t_lexeme_value;
 
 t_lexeme_value lexeme_value;

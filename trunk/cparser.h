@@ -515,17 +515,11 @@ void specifiers_qualifier_list();
 void enum_specifier();
 void enumerator();
 
-//
-// misc, entry points, etc
-//
 void translation_unit();
 void external_declaration();
 
-//
-// types utilities
-//
-int is_typedef_name(int token);
-int is_typedef(char* token_name);
+
+int is_typedef_id(char* token_name);
 //
 // declarations are prefixed with type specifiers
 // which includes build in types and typedef 

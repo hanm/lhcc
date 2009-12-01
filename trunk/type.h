@@ -216,7 +216,7 @@ t_type* remove_type_qualifier(t_type* type);
 #define IS_VOID_TYPE(t) (UNQUALIFY_TYPE(type)->code == TYPE_VOID)
 
 #define IS_SCALAR_TYPE(t) (UNQUALIFY_TYPE(type)->code <= TYPE_PTR)
-
+ 
 //
 // initialize type system by initializing c build in types and install their on type symbol table
 //

@@ -28,6 +28,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 #include "clexer.h"
 #include "cparser.h"
 #include "assert.h"
+#include "symbol.h"
 
 static char* tokens[] = 
 {
@@ -71,21 +72,23 @@ void primary_expression()
     {
     case TK_ID :
         GET_NEXT_TOKEN;
-        break;
+        return;
     case TK_CONST_FLOAT :
     case TK_CONST_INTEGER :
         GET_NEXT_TOKEN;
-        break;
+        return;
     case TK_CONST_CHAR_LITERAL :
     case TK_CONST_STRING_LITERAL:
         GET_NEXT_TOKEN;
-        break;
+        return;
     case TK_LPAREN :
         GET_NEXT_TOKEN;
         expression();
         match(TK_RPAREN);
+        return;
     default :
         error(&coord, "expect identifier, constant, string literal or (");
+        return;
     }
 }
 
@@ -199,7 +202,7 @@ void unary_expression()
     case TK_LPAREN :
         {
             GET_NEXT_TOKEN;
-            if (is_typedef_name(cptk))
+            if (is_typedef_id(lexeme_value.string_value))
             {
                 // todo - parse type name
                 GET_NEXT_TOKEN;
@@ -229,7 +232,7 @@ void sizeof_expression()
     if (cptk == TK_LPAREN)
     {
         GET_NEXT_TOKEN;
-        if (is_typedef_name(cptk))
+        if (is_typedef_id(lexeme_value.string_value))
         {
             // todo - parse typename
             GET_NEXT_TOKEN;
@@ -820,12 +823,12 @@ void declaration_specifiers()
             GET_NEXT_TOKEN;
             break;
         case TK_ID:
-            if (is_typedef(lexeme_value.s))
+            if (is_typedef_id(lexeme_value.string_value))
             {
                 // TYPEDEF names
                 GET_NEXT_TOKEN;
             }
-            break;
+            return;
         case TK_STRUCT:
         case TK_UNION:
             struct_or_union_specifier();
@@ -973,7 +976,7 @@ void suffix_declarator()
     {
         GET_NEXT_TOKEN;
         
-        if (is_typedef(lexeme_value.s))
+        if (is_typedef_id(lexeme_value.string_value))
         {
             parameter_type_list();
         }
@@ -1198,12 +1201,12 @@ void specifiers_qualifier_list()
             GET_NEXT_TOKEN;
             break;
         case TK_ID:
-            if (is_typedef(lexeme_value.s))
+            if (is_typedef_id(lexeme_value.string_value))
             {
                 // TYPEDEF names
                 GET_NEXT_TOKEN;
             }
-            break;
+            return;
         case TK_STRUCT:
         case TK_UNION:
             struct_or_union_specifier();
@@ -1379,25 +1382,11 @@ void external_declaration()
     }
 }
 
-int is_typedef_name(int token)
+int is_typedef_id(char* token_name)
 {
-    if (token >= TK_FLOAT && token <= TK_EXTERN) return 1;
+    t_symbol* sym = find_symbol(token_name, sym_table_identifiers);
 
-    if (token == TK_ID)
-    {
-        // todo - here need to look up symbol table and check type flag.
-        // for now just return false
-        return 0;
-    }
-
-    return 0;
-}
-
-int is_typedef(char* name)
-{
-    // TODO
-    (name);
-    return 0;
+    return (sym != NULL) && (sym->storage == TK_TYPEDEF) && (sym->scope <= scope_level);
 }
 
 int is_current_token_declaration_token()
@@ -1427,20 +1416,14 @@ int is_current_token_declaration_token()
     {
         return 1;
     }
-
-    //
-    // user defined types (typedef)
-    //
-    if (cptk == TK_ID)
+    else if (cptk == TK_ID)
     {
-        //
-        // TODO - implement me by adding is type def check
-        // if it's a typedef name, return 1 otherwise 0
-        //
-        return 1;
+        return is_typedef_id(lexeme_value.string_value);
     }
-    
-	return 0;
+    else
+    {
+        return 0;
+    }
 }
 
 int is_current_token_declarator_token()
@@ -1453,7 +1436,7 @@ int is_current_token_declarator_token()
 	}
 	else
 	{
-		return 0;
+        return is_current_token_declaration_token();
 	}
 }
 

@@ -189,7 +189,7 @@ void test_parser()
     char* path[3] = {"E:\\Program Files\\Microsoft Visual Studio 9.0\\VC\\include", 
 		"C:\\Program Files\\Microsoft Visual Studio 9.0\\VC\\include", "C:\\"};
 
-	sc.filename = "C:\\bloom-filter.c";
+	sc.filename = "C:\\jill.c";
 
     sc.include_pathes = path;
     sc.number_of_include_pathes = 2;
