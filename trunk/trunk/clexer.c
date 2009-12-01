@@ -369,7 +369,7 @@ static int identify_integer_value(char* start, int length, int base)
 
     HCC_TRACE("value is %d\n", value);
 
-    lexeme_value.i = value;
+    lexeme_value.integer_value = value;
     return TK_CONST_INTEGER;
 }
 
@@ -429,7 +429,7 @@ static int identify_float_value(char* number)
     // todo - here maybe do one step further to identify that is it a double, or float?
     // right now the value is just assigned to double which is garanteed to hold on both a double and a float
     // so it doesn't hurt, so far...
-    lexeme_value.d = value;
+    lexeme_value.double_value = value;
     return TK_CONST_FLOAT;
 }
 
@@ -605,8 +605,8 @@ static int get_token_internal()
 
                     if (retval == TK_ID)
                     {
-                        lexeme_value.s = atom_string(ls.ctok->name);
-                        HCC_TRACE("identifier: %s\n", lexeme_value.s);
+                        lexeme_value.string_value = atom_string(ls.ctok->name);
+                        HCC_TRACE("identifier: %s\n", lexeme_value.string_value);
                     }
                     else
                     {
@@ -619,7 +619,7 @@ static int get_token_internal()
                 {
                     HCC_TRACE("string const : %s\n", ls.ctok->name);
 
-                    lexeme_value.s = atom_string(ls.ctok->name);
+                    lexeme_value.string_value = atom_string(ls.ctok->name);
                     retval = TK_CONST_STRING_LITERAL;
                     break;
                 }
@@ -627,7 +627,7 @@ static int get_token_internal()
                 {
                     HCC_TRACE("char const : %s\n", ls.ctok->name);
 
-                    lexeme_value.s = atom_string(ls.ctok->name);
+                    lexeme_value.string_value = atom_string(ls.ctok->name);
                     retval = TK_CONST_CHAR_LITERAL;
                     break;
                 }
