@@ -981,7 +981,8 @@ void suffix_declarator()
     {
         GET_NEXT_TOKEN;
         
-        if (is_typedef_id(lexeme_value.string_value))
+		// [JILL VALENTINE] [FIX ME]
+		if (is_current_token_declaration_token())
         {
             parameter_type_list();
         }

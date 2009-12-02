@@ -159,7 +159,11 @@ struct symbol* find_symbol(char* name, t_symbol_table* table)
     
 	for (;;)
 	{
-		if (!table->buckets)
+		//
+		// [TO IMPROVE] Is this check really needed? The allocation of symbol table
+		// would guarantee the buckets are allocated.
+		//
+		if (table->buckets)
 		{
 			for (p = table->buckets[h]; p; p = p->next)
 			{
