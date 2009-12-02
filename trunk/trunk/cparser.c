@@ -790,8 +790,10 @@ void declaration()
 	match(TK_SEMICOLON);
 }
 
-void declaration_specifiers()
+int declaration_specifiers()
 {
+    int storage_specifier = TK_AUTO;
+
     for(;;)
     {
         switch(cptk)
@@ -801,6 +803,7 @@ void declaration_specifiers()
         case TK_EXTERN:
         case TK_STATIC:
         case TK_TYPEDEF:
+            storage_specifier = cptk;
             // storage specifiers
             GET_NEXT_TOKEN;
             break;
@@ -828,7 +831,7 @@ void declaration_specifiers()
                 // TYPEDEF names
                 GET_NEXT_TOKEN;
             }
-            return;
+            return storage_specifier;
         case TK_STRUCT:
         case TK_UNION:
             struct_or_union_specifier();
@@ -837,7 +840,7 @@ void declaration_specifiers()
             enum_specifier();
             break;
         default:
-            return;
+            return storage_specifier;
         }
     }
 }
@@ -850,7 +853,8 @@ init_declarator
 */
 void init_declarator()
 {
-	declarator();
+    // [TODO] [FIX ME]
+    declarator(TK_AUTO);
 
 	if (cptk == TK_ASSIGN)
 	{
@@ -930,7 +934,8 @@ parameter_declaration
 void parameter_declaration()
 {
 	declaration_specifiers();
-	declarator(); // TODO - abstract declarator can be parsed also here.
+    // [TODO] [FIX ME]
+    declarator(TK_AUTO); // TODO - abstract declarator can be parsed also here.
 }
 
 /*
@@ -1003,13 +1008,13 @@ declarator
 	| direct_declarator
 	;
 */
-void declarator()
+void declarator(int storage_class)
 {
 	if (cptk == TK_MUL)
 	{
 		pointer();
 	}
-	direct_declarator();
+    direct_declarator(storage_class);
 
     while (cptk == TK_LPAREN || cptk == TK_LBRACKET)
     {
@@ -1023,17 +1028,28 @@ direct_declarator
 	| '(' declarator ')'
 	;
 */
-void direct_declarator()
+void direct_declarator(int storage_class)
 {
+    t_symbol* symbol = NULL;
+
     if (cptk == TK_LPAREN)
     {
         GET_NEXT_TOKEN;
-        declarator();
+        // [FIX ME]
+        declarator(TK_AUTO);
         match(TK_RPAREN);
     }
     else
     {
-        // TODO -??? install symbol??
+        //
+        // [TODO] the symbol should be installed after semantic checking.
+        // at this moment, AST is not ready so assume what the source I am parsing is valid (as they should)
+        // and install symbol here. As a result, specifier parsing functions need to return storage class type for declarator
+        // parsing code to use, and declarator parsing function needs to accept such input parameter.
+        // After AST is ready, such parameter passing can be done implicitly via AST.
+        //
+        symbol = install_symbol(lexeme_value.string_value, sym_table_identifiers);
+        symbol->storage = storage_class;
         match(TK_ID);
     }
 }
@@ -1158,7 +1174,8 @@ void struct_declarator()
 {
     if (cptk != TK_COLON)
     {
-        declarator();
+        // [FIX ME]
+        declarator(TK_AUTO);
     }
 
     if (cptk == TK_COLON)
@@ -1321,9 +1338,12 @@ declaration
 */
 void external_declaration()
 {
+    int storage_class = TK_AUTO;
+
     if (is_current_token_declarator_token())
     {
-        declarator();
+        // [FIX ME] - IS THAT NEEDED? function omit types have extern int assumed...
+        declarator(TK_AUTO);
 
         if (cptk != TK_LBRACE)
         {
@@ -1338,7 +1358,8 @@ void external_declaration()
         compound_statement();
     }
 
-    declaration_specifiers();
+    storage_class = declaration_specifiers();
+    
     if (cptk == TK_SEMICOLON)
     {
         // an external declaration
@@ -1348,7 +1369,7 @@ void external_declaration()
         return;
     }
 
-    declarator();
+    declarator(storage_class);
     
 	if (cptk == TK_SEMICOLON)
 	{
