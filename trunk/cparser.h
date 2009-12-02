@@ -496,15 +496,15 @@ void labeled_statement();
 // declarations
 //
 void declaration();
-void declaration_specifiers();
+int declaration_specifiers();
 void init_declarator();
 void initializer();
 void parameter_type_list();
 void parameter_declaration();
 void pointer();
 void suffix_declarator();
-void declarator();
-void direct_declarator();
+void declarator(int storage_class);
+void direct_declarator(int storage_class);
 void abstract_declarator();
 void direct_abstract_declarator();
 
