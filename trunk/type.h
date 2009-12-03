@@ -61,7 +61,10 @@ enum
 	// type qualifiers
 	TYPE_CONST, // constant
 	TYPE_VOLATILE, // volatile
-	TYPE_RESTRICT // restrict (C99)
+	TYPE_RESTRICT, // restrict (C99)
+
+	// extended types [FIX ME]
+	TYPE_INT64
 };
 
 //
