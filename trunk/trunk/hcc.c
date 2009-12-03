@@ -192,7 +192,8 @@ void test_parser()
 #if 0
 	sc.filename = "G:\\Jill.c";
 #else
-	sc.filename = "G:\\bloom-filter.c";
+	//sc.filename = "G:\\bloom-filter.c";
+	sc.filename = "G:\\stdlib.h";
 #endif
 
     sc.include_pathes = path;

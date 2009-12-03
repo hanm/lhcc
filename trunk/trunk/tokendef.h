@@ -168,5 +168,7 @@ TK(TK_END,           "EOF")
 // their private extension like __cdecl
 //
 TK(TK_CDECL, "__cdecl")
+// extension to support 64 bit integer
+TK(TK_INT64, "__int64")
 
 TK(TK_NULL, "null")

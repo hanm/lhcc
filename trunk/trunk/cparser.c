@@ -822,6 +822,7 @@ int declaration_specifiers()
         case TK_UNSIGNED:
         case TK_VOID:
         case TK_LONG:
+		case TK_INT64:
             // "native" type specifiers
             GET_NEXT_TOKEN;
             break;
@@ -1249,6 +1250,7 @@ void specifiers_qualifier_list()
         case TK_UNSIGNED:
         case TK_VOID:
         case TK_LONG:
+		case TK_INT64:
             // "native" type specifiers
             GET_NEXT_TOKEN;
             break;
@@ -1474,7 +1476,8 @@ int is_current_token_declaration_specifier_token()
         cptk == TK_ENUM ||
         cptk == TK_STRUCT ||
         cptk == TK_UNION ||
-        cptk == TK_VOID)
+        cptk == TK_VOID ||
+		cptk == TK_INT64)
     {
         return 1;
     }
@@ -1492,7 +1495,7 @@ int is_current_token_declarator_token()
 {
 	if (cptk == TK_MUL ||
 		cptk == TK_LPAREN ||
-		cptk == TK_ID)
+		(cptk == TK_ID && !is_typedef_id(lexeme_value.string_value)))
 	{
 		return 1;
 	}

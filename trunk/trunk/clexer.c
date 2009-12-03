@@ -277,6 +277,13 @@ static int identify_keyword(char* id)
 		// deal special case "_" seperately which will generate index out of bounds (26)
 		index = (*id &~0x20) - 'A'; 
 	}
+	// [NON STD EXT][FIX ME]
+	// here is a hack to support __int64 extension
+	// otherwise this keyword will be omitted.
+	else if (!strcmp(id, "__int64"))
+	{
+		return TK_INT64;
+	}
   
     HCC_ASSERT(id);
 
