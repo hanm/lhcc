@@ -521,11 +521,13 @@ void external_declaration();
 
 int is_typedef_id(char* token_name);
 //
+// check if current token is in declaration specifier token set
+//
 // declarations are prefixed with type specifiers
 // which includes build in types and typedef 
 // identifier names
 //
-int is_current_token_declaration_token();
+int is_current_token_declaration_specifier_token();
 //
 // declarators are prefixed with pointers,
 // left parenthesis, or identifiers

@@ -742,7 +742,7 @@ void compound_statement()
 
 	while (cptk != TK_RBRACE && cptk != TK_END)
 	{
-		if (is_current_token_declaration_token())
+		if (is_current_token_declaration_specifier_token())
 		{
 			if (cptk == TK_ID && peek_token() == TK_COLON)
 			{
@@ -933,9 +933,43 @@ parameter_declaration
 */
 void parameter_declaration()
 {
-	declaration_specifiers();
-    // [TODO] [FIX ME]
-    declarator(TK_AUTO); // TODO - abstract declarator can be parsed also here.
+	int storage_class = declaration_specifiers();
+    
+    //
+    // look ahead is neither in declarator nor in abstract declarator, we are done
+    //
+    if (!is_current_token_declarator_token() && cptk != TK_LBRACKET)
+    {
+        return;
+    }
+
+    //
+    // I admit this is ugly but hopefully this is the only place where declarator and abstract declarator side by side
+    //
+    // [TO IMPROVE]
+    //
+    if (cptk == TK_MUL)
+    {
+        pointer();
+    }
+    
+    if (!is_current_token_declarator_token() && cptk != TK_LBRACKET)
+    {
+        // we are in abstract declarator. job done.
+        return;
+    }
+    
+    //
+    // interestingly abstract declarator would never end up with an identifier so hopefully we finish the deal here
+    //
+    if (cptk == TK_ID)
+    {
+        declarator(storage_class);
+    }
+    else
+    {
+        abstract_declarator();
+    }
 }
 
 /*
@@ -982,7 +1016,8 @@ void suffix_declarator()
         GET_NEXT_TOKEN;
         
 		// [JILL VALENTINE] [FIX ME]
-		if (is_current_token_declaration_token())
+        // parameter type list always starts with declaration specifiers
+		if (is_current_token_declaration_specifier_token())
         {
             parameter_type_list();
         }
@@ -1036,8 +1071,7 @@ void direct_declarator(int storage_class)
     if (cptk == TK_LPAREN)
     {
         GET_NEXT_TOKEN;
-        // [FIX ME]
-        declarator(TK_AUTO);
+        declarator(storage_class);
         match(TK_RPAREN);
     }
     else
@@ -1349,7 +1383,7 @@ void external_declaration()
         if (cptk != TK_LBRACE)
         {
             // declaration list
-            while (is_current_token_declaration_token())
+            while (is_current_token_declaration_specifier_token())
             {
                 declaration();
             }
@@ -1397,10 +1431,10 @@ void external_declaration()
     else
     {
         // function definition
-        if (is_current_token_declaration_token())
+        if (is_current_token_declaration_specifier_token())
         {
             // declaration list
-            while (is_current_token_declaration_token())
+            while (is_current_token_declaration_specifier_token())
             {
                 declaration();
             }
@@ -1417,7 +1451,7 @@ int is_typedef_id(char* token_name)
     return (sym != NULL) && (sym->storage == TK_TYPEDEF) && (sym->scope <= scope_level);
 }
 
-int is_current_token_declaration_token()
+int is_current_token_declaration_specifier_token()
 {
     //
     // native types
