@@ -162,4 +162,11 @@ TK(TK_NEWLINE,       "\n")
 
 TK(TK_END,           "EOF")
 
+//
+// [JILL] [WARNING]
+// these are compiler extensions so HCC can use headers from other compilers like VC which may have
+// their private extension like __cdecl
+//
+TK(TK_CDECL, "__cdecl")
+
 TK(TK_NULL, "null")

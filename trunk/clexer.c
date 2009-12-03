@@ -606,6 +606,14 @@ static int get_token_internal()
                     if (retval == TK_ID)
                     {
                         lexeme_value.string_value = atom_string(ls.ctok->name);
+
+                        // [FIX ME]
+                        // note this is just a hack to get around Microsoft VC extensions
+                        if (!strcmp(lexeme_value.string_value, "__cdecl"))
+                        {
+                            retval = TK_CDECL;
+                        }
+
                         HCC_TRACE("identifier: %s\n", lexeme_value.string_value);
                     }
                     else
@@ -669,7 +677,8 @@ int get_token()
     while (token == TK_NEWLINE ||
         token == TK_CRETURN ||
         token == TK_WHITESPACE ||
-        token == TK_POUND)
+        token == TK_POUND ||
+        token == TK_CDECL)
     {
         token = get_token_internal();
         if (token == TK_END) break;
