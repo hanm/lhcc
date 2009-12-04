@@ -961,7 +961,9 @@ void parameter_declaration()
     
     //
     // interestingly abstract declarator would never end up with an identifier so hopefully we finish the deal here
-    //
+    // 
+    // [FIX ME] - this needs be fixed. It can't deal with something like
+    // int foo(const void*, int (__cdecl * _PtFuncCompare)(void *, const void *, const void *), const void*);
     if (cptk == TK_ID)
     {
         declarator(storage_class);
