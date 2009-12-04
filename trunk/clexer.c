@@ -254,6 +254,11 @@ void reset_clexer(t_scanner_context* sc)
 
 	for (; i < sc->number_of_include_pathes; i ++) add_incpath(sc->include_pathes[i]);
 
+    //
+    // [NOTICE] Inject macro from here
+    //
+    define_macro(&ls, "wchar_t=int");
+
 #if defined(_WIN32)
     define_macro(&ls, "_WIN32");
 
@@ -267,6 +272,7 @@ void reset_clexer(t_scanner_context* sc)
 #if defined(HCC_VISUAL_STUDIO_WORK_AROUND)
     define_macro(&ls, "__cdecl=");
     define_macro(&ls, "__declspec(a)=");
+    define_macro(&ls, "deprecated(a)=");
     define_macro(&ls, "dllimport(a)=");
 #endif
 
@@ -700,6 +706,7 @@ int get_token()
 
     return token;
 }
+
 int peek_token()
 {
     // save and restore current token code and lexeme value..
