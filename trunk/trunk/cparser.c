@@ -771,7 +771,7 @@ declaration
 */
 void declaration()
 {
-	declaration_specifiers();
+	int storage_class = declaration_specifiers();
 	if (cptk == TK_SEMICOLON)
 	{
 		GET_NEXT_TOKEN;
@@ -779,12 +779,12 @@ void declaration()
 	}
 
 	// TODO - function definition
-	init_declarator();
+	init_declarator(storage_class);
 
 	while (cptk == TK_COMMA)
 	{
 		GET_NEXT_TOKEN;
-		init_declarator();
+		init_declarator(storage_class);
 	}
 
 	match(TK_SEMICOLON);
@@ -852,10 +852,9 @@ init_declarator
 	| declarator '=' initializer
 	;
 */
-void init_declarator()
+void init_declarator(int storage_class)
 {
-    // [TODO] [FIX ME]
-    declarator(TK_AUTO);
+    declarator(storage_class);
 
 	if (cptk == TK_ASSIGN)
 	{
@@ -1084,6 +1083,12 @@ void direct_declarator(int storage_class)
         // parsing code to use, and declarator parsing function needs to accept such input parameter.
         // After AST is ready, such parameter passing can be done implicitly via AST.
         //
+
+        if (strcmp(lexeme_value.string_value, "_locale_t") == 0)
+        {
+            symbol = NULL;
+        }
+
         symbol = install_symbol(lexeme_value.string_value, sym_table_identifiers);
         symbol->storage = storage_class;
         match(TK_ID);
@@ -1210,7 +1215,7 @@ void struct_declarator()
 {
     if (cptk != TK_COLON)
     {
-        // [FIX ME]
+        // [FIX ME] - need to pass the correct storage class from struct_declarator
         declarator(TK_AUTO);
     }
 
@@ -1410,10 +1415,16 @@ void external_declaration()
     
 	if (cptk == TK_SEMICOLON)
 	{
+        //
+        // got a declarator ending here
+        //
 		GET_NEXT_TOKEN;
 		return;
 	}
 
+    //
+    // init_declarator_list parsing
+    //
     if (cptk == TK_COMMA || cptk == TK_ASSIGN)
     {
         if (cptk == TK_ASSIGN)
@@ -1425,7 +1436,7 @@ void external_declaration()
         while (cptk == TK_COMMA)
         {
             GET_NEXT_TOKEN;
-            init_declarator();
+            init_declarator(storage_class);
         }
 
         match(TK_SEMICOLON);

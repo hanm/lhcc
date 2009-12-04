@@ -75,7 +75,7 @@ TK(TK_CONST,     "const")
 TK(TK_VOLATILE, "volatile")
 
 TK(TK_SIZEOF,        "sizeof")
-TK(TK_TYPEDEF,       "typedef")
+TK(TK_TYPEDEF,       "typedef") // VALUE 16
 
 TK(TK_AUTO,         "auto")
 TK(TK_REGISTER,       "register")

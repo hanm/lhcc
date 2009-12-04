@@ -497,7 +497,7 @@ void labeled_statement();
 //
 void declaration();
 int declaration_specifiers();
-void init_declarator();
+void init_declarator(int storage_class);
 void initializer();
 void parameter_type_list();
 void parameter_declaration();
