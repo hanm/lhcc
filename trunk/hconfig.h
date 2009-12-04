@@ -41,6 +41,8 @@ extern char** g_compiling_files;
 
 	#define HCC_MEM_CHECK_END _CrtDumpMemoryLeaks(); 
 
+    #define HCC_VISUAL_STUDIO_WORK_AROUND
+
 #else
 
 	#define HCC_MEM_CHECK_START

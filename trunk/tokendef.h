@@ -167,7 +167,6 @@ TK(TK_END,           "EOF")
 // these are compiler extensions so HCC can use headers from other compilers like VC which may have
 // their private extension like __cdecl
 //
-TK(TK_CDECL, "__cdecl")
 // extension to support 64 bit integer
 TK(TK_INT64, "__int64")
 
