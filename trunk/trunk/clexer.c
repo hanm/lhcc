@@ -28,6 +28,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 #include "clexer.h"
 #include "keywords.h"
 #include "hcc.h"
+#include "hconfig.h"
 #include "assert.h"
 #include "error.h"
 #include "atom.h"
@@ -255,6 +256,20 @@ void reset_clexer(t_scanner_context* sc)
 
 #if defined(_WIN32)
     define_macro(&ls, "_WIN32");
+
+    //
+    // [FIX ME] 
+    // This is to work around non ANSI C extensions from Visual C++ compiler. 
+    // The work around simply define the VC specific extensions as empty macro so they will be filtered out before getting to parser.
+    // Not a good way as it abandons some information like calling convention from front end to back end, but is the only choice 
+    // at this moment given I don't have other headers / STD C library to use.
+    //
+#if defined(HCC_VISUAL_STUDIO_WORK_AROUND)
+    define_macro(&ls, "__cdecl=");
+    define_macro(&ls, "__declspec(a)=");
+    define_macro(&ls, "dllimport(a)=");
+#endif
+
 #elif defined (_WIN64)
     define_macro(&ls, "_WIN64");
 #endif
@@ -614,13 +629,6 @@ static int get_token_internal()
                     {
                         lexeme_value.string_value = atom_string(ls.ctok->name);
 
-                        // [FIX ME]
-                        // note this is just a hack to get around Microsoft VC extensions
-                        if (!strcmp(lexeme_value.string_value, "__cdecl"))
-                        {
-                            retval = TK_CDECL;
-                        }
-
                         HCC_TRACE("identifier: %s\n", lexeme_value.string_value);
                     }
                     else
@@ -684,8 +692,7 @@ int get_token()
     while (token == TK_NEWLINE ||
         token == TK_CRETURN ||
         token == TK_WHITESPACE ||
-        token == TK_POUND ||
-        token == TK_CDECL)
+        token == TK_POUND)
     {
         token = get_token_internal();
         if (token == TK_END) break;
