@@ -943,28 +943,45 @@ void parameter_declaration()
         return;
     }
 
-    //
-    // I admit this is ugly but hopefully this is the only place where declarator and abstract declarator side by side
-    //
-    // [TO IMPROVE]
-    //
     if (cptk == TK_MUL)
     {
         pointer();
-    }
-    
-    if (!is_current_token_declarator_token() && cptk != TK_LBRACKET)
-    {
-        // we are in abstract declarator. job done.
-        return;
-    }
+
+		if (!is_current_token_declarator_token() && cptk != TK_LBRACKET)
+		{
+			//
+			// look ahead is neither a possible start of a direct declarator, nor
+			// an direct abstract direclarator. 
+			// This is a case where the parameter declaration is just typename*
+			//
+			return;
+		}
+	}  
     
     //
-    // interestingly abstract declarator would never end up with an identifier so hopefully we finish the deal here
-    // 
-    // [FIX ME] - this needs be fixed. It can't deal with something like
+    // [FIX ME] - this needs be fixed. 
+	// Now it can deal with
     // int foo(const void*, int (__cdecl * _PtFuncCompare)(void *, const void *, const void *), const void*);
-    if (cptk == TK_ID)
+    //
+	// but with direct declarator hard coded ...
+	//
+	// now only has to deal with two possible choices: 
+	// direct declarator or direct abstract declarator
+	//
+	/*
+	direct_declarator
+	: IDENTIFIER
+	| '(' declarator ')'
+	;
+	*/
+	/*
+	direct_abstract_declarator
+	: '(' abstract_declarator ')'
+	: suffix_declarator
+	*/
+	
+	/*
+	if (cptk == TK_ID)
     {
         declarator(storage_class);
     }
@@ -972,6 +989,43 @@ void parameter_declaration()
     {
         abstract_declarator();
     }
+	*/
+
+	if (cptk == TK_ID)
+	{
+		direct_declarator(storage_class);
+	}
+	else if (cptk == TK_LBRACKET)
+	{
+		direct_abstract_declarator();
+	}
+	else
+	{
+		HCC_ASSERT(cptk == TK_LPAREN);
+		GET_NEXT_TOKEN;
+		
+		if (cptk == TK_RPAREN)
+		{
+			// empty suffix declarator
+			return;
+		}
+		else if (is_current_token_declaration_specifier_token())
+		{
+			// ( parameter_type_list) in suffix declarator
+			parameter_type_list();
+			match(TK_RPAREN);
+		}
+		else
+		{
+			declarator(storage_class);
+			match(TK_RPAREN);
+		}
+	}
+
+	while (cptk == TK_LPAREN || cptk == TK_LBRACKET)
+	{
+		suffix_declarator();
+	}
 }
 
 /*
