@@ -1121,7 +1121,6 @@ void abstract_declarator()
 
 	direct_abstract_declarator();
 
-	// Need refine
 	while (cptk == TK_LPAREN || cptk == TK_LBRACKET)
 	{
 		suffix_declarator();
@@ -1138,15 +1137,26 @@ void direct_abstract_declarator()
 	if (cptk == TK_LPAREN)
 	{
 		GET_NEXT_TOKEN;
-		abstract_declarator();
-		match(TK_RPAREN);
-	}
 
-	if (cptk == TK_ID)
+		//
+		// look ahead is either ')' or parameter_type_list, so we must processing the suffix declarator.
+		//
+		if (cptk == TK_RPAREN || is_current_token_declaration_specifier_token())
+		{
+			suffix_declarator();
+		}
+		else
+		{
+			abstract_declarator();
+			match(TK_RPAREN);
+		}
+	}
+	else
 	{
-		syntax_error(&coord, "abstract declarator can't follow with an identifier!");
+		syntax_error(&coord, "illegal token found in abstract declarator!");
 	}
 }
+
 
 /*
 struct_or_union_specifier
