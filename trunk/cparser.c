@@ -1017,7 +1017,6 @@ void suffix_declarator()
     {
         GET_NEXT_TOKEN;
         
-		// [JILL VALENTINE] [FIX ME]
         // parameter type list always starts with declaration specifiers
 		if (is_current_token_declaration_specifier_token())
         {
@@ -1109,10 +1108,20 @@ void abstract_declarator()
 	if (cptk == TK_MUL)
 	{
 		pointer();
+
+		//
+		// look ahead is neither '(' nor '[', we are done.
+		// In this case abstract declarator is just a plain pointer.
+		//
+		if (cptk != TK_LPAREN && cptk != TK_LBRACKET)
+		{
+			return;
+		}
 	}
+
 	direct_abstract_declarator();
 
-	//TODO - this needs refine.. 
+	// Need refine
 	while (cptk == TK_LPAREN || cptk == TK_LBRACKET)
 	{
 		suffix_declarator();
@@ -1122,18 +1131,7 @@ void abstract_declarator()
 /*
 direct_abstract_declarator
 	: '(' abstract_declarator ')'
-*/
-/*
-suffix abstract declarator
-	| '[' ']'
-	| '[' constant_expression ']'
-	| direct_abstract_declarator '[' ']'
-	| direct_abstract_declarator '[' constant_expression ']'
-	| '(' ')'
-	| '(' parameter_type_list ')'
-	| direct_abstract_declarator '(' ')'
-	| direct_abstract_declarator '(' parameter_type_list ')'
-	;
+	: suffix_declarator
 */
 void direct_abstract_declarator()
 {
