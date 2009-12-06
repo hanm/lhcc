@@ -274,6 +274,7 @@ void reset_clexer(t_scanner_context* sc)
     define_macro(&ls, "__declspec(a)=");
     define_macro(&ls, "deprecated(a)=");
     define_macro(&ls, "dllimport(a)=");
+	define_macro(&ls, "__inline=");
 #endif
 
 #elif defined (_WIN64)
