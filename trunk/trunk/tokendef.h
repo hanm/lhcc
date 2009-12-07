@@ -96,7 +96,7 @@ TK(TK_GOTO,      "goto")
 TK(TK_RETURN,      "return")
 
 /* identifier */
-TK(TK_ID, "identifier")
+TK(TK_ID, "identifier") // value 33
 
 /* constants */
 TK(TK_CONSTTODO, "constants")

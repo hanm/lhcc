@@ -56,6 +56,33 @@ argument_expression_list
 
 unary_expression
         : postfix_expression
+        | unary_operator unary_expression
+        | SIZEOF unary_expression
+        | SIZEOF '(' type_name ')'
+        | '(' type_name ')' unary_expression
+        ;
+
+unary_operator
+        : '&'
+        | '*'
+        | '+'
+        | '-'
+        | '~'
+        | '!'
+        | '++'
+        | '--'
+        ;
+
+//
+// Alternate grammar for unary expression
+// This grammar is the orignial copy from http://www.lysator.liu.se/c/ANSI-C-grammar-y.html#postfix-expression
+// However it looks incorrect in that it doesn't accept a plain cast expression like (type)expression
+// It requires unary operator preceeds the cast operator (), which is bad. 
+// In hcc I use the above "corrected" grammar to implement unary expression parsing.
+// Michael Liang Han - 12/07/2009
+// 
+unary_expression
+        : postfix_expression
         | '++' unary_expression
         | '--' unary_expression
         | unary_operator cast_expression
@@ -76,6 +103,7 @@ cast_expression
         : unary_expression
         | '(' type_name ')' cast_expression
         ;
+// end of alternate grammar for unary expression
 
 multiplicative_expression
         : cast_expression

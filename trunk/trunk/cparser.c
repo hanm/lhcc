@@ -159,11 +159,10 @@ void postfix_expression()
 /*
 unary_expression
         : postfix_expression
-        | '++' unary_expression
-        | '--' unary_expression
-        | unary_operator cast_expression
+        | unary_operator unary_expression
         | SIZEOF unary_expression
         | SIZEOF '(' type_name ')'
+        | '(' type_name ')' unary_expression
         ;
 
 unary_operator
@@ -173,25 +172,23 @@ unary_operator
         | '-'
         | '~'
         | '!'
+        | '++'
+        | '--'
         ;
 
-cast_expression
-        : unary_expression
-        | '(' type_name ')' cast_expression
-        ;
 */
 void unary_expression()
 {
 	switch (cptk)
 	{
-	case TK_INC :
-	case TK_DEC :
 	case TK_BITAND :
 	case TK_MUL :
 	case TK_ADD :
 	case TK_SUB :
-	case TK_COMP :
-	case TK_NOT :
+    case TK_COMP :
+    case TK_NOT :
+    case TK_INC :
+    case TK_DEC :
 		{
 			GET_NEXT_TOKEN;
 
@@ -201,11 +198,24 @@ void unary_expression()
 		}
     case TK_LPAREN :
         {
-            GET_NEXT_TOKEN;
+            //
+            // Two possibilites here - 
+            // 1. (type name) unary_expression
+            // 2. postfix_expression
+            // The trick here is postfix_expression requires parsing the '(' itself. 
+            // So here we need to peek next token instead of consume TK_LPAREN
+            //
+            peek_token();
+
             if (is_typedef_id(lexeme_value.string_value))
             {
-                // todo - parse type name
+                //
+                // [TODO] - well, not sure. this is a cast op, what else to do? parse type name??
+                // anyways, this place looks suspicious.
+                //
+                GET_NEXT_TOKEN; 
                 GET_NEXT_TOKEN;
+
                 match(TK_RPAREN);
             }
             else
