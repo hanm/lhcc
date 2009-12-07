@@ -206,16 +206,16 @@ void unary_expression()
             // So here we need to peek next token instead of consume TK_LPAREN
             //
             int peek_token_code = peek_token();
-            (peek_token_code);
 
-            if (is_typedef_id(lexeme_value.string_value))
+            if (is_token_typename_token(peek_token_code, peek_lexeme_value.string_value))
             {
                 //
                 // [TODO] - well, not sure. this is a cast op, what else to do? parse type name??
                 // anyways, this place looks suspicious.
                 //
                 GET_NEXT_TOKEN; 
-                GET_NEXT_TOKEN;
+                
+                type_name();
 
                 match(TK_RPAREN);
             }
@@ -1576,6 +1576,23 @@ void external_declaration()
     }
 }
 
+/*
+type_name
+        : specifier_qualifier_list
+        | specifier_qualifier_list abstract_declarator
+        ;
+*/
+void type_name()
+{
+    specifiers_qualifier_list();
+
+    if (cptk == TK_MUL || cptk == TK_LPAREN || cptk == TK_LBRACKET)
+    {
+        abstract_declarator();
+    }
+}
+
+
 int is_typedef_id(char* token_name)
 {
     t_symbol* sym = find_symbol(token_name, sym_table_identifiers);
@@ -1633,6 +1650,37 @@ int is_current_token_declarator_token()
 	{
         return 0;
 	}
+}
+
+int is_token_typename_token(int token_code, char* token_symbol)
+{
+    if (token_code == TK_CONST ||
+        token_code == TK_VOLATILE ||
+        token_code == TK_FLOAT ||
+        token_code == TK_DOUBLE ||
+        token_code == TK_CHAR ||
+        token_code == TK_SHORT ||
+        token_code == TK_INT ||
+        token_code == TK_SIGNED ||
+        token_code == TK_UNSIGNED ||
+        token_code == TK_VOID ||
+        token_code == TK_LONG ||
+        token_code == TK_INT64 ||
+        token_code == TK_STRUCT ||
+        token_code == TK_UNION ||
+        token_code == TK_ENUM)
+    {
+        //
+        // ANSI build in type keywords
+        //
+        return 1;
+    }
+    else if (token_symbol != NULL)
+    {
+        return is_typedef_id(token_symbol);
+    }
+      
+    return 0;
 }
 
 
