@@ -731,6 +731,7 @@ int peek_token()
     t_lexeme_value backup_lexeme_value = lexeme_value;
 
 	peek_token_code = get_token();
+    peek_lexeme_value = lexeme_value;
 
 	current_token_code = backup_token;
     lexeme_value = backup_lexeme_value;
