@@ -979,17 +979,6 @@ void parameter_declaration()
 	: '(' abstract_declarator ')'
 	: suffix_declarator
 	*/
-	
-	/*
-	if (cptk == TK_ID)
-    {
-        declarator(storage_class);
-    }
-    else
-    {
-        abstract_declarator();
-    }
-	*/
 
 	if (cptk == TK_ID)
 	{
@@ -1428,7 +1417,7 @@ void translation_unit()
 
 /*
 external_declaration
-	: function_definition
+	: function_definition  
 	| declaration
 	;
 function_definition
@@ -1437,9 +1426,25 @@ function_definition
 	| declarator declaration_list compound_statement
 	| declarator compound_statement
 	;
+
+declaration_list
+	: declaration
+	| declaration_list declaration
+	;
+
 declaration
 	: declaration_specifiers ';'
 	| declaration_specifiers init_declarator_list ';'
+	;
+
+init_declarator_list
+	: init_declarator
+	| init_declarator_list ',' init_declarator
+	;
+
+init_declarator
+	: declarator
+	| declarator '=' initializer
 	;
 */
 void external_declaration()
@@ -1453,38 +1458,77 @@ void external_declaration()
 
         if (cptk != TK_LBRACE)
         {
+            //
             // declaration list
+            //
             while (is_current_token_declaration_specifier_token())
             {
                 declaration();
             }
         }
         
-        // function definition
+        //
+        // function definition body
+        //
         compound_statement();
+        return;
     }
 
     storage_class = declaration_specifiers();
     
     if (cptk == TK_SEMICOLON)
     {
+        //
         // an external declaration
         // warning - this would be an empty declaration with just type specifiers but no variables
-        // TODO - warning here
+        // [FIX ME] - we should initiate a warning here
+        //
         GET_NEXT_TOKEN;
         return;
     }
 
     declarator(storage_class);
     
+    //
+    // here is again LL(0) 
+    //
 	if (cptk == TK_SEMICOLON)
 	{
         //
-        // got a declarator ending here
+        // got a declaration ending here which just contains one declarator
         //
 		GET_NEXT_TOKEN;
-		return;
+        return;
 	}
+    else if (cptk == TK_LBRACE)
+    {
+        //
+        // look ahead is brace next is compound statement to parse. 
+        // we have a function definition here where the grammar looks like :
+        // declaration_specifiers declarator compound_statement
+        //
+        compound_statement();
+        return;
+    }
+    else if (is_current_token_declaration_specifier_token())
+    {
+        //
+        // look ahead is from a declaration_list - still a function definition
+        //
+        // declaration_list
+        // 
+        while (is_current_token_declaration_specifier_token())
+        {
+            declaration();
+        }
+
+        compound_statement();
+        return;
+    }
+  
+    //
+    // otherwise in parsing a declaration ....
+    //
 
     //
     // init_declarator_list parsing
