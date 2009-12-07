@@ -546,6 +546,7 @@ void enumerator();
 void translation_unit();
 void external_declaration();
 
+void type_name();
 
 int is_typedef_id(char* token_name);
 //
@@ -561,5 +562,7 @@ int is_current_token_declaration_specifier_token();
 // left parenthesis, or identifiers
 //
 int is_current_token_declarator_token();
+
+int is_token_typename_token(int token_code, char* token_symbol);
 
 #endif
