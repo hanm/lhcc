@@ -523,15 +523,27 @@ static int identify_numerical_value(char* number)
 
 static int get_token_internal()
 {
-    int retval = TK_ID;
-    int r = lex(&ls);
+    int retval;
+    int r;
 
+    //
+    // This is the trick to implement the backup - restore feature such that
+    // lexer provides its caller the capability to peek a token (without consume).
+    //
 	if (peek_token_code != TK_NULL)
 	{
 		int temp = peek_token_code;
 		peek_token_code = TK_NULL;
 		return temp;
 	}
+
+    retval = TK_ID;
+
+    //
+    // Once lex is called the ucpp internal state is changed. So any book keepig stuff and tricks 
+    // must be done before this call.
+    //
+    r = lex(&ls);
 
     /*
     * lex() reads the next token from the processed stream and stores it
@@ -712,6 +724,9 @@ int peek_token()
 {
     // save and restore current token code and lexeme value..
     // TODO - save coordinate and symbol entry?
+    // [TODO] [Jill Valentine] 
+    // This must be fixed! Need to provide global save - restore
+    // because parser may access symbolic information besides simple token code!
 	int backup_token = current_token_code;
     t_lexeme_value backup_lexeme_value = lexeme_value;
 
