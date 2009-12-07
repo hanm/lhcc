@@ -218,6 +218,8 @@ void unary_expression()
                 type_name();
 
                 match(TK_RPAREN);
+
+                unary_expression();
             }
             else
             {
