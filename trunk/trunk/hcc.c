@@ -189,7 +189,7 @@ void test_parser()
     char* path[3] = {"E:\\Program Files\\Microsoft Visual Studio 9.0\\VC\\include", 
 		"C:\\Program Files\\Microsoft Visual Studio 9.0\\VC\\include", "C:\\"};
 
-#if 0
+#if 1
 	sc.filename = "G:\\Jill.c";
 #else
 	//sc.filename = "G:\\bloom-filter.c";
