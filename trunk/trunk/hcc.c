@@ -1,6 +1,6 @@
 /***************************************************************
 
-Copyright (c) 2008 Michael Liang Han
+Copyright (c) 2008-2009 Michael Liang Han
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation
@@ -189,12 +189,12 @@ void test_parser()
     char* path[3] = {"E:\\Program Files\\Microsoft Visual Studio 9.0\\VC\\include", 
 		"C:\\Program Files\\Microsoft Visual Studio 9.0\\VC\\include", "C:\\"};
 
-#if 0
+#if 1
 	sc.filename = "G:\\Jill.c";
 #else
 	//sc.filename = "G:\\bloom-filter.c";
 	//sc.filename = "G:\\stdlib.h";
-	sc.filename = "G:\\string.h";
+	//sc.filename = "G:\\string.h";
 #endif
 
     sc.include_pathes = path;
