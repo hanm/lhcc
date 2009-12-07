@@ -108,7 +108,11 @@ void test_lexer()
     char* path[3] = {"E:\\Program Files\\Microsoft Visual Studio 9.0\\VC\\include", 
 		"C:\\Program Files\\Microsoft Visual Studio 9.0\\VC\\include", "C:\\"};
 
+#if 1
+    sc.filename = "G:\\jill.c";
+#else
 	sc.filename = "C:\\bloom-filter.c";
+#endif
 
 	sc.include_pathes = path;
 	sc.number_of_include_pathes = 3;
@@ -194,7 +198,7 @@ void test_parser()
 #else
 	//sc.filename = "G:\\bloom-filter.c";
 	//sc.filename = "G:\\stdlib.h";
-	//sc.filename = "G:\\string.h";
+	sc.filename = "G:\\string.h";
 #endif
 
     sc.include_pathes = path;
@@ -219,7 +223,11 @@ int main(int argc, char* argv[])
 {
     (argc), (argv);
 
+#if 1
     test_parser();
+#else
+    test_lexer();
+#endif
 
     return 0;
 }

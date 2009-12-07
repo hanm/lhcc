@@ -205,7 +205,8 @@ void unary_expression()
             // The trick here is postfix_expression requires parsing the '(' itself. 
             // So here we need to peek next token instead of consume TK_LPAREN
             //
-            peek_token();
+            int peek_token_code = peek_token();
+            (peek_token_code);
 
             if (is_typedef_id(lexeme_value.string_value))
             {
@@ -1633,4 +1634,5 @@ int is_current_token_declarator_token()
         return 0;
 	}
 }
+
 
