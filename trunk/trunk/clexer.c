@@ -257,9 +257,11 @@ void reset_clexer(t_scanner_context* sc)
     //
     // [NOTICE] Inject macro from here
     // [FIX ME] These macros should be put in HCC header file.
+    // Also these macros should be passed from command line or configuration file instead of hard coded
     //
     define_macro(&ls, "wchar_t=int");
     define_macro(&ls, "NULL=((void *)0)");
+    define_macro(&ls, "size_t=unsigned int");
 
 #if defined(_WIN32)
     define_macro(&ls, "_WIN32");

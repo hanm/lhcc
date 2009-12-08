@@ -193,7 +193,7 @@ void test_parser()
     char* path[3] = {"E:\\Program Files\\Microsoft Visual Studio 9.0\\VC\\include", 
 		"C:\\Program Files\\Microsoft Visual Studio 9.0\\VC\\include", "G:\\src"};
 
-#if 0
+#if 1
 	sc.filename = "G:\\src\\Jill.c";
 #else
 	//sc.filename = "G:\\bloom-filter.c";
@@ -210,7 +210,8 @@ void test_parser()
     //sc.filename = "G:\\src\\hash-pointer.c";
     //sc.filename = "G:\\src\\hash-int.c";
     //sc.filename = "G:\\src\\binomial-heap.c";
-    sc.filename = "G:\\src\\binary-heap.c";
+    //sc.filename = "G:\\src\\binary-heap.c";
+    sc.filename = "G:\\src\\sqlite3.c";
 #endif
 
     sc.include_pathes = path;
