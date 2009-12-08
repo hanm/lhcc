@@ -535,7 +535,7 @@ void declarator(int storage_class);
 void direct_declarator(int storage_class);
 void abstract_declarator();
 void direct_abstract_declarator();
-
+void all_declarator(int storage_class); 
 void struct_or_union_specifier();
 void struct_declaration_list();
 void struct_declarator();

@@ -193,12 +193,12 @@ void test_parser()
     char* path[3] = {"E:\\Program Files\\Microsoft Visual Studio 9.0\\VC\\include", 
 		"C:\\Program Files\\Microsoft Visual Studio 9.0\\VC\\include", "G:\\src"};
 
-#if 1
+#if 0
 	sc.filename = "G:\\src\\Jill.c";
 #else
-	//sc.filename = "G:\\bloom-filter.c";
-	//sc.filename = "G:\\stdlib.h";
-	//sc.filename = "G:\\string.h";
+	//sc.filename = "G:\\src\\bloom-filter.c";
+	//sc.filename = "G:\\src\\stdlib.h";
+	//sc.filename = "G:\\src\\string.h";
     //sc.filename = "G:\\src\\set.c";
     //sc.filename = "G:\\src\\slist.c";
     //sc.filename = "G:\\src\\avl-tree.c";

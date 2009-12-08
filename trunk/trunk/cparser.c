@@ -1027,7 +1027,9 @@ void parameter_declaration()
 		}
 		else
 		{
-			declarator(storage_class);
+            // [FIX ME] [PRIORITY FIX]
+			//declarator(storage_class);
+            all_declarator(storage_class);
 			match(TK_RPAREN);
 		}
 	}
@@ -1151,6 +1153,8 @@ void direct_declarator(int storage_class)
 
         symbol = install_symbol(lexeme_value.string_value, sym_table_identifiers);
         symbol->storage = storage_class;
+
+        // [FIX ME] - should somehow match ID before install symbol!
         match(TK_ID);
     }
 }
@@ -1216,6 +1220,44 @@ void direct_abstract_declarator()
 	}
 }
 
+// this function parse declarator regardless of its type - that is, it could parse
+// both declarator and abstract declarator. it should only be used when absolutely neccessary
+// because a function should only do one thing well. 
+void all_declarator(int storage_class)
+{
+    if (cptk == TK_MUL)
+    {
+        pointer();
+
+        if (cptk != TK_LPAREN && 
+            cptk != TK_LBRACKET &&
+            cptk != TK_ID) 
+        {
+            return;
+        }
+    }
+
+    if (cptk == TK_ID)
+    {
+        t_symbol* symbol = install_symbol(lexeme_value.string_value, sym_table_identifiers);
+        symbol->storage = storage_class;
+
+        GET_NEXT_TOKEN;
+    }
+    else if (cptk == TK_LPAREN)
+    {
+        all_declarator(storage_class);
+    }
+    else
+    {
+        if (cptk != TK_LBRACKET) syntax_error(&coord, "declarator error");
+    }
+    
+    while (cptk == TK_LPAREN || cptk == TK_LBRACKET)
+    {
+        suffix_declarator();
+    }
+}
 
 /*
 struct_or_union_specifier
