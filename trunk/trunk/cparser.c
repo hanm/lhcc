@@ -1609,6 +1609,8 @@ void external_declaration()
     }
     else
     {
+		// [FIX ME]
+		// This else is too harssel. Could still be parsing declarator. Should fix.
         // function definition
         if (is_current_token_declaration_specifier_token())
         {
