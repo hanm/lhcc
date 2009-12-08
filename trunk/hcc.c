@@ -211,7 +211,9 @@ void test_parser()
     //sc.filename = "G:\\src\\hash-int.c";
     //sc.filename = "G:\\src\\binomial-heap.c";
     //sc.filename = "G:\\src\\binary-heap.c";
-    sc.filename = "G:\\src\\sqlite3.c";
+
+    sc.filename = "G:\\src\\swprintf.inl";
+    //sc.filename = "G:\\src\\sqlite3.c";
 #endif
 
     sc.include_pathes = path;
