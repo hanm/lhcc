@@ -1141,11 +1141,6 @@ void direct_declarator(int storage_class)
         // After AST is ready, such parameter passing can be done implicitly via AST.
         //
 
-        if (strcmp(lexeme_value.string_value, "_locale_t") == 0)
-        {
-            symbol = NULL;
-        }
-
         symbol = install_symbol(lexeme_value.string_value, sym_table_identifiers);
         symbol->storage = storage_class;
         match(TK_ID);

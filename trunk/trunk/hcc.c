@@ -191,18 +191,19 @@ void test_parser()
     t_scanner_context sc;
 
     char* path[3] = {"E:\\Program Files\\Microsoft Visual Studio 9.0\\VC\\include", 
-		"C:\\Program Files\\Microsoft Visual Studio 9.0\\VC\\include", "C:\\"};
+		"C:\\Program Files\\Microsoft Visual Studio 9.0\\VC\\include", "G:\\"};
 
-#if 1
-	sc.filename = "G:\\Jill.c";
+#if 0
+	//sc.filename = "G:\\Jill.c";
 #else
 	//sc.filename = "G:\\bloom-filter.c";
 	//sc.filename = "G:\\stdlib.h";
-	sc.filename = "G:\\string.h";
+	//sc.filename = "G:\\string.h";
+    sc.filename = "G:\\trie.c";
 #endif
 
     sc.include_pathes = path;
-    sc.number_of_include_pathes = 2;
+    sc.number_of_include_pathes = 3;
 
     HCC_MEM_CHECK_START
 
