@@ -61,10 +61,16 @@ static const unsigned int set_primes[] = {
 };
 
 static const int set_num_primes = sizeof(set_primes) / sizeof(int);
+
+// from sqlite
+int sqlite3_busy_handler(void*, int(*)(void*,int), void*);
 #else
 
+typedef struct theList tlist;
 
-int sqlite3_busy_handler(sqlite3*, int(*)(void*,int), void*);
+int sqlite3VdbeAddOpList(void*, int nOp, tlist const *aOp);
+
+#define __$adt_remove_prop(adt,prop)
 #endif
 
 int main(){};
