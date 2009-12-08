@@ -191,15 +191,26 @@ void test_parser()
     t_scanner_context sc;
 
     char* path[3] = {"E:\\Program Files\\Microsoft Visual Studio 9.0\\VC\\include", 
-		"C:\\Program Files\\Microsoft Visual Studio 9.0\\VC\\include", "G:\\"};
+		"C:\\Program Files\\Microsoft Visual Studio 9.0\\VC\\include", "G:\\src"};
 
 #if 0
-	//sc.filename = "G:\\Jill.c";
+	sc.filename = "G:\\src\\Jill.c";
 #else
 	//sc.filename = "G:\\bloom-filter.c";
 	//sc.filename = "G:\\stdlib.h";
 	//sc.filename = "G:\\string.h";
-    sc.filename = "G:\\trie.c";
+    //sc.filename = "G:\\src\\set.c";
+    //sc.filename = "G:\\src\\slist.c";
+    //sc.filename = "G:\\src\\avl-tree.c";
+    //sc.filename = "G:\\src\\arraylist.c";
+    //sc.filename = "G:\\src\\queue.c";
+    //sc.filename = "G:\\src\\list.c";
+    //sc.filename = "G:\\src\\hash-table.c";
+    //sc.filename = "G:\\src\\hash-string.c";
+    //sc.filename = "G:\\src\\hash-pointer.c";
+    //sc.filename = "G:\\src\\hash-int.c";
+    //sc.filename = "G:\\src\\binomial-heap.c";
+    sc.filename = "G:\\src\\binary-heap.c";
 #endif
 
     sc.include_pathes = path;

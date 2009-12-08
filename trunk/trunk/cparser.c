@@ -160,10 +160,13 @@ void postfix_expression()
 unary_expression
         : postfix_expression
         | unary_operator unary_expression
-        | SIZEOF unary_expression
-        | SIZEOF '(' type_name ')'
+        | sizeof_expression
         | '(' type_name ')' unary_expression
         ;
+
+sizeof_expression
+    : SIZEOF unary_expression
+	| SIZEOF '(' type_name ')'
 
 unary_operator
         : '&'
@@ -175,7 +178,6 @@ unary_operator
         | '++'
         | '--'
         ;
-
 */
 void unary_expression()
 {
@@ -238,6 +240,11 @@ void unary_expression()
 	}
 }
 
+/*
+sizeof_expression
+    : SIZEOF unary_expression
+	| SIZEOF '(' type_name ')'
+*/
 void sizeof_expression()
 {
     GET_NEXT_TOKEN;
@@ -245,14 +252,15 @@ void sizeof_expression()
     if (cptk == TK_LPAREN)
     {
         GET_NEXT_TOKEN;
-        if (is_typedef_id(lexeme_value.string_value))
+
+        if (is_token_typename_token(cptk, lexeme_value.string_value))
         {
-            // todo - parse typename
-            GET_NEXT_TOKEN;
+            type_name();
         }
         else
         {
-            expression();
+            // [NOTICE] [IMPROVE]
+            unary_expression();
         }
 
         match(TK_RPAREN);
