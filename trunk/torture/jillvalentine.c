@@ -1,5 +1,3 @@
-typedef unsigned int size_t;
-
 #if 0
 typedef int (__cdecl * _onexit_t)(void);
 
@@ -29,13 +27,14 @@ static size_t  strnlen_s(const char * _Str, size_t _MaxCount)
     return (_Str==0) ? 0 : strnlen(_Str, _MaxCount);
 } // Added on 12/6. It can't parse function definition in header files yet.
 
-
+// from stdlib?
 #define NULL ((void *)0)
 static size_t wcsnlen_s(const wchar_t * _Src, size_t _MaxCount)
 {
     return (_Src == NULL) ? 0 : wcsnlen(_Src, _MaxCount);
 }
 
+// from trie.c
 typedef struct _Trie {
    int foo;
 } Trie;
@@ -53,8 +52,7 @@ Trie *trie_new(void)
 	return new_trie;
 }
 
-#else
-
+// from set.c
 static const unsigned int set_primes[] = {
 	193, 389, 769, 1543, 3079, 6151, 12289, 24593, 49157, 98317,
 	196613, 393241, 786433, 1572869, 3145739, 6291469,
@@ -63,7 +61,10 @@ static const unsigned int set_primes[] = {
 };
 
 static const int set_num_primes = sizeof(set_primes) / sizeof(int);
+#else
 
+
+int sqlite3_busy_handler(sqlite3*, int(*)(void*,int), void*);
 #endif
 
 int main(){};
