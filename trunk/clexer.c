@@ -256,8 +256,10 @@ void reset_clexer(t_scanner_context* sc)
 
     //
     // [NOTICE] Inject macro from here
+    // [FIX ME] These macros should be put in HCC header file.
     //
     define_macro(&ls, "wchar_t=int");
+    define_macro(&ls, "NULL=((void *)0)");
 
 #if defined(_WIN32)
     define_macro(&ls, "_WIN32");
@@ -532,9 +534,15 @@ static int get_token_internal()
     //
 	if (peek_token_code != TK_NULL)
 	{
-		int temp = peek_token_code;
+        //
+        // none NULL peek token indicates previously the peek_token is invoked.
+        // so we just return the cached peek token and restore the clexer state to 
+        // what it should be. 
+        //
+        current_token_code = peek_token_code;
 		peek_token_code = TK_NULL;
-		return temp;
+        lexeme_value = peek_lexeme_value;
+        return current_token_code;
 	}
 
     retval = TK_ID;
