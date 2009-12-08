@@ -688,7 +688,8 @@ static int get_token_internal()
         else
         {
             retval = lexical_map[ls.ctok->type];
-
+			lexeme_value.string_value = atom_string(STRING_TOKEN(ls.ctok->type) ? ls.ctok->name
+                : operators_name[ls.ctok->type]);
 #ifdef HCC_TRACE_ENABLE
             printf("line %ld: <%2d>  `%s'\n", ls.ctok->line,
                 ls.ctok->type,
