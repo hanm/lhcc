@@ -190,13 +190,15 @@ void test_parser()
 {
     t_scanner_context sc;
 
-    char* path[3] = {"E:\\Program Files\\Microsoft Visual Studio 9.0\\VC\\include", 
-		"C:\\Program Files\\Microsoft Visual Studio 9.0\\VC\\include", "G:\\src"};
+    char* path[4] = {"E:\\Program Files\\Microsoft Visual Studio 9.0\\VC\\include", 
+		"C:\\Program Files\\Microsoft Visual Studio 9.0\\VC\\include", "G:\\src", 
+		"C:\\Program Files\\Microsoft SDKs\\Windows\\v6.0A\\Include"};
 
 #if 0
 	sc.filename = "G:\\src\\Jill.c";
 #else
 	//sc.filename = "G:\\src\\bloom-filter.c";
+	//sc.filename = "G:\\src\\stdio.h";
 	//sc.filename = "G:\\src\\stdlib.h";
 	//sc.filename = "G:\\src\\string.h";
     //sc.filename = "G:\\src\\set.c";
@@ -212,12 +214,12 @@ void test_parser()
     //sc.filename = "G:\\src\\binomial-heap.c";
     //sc.filename = "G:\\src\\binary-heap.c";
 
-    sc.filename = "G:\\src\\swprintf.inl";
-    //sc.filename = "G:\\src\\sqlite3.c";
+    //sc.filename = "G:\\src\\swprintf.inl";
+    sc.filename = "G:\\src\\sqlite3.c";
 #endif
 
     sc.include_pathes = path;
-    sc.number_of_include_pathes = 3;
+    sc.number_of_include_pathes = 4;
 
     HCC_MEM_CHECK_START
 

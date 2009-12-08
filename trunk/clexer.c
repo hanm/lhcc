@@ -566,11 +566,15 @@ static int get_token_internal()
         // end of file
         return TK_END;
     }
+	/*
     else if (r)
     {
         // error - TODO what kind of error?
         assert(0); // TODO
+		// [FIX ME]
+		// ucpp issues warning when parsing <windows.h>
     }
+	*/
     
     /* we print each token: its numerical value, and its
     string content; if this is a PRAGMA token, the
