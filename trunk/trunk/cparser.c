@@ -852,6 +852,7 @@ int declaration_specifiers()
             {
                 // TYPEDEF names
                 GET_NEXT_TOKEN;
+				break;
             }
             return storage_specifier;
         case TK_STRUCT:
