@@ -281,6 +281,9 @@ void reset_clexer(t_scanner_context* sc)
     define_macro(&ls, "dllimport(a)=");
 	define_macro(&ls, "__inline=");
     define_macro(&ls, "__forceinline=");
+	// temp solution
+	define_macro(&ls, "IN=");
+	define_macro(&ls, "PCONTEXT=int");
 #endif
 
 #elif defined (_WIN64)
