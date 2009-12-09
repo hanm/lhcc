@@ -284,6 +284,27 @@ void reset_clexer(t_scanner_context* sc)
 #elif defined (_WIN64)
     define_macro(&ls, "_WIN64");
 #endif
+
+/*
+    ucpp may be configured at runtime to accept alternate characters as
+    possible parts of identifiers. Typical intended usage is for the '$'
+    and '@' characters. The two relevant functions are set_identifier_char()
+    and unset_identifier_char(). When this call is issued:
+	    set_identifier_char('$');
+    then for all the remaining input, the '$' character will be considered
+    as just another letter, as far as identifier tokenizing is concerned. This
+    is for identifiers only; numeric constants are not modified by that setting.
+    This call resets things back:
+	    unset_identifier_char('$');
+    Those two functions modify the static table which is initialized by
+    init_cpp(). You may call init_cpp() at any time to restore the table
+    to its standard state.
+
+    set '$' as an acceptable identifier char because some windows SDK header files
+    (for example, specstrings.h) has macro with identifier containing $. 
+*/
+    // [NOTICE] - side effect?
+    set_identifier_char('$');
 }
 
 void free_clexer()

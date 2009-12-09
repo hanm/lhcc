@@ -1376,6 +1376,7 @@ void specifiers_qualifier_list()
             {
                 // TYPEDEF names
                 GET_NEXT_TOKEN;
+                break;
             }
             return;
         case TK_STRUCT:
