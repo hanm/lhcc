@@ -502,8 +502,14 @@ void assignment_expression()
 void expression()
 {
     //
-    // todo - guard here?
-    // 
+    // empty expression. Note the implicit contract through out cparser is expression parsing doesn't consume semicolons,
+    // because I want to explicit handle semicolon whenever possible which is clean and easy for debugging purpose.
+    //
+    if (cptk == TK_SEMICOLON)
+    {
+        return;
+    }
+
     assignment_expression();
 
     while (cptk == TK_COMMA)
