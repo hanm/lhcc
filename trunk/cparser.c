@@ -799,7 +799,6 @@ void declaration()
 		return;
 	}
 
-	// TODO - function definition
 	init_declarator(storage_class);
 
 	while (cptk == TK_COMMA)
@@ -807,6 +806,14 @@ void declaration()
 		GET_NEXT_TOKEN;
 		init_declarator(storage_class);
 	}
+
+    //
+    // [FIX ME] beginning of a compound statement
+    // 
+    if (cptk == TK_LBRACE)
+    {
+        return;
+    }
 
 	match(TK_SEMICOLON);
 }
@@ -1155,6 +1162,12 @@ void direct_declarator(int storage_class)
         symbol = install_symbol(lexeme_value.string_value, sym_table_identifiers);
         symbol->storage = storage_class;
 
+        // [DEBUG]
+        if (strcmp("RtlRunOnceComplete", lexeme_value.string_value) == 0)
+        {
+            symbol->storage = storage_class;
+        }
+
         // [FIX ME] - should somehow match ID before install symbol!
         match(TK_ID);
     }
@@ -1325,6 +1338,18 @@ struct_declarator
 */
 void struct_declarator()
 {
+    //
+    // [WARNING][NON ANSI]
+    //
+    // This is to deal with unnamed struct / union. Unnamed struct and union is not in ANSI C
+    // and portable code should avoid its usage. Limited support for unnamed struct / union
+    // in hcc is simply for compatibility with other compilers. 
+    //
+    if (cptk == TK_SEMICOLON)
+    {
+        return;
+    }
+
     if (cptk != TK_COLON)
     {
         // [FIX ME] - need to pass the correct storage class from struct_declarator

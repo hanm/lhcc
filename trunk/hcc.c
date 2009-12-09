@@ -194,7 +194,7 @@ void test_parser()
 		"C:\\Program Files\\Microsoft Visual Studio 9.0\\VC\\include", "G:\\src", 
 		"C:\\Program Files\\Microsoft SDKs\\Windows\\v6.0A\\Include"};
 
-#if 0
+#if 1
 	sc.filename = "G:\\src\\Jill.c";
 #else
 	//sc.filename = "G:\\src\\bloom-filter.c";
@@ -214,8 +214,8 @@ void test_parser()
     //sc.filename = "G:\\src\\binomial-heap.c";
     //sc.filename = "G:\\src\\binary-heap.c";
     //sc.filename = "G:\\src\\swprintf.inl"; // requires typedef _locale_t  to work. stand alone parsing doesn't work.
-    sc.filename = "G:\\src\\specstrings.h"; 
-    //sc.filename = "G:\\src\\sqlite3.c";
+    //sc.filename = "G:\\src\\specstrings.h"; 
+    sc.filename = "G:\\src\\sqlite3.c";
 #endif
 
     sc.include_pathes = path;
