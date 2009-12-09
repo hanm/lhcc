@@ -262,9 +262,10 @@ void reset_clexer(t_scanner_context* sc)
     define_macro(&ls, "wchar_t=int");
     define_macro(&ls, "NULL=((void *)0)");
     define_macro(&ls, "size_t=unsigned int");
-
+    
 #if defined(_WIN32)
     define_macro(&ls, "_WIN32");
+    define_macro(&ls, "_M_IX86=500");
 
     //
     // [FIX ME] 
@@ -685,6 +686,13 @@ static int get_token_internal()
                         lexeme_value.string_value = atom_string(ls.ctok->name);
 
                         HCC_TRACE("identifier: %s\n", lexeme_value.string_value);
+
+                        // [DEBUG] [FIX ME]
+                        if (strcmp("_LUID", lexeme_value.string_value) == 0)
+                        {
+                            int a = 0;
+                            (a);
+                        }
                     }
                     else
                     {
