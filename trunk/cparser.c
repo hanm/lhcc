@@ -1480,6 +1480,15 @@ void enumerator()
 {
     if (cptk != TK_ID)
     {
+		//
+		// deal with "unclosed" enum member declaration like
+		// enum { a, b, c, }
+		//
+		if (cptk == TK_RBRACE)
+		{
+			return;
+		}
+
         syntax_error(&coord, "enumerator must be identifier!");
         return;
     }
