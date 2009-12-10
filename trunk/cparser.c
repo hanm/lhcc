@@ -1199,7 +1199,8 @@ void direct_declarator(int storage_class)
         // After AST is ready, such parameter passing can be done implicitly via AST.
         //
 
-        symbol = install_symbol(lexeme_value.string_value, sym_table_identifiers);
+        //symbol = install_symbol(lexeme_value.string_value, sym_table_identifiers);
+        symbol = add_symbol(lexeme_value.string_value, &sym_table_identifiers, scope_level, FUNC);
         symbol->storage = storage_class;
 
         // [DEBUG]
