@@ -771,17 +771,6 @@ int get_token()
         if (token == TK_END) break;
     }
 
-    // [SWITCH] [TODO] this switch should be configurable
-    // Skip inline assemblies which hcc can't deal with at this moment
-    if (token == TK_ID && strcmp(lexeme_value.string_value, "__asm") == 0)
-    {
-        while (token != TK_RBRACE)
-        {
-            token = get_token_internal();
-            if (token == TK_END) break;
-        }
-    }
-
     return token;
 }
 

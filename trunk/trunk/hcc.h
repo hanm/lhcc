@@ -76,6 +76,7 @@ enum { CONSTANTS=1, LABELS, GLOBAL, PARAM, LOCAL };
 //
 enum { STORAGE_AUTO=0, STORAGE_REGISTER, STORAGE_STATIC, STORAGE_EXTERN};
 
+
 #ifdef _DEBUG
 void llcc_test_symbol_table();
 #endif
