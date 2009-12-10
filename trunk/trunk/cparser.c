@@ -589,6 +589,30 @@ void expression_statement()
     {
         labeled_statement();
     }
+    else if (cptk == TK_ID && strcmp(lexeme_value.string_value, "__asm") == 0)
+    {
+        //
+        // [FIX ME] work around inline assembly parsing. this is temp solution and needs be fixed asap.
+        // Ideally I need my own assembler routine to help this out.
+        //
+        GET_NEXT_TOKEN;
+
+        if (cptk == TK_LBRACE)
+        {
+            //
+            // skip __asm {} block
+            //
+            while (cptk != TK_RBRACE) GET_NEXT_TOKEN;
+            match(TK_RBRACE); 
+        }
+        else
+        {
+            //
+            // skip single __asm statement - it [TODO] can't deal with multiple asm statements at this moment
+            //
+             while (cptk != TK_RBRACE) GET_NEXT_TOKEN;
+        }
+    }
     else
     {
         expression();
@@ -780,16 +804,6 @@ void compound_statement()
 			{
                 declaration();
             }
-        }
-        else if (strcmp(lexeme_value.string_value, "__asm") == 0)
-        {
-            //
-            // [TO DO] 
-            // work around inline assembly parsing. currently hcc parser can't deal with inline assembly starting
-            // with __asm or such (check gcc also). this workaround just skip the asm block ( __asm { blah.. })
-            //
-            while (cptk != TK_RBRACE) GET_NEXT_TOKEN;
-            match(TK_RBRACE);
         }
 		else
 		{
@@ -1189,7 +1203,7 @@ void direct_declarator(int storage_class)
         symbol->storage = storage_class;
 
         // [DEBUG]
-        if (strcmp("_SID_AND_ATTRIBUTES_HASH", lexeme_value.string_value) == 0)
+        if (strcmp("Hash", lexeme_value.string_value) == 0)
         {
             symbol->storage = storage_class;
         }
