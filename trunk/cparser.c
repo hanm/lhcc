@@ -1191,26 +1191,35 @@ void direct_declarator(int storage_class)
     }
     else
     {
-        //
-        // [TODO] the symbol should be installed after semantic checking.
-        // at this moment, AST is not ready so assume what the source I am parsing is valid (as they should)
-        // and install symbol here. As a result, specifier parsing functions need to return storage class type for declarator
-        // parsing code to use, and declarator parsing function needs to accept such input parameter.
-        // After AST is ready, such parameter passing can be done implicitly via AST.
-        //
+		if (cptk != TK_ID)
+		{
+			syntax_error(&coord, "direct declarator must end with an identifier");
+		}
 
-        //symbol = install_symbol(lexeme_value.string_value, sym_table_identifiers);
-        symbol = add_symbol(lexeme_value.string_value, &sym_table_identifiers, scope_level, FUNC);
-        symbol->storage = storage_class;
+		//
+		// parser has to know if an ID is typedefined type name or not to make some decisions
+		// this is the place where C grammar's LL(0) is violated
+		// otherwise symbol management could all be done in semantic checking phase.
+		//
+		if (storage_class == TK_TYPEDEF)
+		{
+			symbol = add_symbol(lexeme_value.string_value, &sym_table_identifiers, scope_level, FUNC);
+			symbol->storage = TK_TYPEDEF;
+		}
+		else
+		{
+			// [DEBUG]
+			(lexeme_value.string_value);
+			(storage_class);
+		}
 
         // [DEBUG]
         if (strcmp("UOW"/*"PRKCRM_MARSHAL_HEADER"*/, lexeme_value.string_value) == 0)
         {
-            symbol->storage = storage_class;
+			(storage_class);
         }
 
-        // [FIX ME] - should somehow match ID before install symbol!
-        match(TK_ID);
+		GET_NEXT_TOKEN;
     }
 }
 

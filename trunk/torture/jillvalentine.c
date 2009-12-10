@@ -70,6 +70,12 @@ typedef struct theList tlist;
 
 int sqlite3VdbeAddOpList(void*, int nOp, tlist const *aOp);
 
+// from sqlite
+ static char zChars[] =
+    "abcdefghijklmnopqrstuvwxyz"
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    "0123456789";
+
 #define __$adt_remove_prop(adt,prop)
 #endif
 
