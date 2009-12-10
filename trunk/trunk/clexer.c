@@ -276,14 +276,20 @@ void reset_clexer(t_scanner_context* sc)
     //
 #if defined(HCC_VISUAL_STUDIO_WORK_AROUND)
     define_macro(&ls, "__cdecl=");
+    define_macro(&ls, "__stdcall=");
     define_macro(&ls, "__declspec(a)=");
     define_macro(&ls, "deprecated(a)=");
     define_macro(&ls, "dllimport(a)=");
 	define_macro(&ls, "__inline=");
     define_macro(&ls, "__forceinline=");
 	// temp solution
-	define_macro(&ls, "IN=");
+	/*
+    define_macro(&ls, "IN=");
 	define_macro(&ls, "PCONTEXT=int");
+    define_macro(&ls, "BYTE=unsigned char");
+    define_macro(&ls, "WORD=unsigned short");
+    define_macro(&ls, "DWORD=unsigned long");
+    */
 #endif
 
 #elif defined (_WIN64)
@@ -763,6 +769,17 @@ int get_token()
     {
         token = get_token_internal();
         if (token == TK_END) break;
+    }
+
+    // [SWITCH] [TODO] this switch should be configurable
+    // Skip inline assemblies which hcc can't deal with at this moment
+    if (token == TK_ID && strcmp(lexeme_value.string_value, "__asm") == 0)
+    {
+        while (token != TK_RBRACE)
+        {
+            token = get_token_internal();
+            if (token == TK_END) break;
+        }
     }
 
     return token;
