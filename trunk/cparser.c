@@ -778,9 +778,19 @@ void compound_statement()
 			}
 			else
 			{
-				declaration();
-			}
-		}
+                declaration();
+            }
+        }
+        else if (strcmp(lexeme_value.string_value, "__asm") == 0)
+        {
+            //
+            // [TO DO] 
+            // work around inline assembly parsing. currently hcc parser can't deal with inline assembly starting
+            // with __asm or such (check gcc also). this workaround just skip the asm block ( __asm { blah.. })
+            //
+            while (cptk != TK_RBRACE) GET_NEXT_TOKEN;
+            match(TK_RBRACE);
+        }
 		else
 		{
 			statement();
@@ -984,12 +994,22 @@ void parameter_declaration()
 
 		if (!is_current_token_declarator_token() && cptk != TK_LBRACKET)
 		{
-			//
-			// look ahead is neither a possible start of a direct declarator, nor
-			// an direct abstract direclarator. 
-			// This is a case where the parameter declaration is just typename*
-			//
-			return;
+            if (cptk == TK_ID && is_typedef_id(lexeme_value.string_value))
+            {
+                // [FIX ME][PRIORITY FIX] -  need to update symbol table and mark this specific typedefined name out of range
+                // This happens rare but it does happen
+                // Typedef name is hidden by a declaration of function parameter
+
+            }
+            else
+            {
+                //
+                // look ahead is neither a possible start of a direct declarator, nor
+                // an direct abstract direclarator. 
+                // This is a case where the parameter declaration is just typename*
+                //
+                return;
+            }
 		}
 	}  
     
@@ -1169,7 +1189,7 @@ void direct_declarator(int storage_class)
         symbol->storage = storage_class;
 
         // [DEBUG]
-        if (strcmp("Int64ShllMod32", lexeme_value.string_value) == 0)
+        if (strcmp("_SID_AND_ATTRIBUTES_HASH", lexeme_value.string_value) == 0)
         {
             symbol->storage = storage_class;
         }
