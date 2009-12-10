@@ -1203,7 +1203,7 @@ void direct_declarator(int storage_class)
         symbol->storage = storage_class;
 
         // [DEBUG]
-        if (strcmp("Hash", lexeme_value.string_value) == 0)
+        if (strcmp("UOW"/*"PRKCRM_MARSHAL_HEADER"*/, lexeme_value.string_value) == 0)
         {
             symbol->storage = storage_class;
         }
@@ -1327,6 +1327,7 @@ void struct_or_union_specifier()
     GET_NEXT_TOKEN;
     if (cptk  == TK_ID)
     {
+        // [TODO] [SYMBOL MANAGE] - install tag name into the types table?
         GET_NEXT_TOKEN;
     }
 
@@ -1413,6 +1414,8 @@ specifier_qualifier_list
 */
 void specifiers_qualifier_list()
 {
+    int has_met_typedefined = 0;
+
     for(;;)
     {
         switch(cptk)
@@ -1437,10 +1440,17 @@ void specifiers_qualifier_list()
             GET_NEXT_TOKEN;
             break;
         case TK_ID:
-            if (is_typedef_id(lexeme_value.string_value))
+            if (!has_met_typedefined && is_typedef_id(lexeme_value.string_value))
             {
                 // TYPEDEF names
                 GET_NEXT_TOKEN;
+                //
+                // [FIX ME]? this is to short circuit specifier list parsing code 
+                // otherwise we may get two typedef names straight in one line'
+                // which the later might actually be redefined as a variable. without the short circuit
+                // we would never have a chance to process that redefined variable.
+                //
+                has_met_typedefined = 1; 
                 break;
             }
             return;
