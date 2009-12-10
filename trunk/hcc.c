@@ -215,8 +215,8 @@ void test_parser()
     //sc.filename = "G:\\src\\binary-heap.c";
     //sc.filename = "G:\\src\\swprintf.inl"; // requires typedef _locale_t  to work. stand alone parsing doesn't work.
     //sc.filename = "G:\\src\\specstrings.h"; 
-    sc.filename = "G:\\src\\winnt.h";
-    //sc.filename = "G:\\src\\sqlite3.c";
+    //sc.filename = "G:\\src\\winnt.h";
+    sc.filename = "G:\\src\\sqlite3.c";
 #endif
 
     sc.include_pathes = path;

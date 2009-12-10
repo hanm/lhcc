@@ -1169,7 +1169,7 @@ void direct_declarator(int storage_class)
         symbol->storage = storage_class;
 
         // [DEBUG]
-        if (strcmp("RtlRunOnceComplete", lexeme_value.string_value) == 0)
+        if (strcmp("Int64ShllMod32", lexeme_value.string_value) == 0)
         {
             symbol->storage = storage_class;
         }
