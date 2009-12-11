@@ -71,6 +71,7 @@ static struct symbol sym;
 
 static int current_token_code;
 static int peek_token_code;
+static int cached_token_code;
 
 /* 
 	Lexical Map
@@ -184,6 +185,7 @@ void reset_clexer(t_scanner_context* sc)
 
 	current_token_code = TK_NULL;
 	peek_token_code = TK_NULL;
+    cached_token_code = TK_NULL;
 
 	//
 	// initialize static tables of preprocessor ucpp
@@ -755,12 +757,20 @@ static int get_token_internal()
 
 int get_token()
 {
-    int token = get_token_internal();
+    int token;
+
+    if (cached_token_code != TK_NULL)
+    {
+        current_token_code = cached_token_code;
+        cached_token_code = TK_NULL;
+        lexeme_value = cached_lexeme_value;
+        return current_token_code;
+    }
+
+    token = get_token_internal();
 
     //
-    // TODO - tabs (vertical and horizontal) and form feed needs be filtered out
-    // update tokendef
-    // targets - \t, \v, \f
+    // [TODO] - tabs (vertical and horizontal) and form feed needs?
     //
     while (token == TK_NEWLINE ||
         token == TK_CRETURN ||
@@ -768,7 +778,46 @@ int get_token()
         token == TK_POUND)
     {
         token = get_token_internal();
-        if (token == TK_END) break;
+        if (token == TK_END)
+        {
+            return token;
+        }
+    }
+
+    //
+    // [WORK AROUND] 
+    // work around ucpp can't concat string literals
+    // a better fix should be done in ucpp
+    //
+    while (token == TK_CONST_STRING_LITERAL)
+    {
+        cached_token_code = token;
+        cached_lexeme_value = lexeme_value;
+
+        token = get_token_internal();
+        while (token == TK_NEWLINE ||
+            token == TK_CRETURN ||
+            token == TK_WHITESPACE)
+        {
+            token = get_token_internal();
+        }
+
+        if (token == TK_CONST_STRING_LITERAL)
+        {
+            char* tmp = (char*)malloc(strlen(cached_lexeme_value.string_value) + strlen(lexeme_value.string_value) + 1);
+            
+            strcpy(tmp, cached_lexeme_value.string_value);
+            strcat(tmp, lexeme_value.string_value);
+            
+            lexeme_value.string_value = atom_string(tmp);
+            free(tmp);
+        }
+        else
+        {
+            cached_token_code = token;
+            cached_lexeme_value = lexeme_value;
+            return TK_CONST_STRING_LITERAL;
+        }
     }
 
     return token;
@@ -776,11 +825,7 @@ int get_token()
 
 int peek_token()
 {
-    // save and restore current token code and lexeme value..
-    // TODO - save coordinate and symbol entry?
-    // [TODO] [Jill Valentine] 
-    // This must be fixed! Need to provide global save - restore
-    // because parser may access symbolic information besides simple token code!
+    // [TODO] token coordinate value save and restore
 	int backup_token = current_token_code;
     t_lexeme_value backup_lexeme_value = lexeme_value;
 
