@@ -811,7 +811,7 @@ void compound_statement()
 		}
 	}
 
-	match(TK_RBRACE);
+    match(TK_RBRACE);
 }
 
 /*
@@ -1214,9 +1214,10 @@ void direct_declarator(int storage_class)
 		}
 
         // [DEBUG]
-        if (strcmp("UOW"/*"PRKCRM_MARSHAL_HEADER"*/, lexeme_value.string_value) == 0)
+        if (strcmp("sqlite3_limit"/*"PRKCRM_MARSHAL_HEADER"*/, lexeme_value.string_value) == 0)
         {
-			(storage_class);
+			int a = 0;
+            (a);
         }
 
 		GET_NEXT_TOKEN;
