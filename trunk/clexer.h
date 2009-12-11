@@ -75,6 +75,11 @@ t_lexeme_value lexeme_value;
 t_lexeme_value peek_lexeme_value;
 
 //
+// lexeme value of cached token
+//
+t_lexeme_value cached_lexeme_value;
+
+//
 // current token coordinate (file, line, column)
 // [FIX ME] - currently it has a problem to support column and file
 //
