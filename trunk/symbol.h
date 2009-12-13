@@ -30,36 +30,28 @@ OTHER DEALINGS IN THE SOFTWARE.
 #include "hcc.h"
 #include "type.h"
 
-// scope level
 extern int scope_level;
 
-
-//
-// Tooken coordinate
-//
 typedef struct token_coordinate
 {
     char* file;
     unsigned long x, y;
 } t_token_coordinate;
 
-//
-// symbol attribute - category
-// [TODO] may expand and grow from here
-//
+
 enum {
-	SYMBOL_TYPEDEF, // typedef names
-	SYMBOL_IDENTIFIER, // normal identifier
-	SYMBOL_FUNC, // function 
-	SYMBOL_CONST, // constant
-	SYMBOL_STRING, // string literals including char
-	SYMBOL_LABEL, // label
-	SYMBOL_ENUM_CONST // enum constant
+	SYMBOL_TYPEDEF, /* typedef names */
+	SYMBOL_IDENTIFIER, /* normal identifier */
+	SYMBOL_FUNC, /* function */ 
+	SYMBOL_CONST, /* constant */
+	SYMBOL_STRING, /* string literals including char */
+	SYMBOL_LABEL, /* label */
+	SYMBOL_ENUM_CONST /* enum constant */
 };
 
-//
-// [TODO] - polish - remove some unneed fields or add more..
-//
+/*
+ * symbol value
+ */
 typedef union value
 {
 	char sc;
@@ -77,18 +69,18 @@ typedef union value
 } t_value;
 
 
-//
-// Symbol
-//
+/*
+ * symbol struct
+ */
 typedef struct symbol 
 {
-	char *name; // symbol name - eg, literal string for an identifier
-    int storage; // stroage class - auto, register, extern, static, typedef, enum
-	int scope; // symbol effective scope 
-	int category; // symbol category (class)
-	t_type* type; // symbol type
+	char *name; /* symbol name - eg, literal string for an identifier */
+    int storage; /* stroage class - auto, register, extern, static, typedef, enum */
+	int scope; /* symbol effective scope */
+	int category; /* symbol category */
+	t_type* type; /* symbol type */
 
-    int defined; // symbol definition flag
+    int defined; /* symbol definition flag */
     t_token_coordinate coordinate;
 
 	struct symbol* previous;
@@ -98,9 +90,9 @@ typedef struct symbol
 } t_symbol;
 
 
-//
-// Symbol Table
-//
+/*
+ * Symbol Table
+ */
 typedef struct symbol_table
 {
 	int level;
@@ -114,10 +106,10 @@ typedef struct symbol_table
     struct symbol* all_symbols;
 } t_symbol_table;
 
-extern t_symbol_table* sym_table_constants; // store constants, string literals
-extern t_symbol_table* sym_table_identifiers; // store identifiers
-extern t_symbol_table* sym_table_types;// store types
-extern t_symbol_table* sym_table_externals; // store external .. ??? [TODO]
+extern t_symbol_table* sym_table_constants; /* store constants, string literals */
+extern t_symbol_table* sym_table_identifiers; /* store identifiers */
+extern t_symbol_table* sym_table_types;/* store types */
+extern t_symbol_table* sym_table_externals; /* []*/
 
 t_symbol_table* make_symbol_table(int arena);
 
@@ -127,25 +119,26 @@ void exit_scope(void);
 
 t_symbol* install_symbol(char* name, t_symbol_table* table);
 
-//
-// add a symbol to symbol table chain. scope_level should be no less than table's level.. in other words, hcc
-// only calls this function in current or nested scope. This reflects the actual processing for parser that
-// outer scope is to be processed first then inner scope..etc
-//
-//
+/*
+ * add a symbol to symbol table chain. scope_level should be no less than table's level.. in other words, hcc
+ * only calls this function in current or nested scope. This reflects the actual processing for parser that
+ * outer scope is to be processed first then inner scope..etc
+ *
+ */
 t_symbol* add_symbol(char* name, t_symbol_table** table, int scope_level, int arena);
 
-// search a symbol in symbol table - if the symbol is not there then search previous chained symbol tables if any
-// (it doesn't make sense to search next chained symbol table constrained by C binding rules)
+/* search a symbol in symbol table - if the symbol is not there then search previous chained symbol tables if any
+ * (it doesn't make sense to search next chained symbol table constrained by C binding rules)
+*/
 t_symbol* find_symbol(char* name, t_symbol_table* table);
 
-//
-// constant differ from normal identifier in such aspects that:
-// 1. In ANSI C all constants are in the same namespace and has no scope concepts
-// 2. Constants with same literal value share a single instance
-//
-// [TODO] - add type information
-//
+/*
+ * constant differ from normal identifier in such aspects that:
+ * 1. In ANSI C all constants are in the same namespace and has no scope concepts
+ * 2. Constants with same literal value share a single instance
+ *
+ * [TODO] - add type information
+ */
 t_symbol* add_const(t_value val);
 
 #endif

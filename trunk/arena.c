@@ -67,13 +67,13 @@ void* hcc_alloc(unsigned long n, unsigned a)
 	ap = arena[a];
 	n = ROUNDUP(n, sizeof (union align));
 
-    // warning [tag] - unsigned (n) and signed (?!) (limit, avail..) mismatch
 	while (n > (unsigned)(ap->limit - ap->avail)) 
     {
-		// [tag] - this could be optimized - the orignial impl in lcc
-		// will never stop remove free blocks from the list and put them
-		// into the arena if the free block it checks is not big enough for this allocation.
-		// as a result these removd free blocks are wasted and never gonna be used.
+		/* [IMPROVE] - this could be optimized - the orignial impl in lcc
+		 * will never stop remove free blocks from the list and put them
+		 * into the arena if the free block it checks is not big enough for this allocation.
+		 * as a result these removd free blocks are wasted and never gonna be used.
+		 */
 		if ((ap->next = freeblocks) != NULL) 
         {
 			freeblocks = freeblocks->next;
@@ -87,7 +87,6 @@ void* hcc_alloc(unsigned long n, unsigned a)
             ap = ap->next;
             if (ap == NULL) 
             {
-                //error("insufficient memory\n");
                 exit(1);
             }
             ap->limit = (char *)ap + m;
@@ -117,7 +116,6 @@ void hcc_free_all()
     struct block* cblock = NULL;
     struct block* nblock = NULL;
 
-    // todo - elegant solution
     for (n; n < arenas; n ++)
     {
 		cblock = &first[n];

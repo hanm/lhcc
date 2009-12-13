@@ -28,68 +28,67 @@ OTHER DEALINGS IN THE SOFTWARE.
 #ifndef __HCC_TYPE_H
 #define __HCC_TYPE_H
 
-//
-// ANSI C build in types and type qualifiers
-// 
+/***********************************************
+ * ANSI C build in types and type qualifiers
+ ************************************************/
 enum 
 {
-	//
-	// caution - the relevant order of these fields matters
-	// as some macros and functions in type system depends on the order!
-	//
-	TYPE_CHAR, // signed char
-	TYPE_UNSIGNED_CHAR, // unsigned char
-	TYPE_SHORT, // short, signed short, short int, signed short int
-	TYPE_UNSIGNED_SHORT, // unsigned short, unsigned short int
-	TYPE_INT, // int, signed int, or no type specifiers
-	TYPE_UNSIGNED_INT, // unsigned, unsigned int
-	TYPE_LONG, // long, signed long, long int, signed long int
-	TYPE_UNSIGNED_LONG, // unsigned long, unsigned long int
-	TYPE_LONGLONG, // [TODO] - WARNING : long long is not ANSI C type
-	TYPE_UNSIGNED_LONGLONG, // AS ABOVE
-	TYPE_ENUM, // enum
-	TYPE_FLOAT, // float
-	TYPE_DOUBLE, // double
-	TYPE_LONGDOUBLE, // long double
-	TYPE_PTR, // pointer /*scalar type ends */
-	TYPE_VOID, // void
-	TYPE_STRUCT, // struct
-	TYPE_UNION, // union
-	TYPE_FUNCTION, // function
-	TYPE_ARRARY, // array
+	TYPE_CHAR, /* signed char */
+	TYPE_UNSIGNED_CHAR, /* unsigned char */
+	TYPE_SHORT, /* short, signed short, short int, signed short int */
+	TYPE_UNSIGNED_SHORT, /* unsigned short, unsigned short int */
+	TYPE_INT, /* int, signed int, or no type specifiers */
+	TYPE_UNSIGNED_INT, /* unsigned, unsigned int */
+	TYPE_LONG, /* long, signed long, long int, signed long int */
+	TYPE_UNSIGNED_LONG, /* unsigned long, unsigned long int */
+	TYPE_LONGLONG, /* [TODO] - WARNING : long long is not ANSI C type */
+	TYPE_UNSIGNED_LONGLONG, /* AS ABOVE */
+	TYPE_ENUM, /* enum */
+	TYPE_FLOAT, /* float */
+	TYPE_DOUBLE, /* double */
+	TYPE_LONGDOUBLE, /* long double */
+	TYPE_PTR, /* pointer */
 	
-	// type qualifiers
-	TYPE_CONST, // constant
-	TYPE_VOLATILE, // volatile
-	TYPE_RESTRICT, // restrict (C99)
+	/*scalar type ends */
+	
+	TYPE_VOID, /* void */
+	TYPE_STRUCT, /* struct */
+	TYPE_UNION, /* union */
+	TYPE_FUNCTION, /* function */
+	TYPE_ARRARY, /* array */
+	
+	/* type qualifiers */
+	TYPE_CONST, /* constant */
+	TYPE_VOLATILE, /* volatile */
+	TYPE_RESTRICT, /* restrict (C99) */
 
-	// extended types [FIX ME]
-	TYPE_INT64
+	/* extended types [FIX ME] */
+	TYPE_INT64 /* int 64 */
 };
 
-//
-// Type
-//
+
 typedef struct type
 {
-	int code; // type code 
-	int align; // type alignment
-	int size; // type size
+	int code; /* type code */
+	int align; /* type alignment */
+	int size; /* type size */
 
-	// link to "sub types" - c type system basically have two kinds of types
-	// one is built in types like int, long, char, float, etc
-	// the other is composed types or user defined types like typedef, struct, union, etc
-	// the link field here enable type struct to extends itself linearly.
+	/* link to other types - for example unsigned long 
+	 * where unsigned in type and long is type->link
+	 * this allows types be expanded linearly
+	 */
 	struct type* link; 
 
-	// point to the symbol table entry for the type
-	// occasionally type needs to access the symbol table information like scope level
-	// etc. this field sets up the link between them.
+	/*
+	 * link to symbol information of the type
+	 * sometimes type needs to access symbol table for information 
+	 * like scope level
+	 */
 	void* symbolic_link;
 
-	//
-	// record/enum/function types
-	//
+	/*
+	 * record/enum/function types
+	 */
 	union  
 	{
 		struct record_type* record;
@@ -99,39 +98,38 @@ typedef struct type
 
 } t_type;
 
-
-//
-// Member in struct or union
-//
+/*
+ * members in struct / union
+ * it's a linked list
+ */
 typedef struct field_type
 {
-	char* name; // field name.
-	int offset; // field offset relative to start of the record.
-	int bits; // number of bits if the field is a bit field; otherwise 0 by default.
-	t_type* type; // field type.
-	struct field_type* next; // link to next field in the same record.
+	char* name; /* field name */
+	int offset; /* field offset relative to start of the record */
+	int bits; /* number of bits if the field is a bit field; otherwise 0 by default */
+	t_type* type; /* field type */
+	struct field_type* next; /* link to next field in the same record */
 } t_field;
 
-//
-// Record type - struct or union
-//
+/*
+ * struct / union
+ */
 typedef struct record_type
 {
-	char* name; // record name
-	t_field* fields; // members in the record
+	char* name; 
+	t_field* fields; 
 } t_record;
 
-//
-// enumeration type
-//
+
 typedef struct enum_type
 {
-	char* name; // [TODO] - prove me...
+	char* name; 
 } t_enum;
 
-//
-// parameter type
-//
+/*
+ * function parameter type
+ * also a linked list
+ */
 typedef struct paremeter_type
 {
 	char* name;
@@ -141,9 +139,10 @@ typedef struct paremeter_type
 	struct parameter_type* next;
 } t_param;
 
-//
-// function type
-//
+/*
+ * function type
+ * a function type is signed by its parameter and return value
+ */
 typedef struct function_type
 {
 	int prototype;
@@ -152,9 +151,9 @@ typedef struct function_type
 	t_param* parameter;
 } t_function;
 
-//
-// build in types
-//
+/*
+ * ANSI C Defined Types
+ */
 t_type* type_char;
 t_type* type_unsigned_char;
 t_type* type_short;
@@ -171,9 +170,7 @@ t_type* type_longdouble;
 t_type* type_ptr;
 t_type* type_void;
 
-//
-// remove the type qualifier for specified type
-//
+
 t_type* remove_type_qualifier(t_type* type);
 
 #define IS_TYPE_QUALIFIERS(t) ((t) == TYPE_CONST \
@@ -220,98 +217,98 @@ t_type* remove_type_qualifier(t_type* type);
 
 #define IS_SCALAR_TYPE(t) (UNQUALIFY_TYPE(type)->code <= TYPE_PTR)
  
-//
-// initialize type system by initializing c build in types and install their on type symbol table
-//
+/*
+ * initialize type system by initializing c build in types and install their on type table
+ */
 void type_system_initialize();
 
-//
-// remove types at specified scope level
-//
+/*
+ * remove types at specified scope level
+ */
 void remove_types(int level);
 
-//
-// construct a pointer type whose sub type is input parameter "pointed"
-//
+/*
+ * construct a pointer type whose sub type is input parameter "pointed"
+ */
 t_type* pointer_type(t_type* pointed);
 
-//
-// dereference a pointer type
-//
+/*
+ * dereference a pointer type
+ */
 t_type* dereference_type(t_type* type);
 
-//
-// construct an array type with specified element type and array size
-//
+/*
+ * construct an array type with specified element type and array size
+ */
 t_type* make_array_type(t_type* type, int size);
 
-//
-// get the ptr type out of an array type
-// in ANSI C, array can be used as a pointer in some cases
-//
+/*
+ * get the ptr type out of an array type
+ * in ANSI C, array can be used as a pointer in some cases
+ */
 t_type* array_to_ptr_type(t_type* type);
 
-//
-// qualify specified type with code
-//
+/*
+ * qualify specified type with code
+ */
 t_type* qualify_type(t_type* type, int code);
 
-//
-// construct a function type
-//
+/*
+ * construct a function type
+ */
 t_type* make_function_type(t_type* type, t_param* parameter, int prototype, int ellipse);
 
-//
-// construct a record type
-// record_type - type of record could be one of either a struct or union
-// name - name of struct/union, could be null (anonymous struct/union)
-//
+/*
+ * construct a record type
+ * record_type - type of record could be one of either a struct or union
+ * name - name of struct/union, could be null (anonymous struct/union)
+ */
 t_type* make_record_type(int record_type, char* name);
 
-//
-// construct a field type and associate it with specified record type
-//
+/*
+ * construct a field type and associate it with specified record type
+ */
 t_field* make_field_type(t_type* field_type, char* name, t_type* record_type);
 
-//
-// Check type compatibility
-//
-// To determine whether or not an implicit conversion is permissible, ANSI C
-// introduced the concept of compatible types. After promotion, using the appropriate
-// set of promotion rules, two non-pointer types are compatible if they have the same
-// size, signedness, and integer or float characteristic, or, in the case of aggregates, are of
-// the same structure or union type
-// 
-// Two arithmetic types are compatible only if they are the same type.
-//
-// Pointers are compatible if they point to compatible types. No default promotion rules
-// apply to pointers
-//
+/*
+ * Check type compatibility
+ *
+ * To determine whether or not an implicit conversion is permissible, ANSI C
+ * introduced the concept of compatible types. After promotion, using the appropriate
+ * set of promotion rules, two non-pointer types are compatible if they have the same
+ * size, signedness, and integer or float characteristic, or, in the case of aggregates, are of
+ * the same structure or union type
+ * 
+ * Two arithmetic types are compatible only if they are the same type.
+ *
+ * Pointers are compatible if they point to compatible types. No default promotion rules
+ * apply to pointers
+ */
 int is_compatible_type(t_type*, t_type*); 
 
-//
-// promote type according to default argument promotion rules: 
-// short and char types (whether signed or unsigned) are passed as ints, 
-// other integral quantities are not changed, and floating
-// point quantities are passed as doubles. These rules are also used for arguments in the
-// variable-argument portion of a function whose prototype ends in ellipses (?
-//
+/*
+ * promote type according to default argument promotion rules: 
+ * short and char types (whether signed or unsigned) are passed as ints, 
+ * other integral quantities are not changed, and floating
+ * point quantities are passed as doubles. These rules are also used for arguments in the
+ * variable-argument portion of a function whose prototype ends in ellipses (?
+ */
 t_type* promote_type(t_type* type);
 
-//
-// check if a function is a function of variable arity
-//
+/*
+ * check if a function is a function of variable arity
+ */
 int is_variadic_function(t_type* type);
 
-//
-// composite a new type from compatible types
-//
+/*
+ * composite a new type from compatible types
+ */
 t_type* composite_type(t_type* type1, t_type* type2);
 
-//
-// check if two types have same type qualifier
-// for example, const volatile restrict would be treat the same set of qualifier as restrict volatile const.. etc.
-// 
+/*
+ * check if two types have same type qualifier
+ * for example, const volatile restrict would be treat the same set of qualifier as restrict volatile const.. etc.
+ */ 
 int has_same_type_qualifier(t_type* type1, t_type* type2);
 
 #endif

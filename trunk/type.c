@@ -35,10 +35,10 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 #define __HCC_TYPE_TABLE_HASHSIZE 512
 
-//
-// this table exits simply to provide singleton of types
-// it would make sure identical type has only one runtime representation.
-//
+/*
+ * this table exits simply to provide singleton of types
+ * it would make sure identical type has only one runtime representation.
+ */
 static struct type_entry
 {
 	t_type type;
@@ -53,11 +53,11 @@ static t_type* atomic_type(t_type* type, int code, int align, int size, t_symbol
 
 	HCC_ASSERT(code >= 0 && align >= 0 && size >= 0);
 
-	//
-	// Here function and zero sized (incomplete) array
-	// can't be identified simply by code, align, size, and sub type.
-	// So for function and incomplete array always allocate new type for them.
-	//
+	/*
+	 * Here function and zero sized (incomplete) array
+	 * can't be identified simply by code, align, size, and sub type.
+	 * So for function and incomplete array always allocate new type for them.
+	 */
 	if (code != TYPE_FUNCTION && (code != TYPE_ARRARY || size > 0))
 	{
 		for (p = type_table[h]; p; p = p->next)
@@ -85,10 +85,10 @@ static t_type* atomic_type(t_type* type, int code, int align, int size, t_symbol
 }
 
 
-//
-// install a specific type to type symbol table
-// and return a runtime representation for the type
-//
+/*
+ * install a specific type to type symbol table
+ * and return a runtime representation for the type
+ */
 static t_type* install_type_symbol(int code, char*name, int size, int align)
 {
 	t_symbol* symbol = add_symbol(name, &sym_table_types, GLOBAL, PERM);
@@ -152,18 +152,16 @@ void remove_types(int level)
 			else if (current_entry->type.code != TYPE_FUNCTION &&
 				((t_symbol*)current_entry->type.symbolic_link)->scope >= level)
 			{
-				// heading next item in the hash chain
 				*bucket = current_entry->next;
 			}
 			else
 			{
-				// delete current item from hash chain
 				bucket = &current_entry->next;
 			}
 		}
 	}
 
-	// [TODO] - possible optimizations here to avoid iterating hash table in some cases.
+	/* [TODO] - possible optimizations here to avoid iterating hash table in some cases. */
 } 
 
 
@@ -185,8 +183,7 @@ t_type* dereference_type(t_type* type)
 		type_error("expect pointer type : dereference can only be applied to a pointer type.");
 	}
 
-	// for pointer to enum need to get the unqualified member type
-	// typically this is int
+	/* for pointer to enum need to get the unqualified member type; typically this is int */
 	if (IS_ENUM_TYPE(type))
 	{
 		type = UNQUALIFY_TYPE(type)->link;
@@ -288,12 +285,12 @@ t_type* make_function_type(t_type* type, t_param* parameter, int prototype, int 
 
 	if (IS_ARRAY_TYPE(type) || IS_FUNCTION_TYPE(type))
 	{
-		// function can't have either array or function as its return type
+		/* function can't have either array or function as its return type */
 		type_error("illegal function return type");
 		return NULL;
 	}
 
-	// [TODO] function type align and size ; currently it's the same with ptr 
+	/* [TODO] function type align and size ; currently it's the same with ptr */
 	type = atomic_type(type, TYPE_FUNCTION, type_ptr->align, type_ptr->size, NULL);
 
 	CALLOC(function, sizeof *function);
@@ -311,7 +308,7 @@ t_type* make_record_type(int record_type, char* name)
 {
     t_symbol* symbol = NULL;
     t_record* record = NULL;
-    static int a = 0; // for anonymous record hcc generate the name
+    static int a = 0; /* for anonymous record hcc generate the name */
 
     HCC_ASSERT(record_type == TYPE_ENUM || record_type == TYPE_STRUCT || record_type == TYPE_UNION);
 
@@ -324,7 +321,7 @@ t_type* make_record_type(int record_type, char* name)
         symbol = find_symbol(name, sym_table_types);
         if (symbol != NULL)
         {
-            // this implicitly means a new record type is only created in current scope (scope_level)
+            /* this implicitly means a new record type is only created in current scope (scope_level) */
             if (symbol->scope == scope_level || symbol->scope == PARAM && scope_level == PARAM + 1)
             {
                 if (symbol->type->code == record_type && !symbol->defined)
@@ -340,13 +337,13 @@ t_type* make_record_type(int record_type, char* name)
         }
     }
 
-    // after cross fire either the type is missing or not satisfy our needs
-    // so create a new one and set up links with sym table
-    // the fields of record will be added later and size/align will be adjusted accordingly.
+    /* after cross fire either the type is missing or not satisfy our needs
+     * so create a new one and set up links with sym table
+     * the fields of record will be added later and size/align will be adjusted accordingly.
+	 */
     symbol = add_symbol(name, &sym_table_types, scope_level, PERM);
-    symbol->type = atomic_type(NULL, record_type, 0, 0, symbol); // a new record type has align 0 and size 0
+    symbol->type = atomic_type(NULL, record_type, 0, 0, symbol); /* a new record type has align 0 and size 0 */
     
-    // bind with record 
     CALLOC(record, sizeof *record);
     record->name = name;
     record->fields = NULL;
@@ -361,7 +358,7 @@ t_field* make_field_type(t_type* field_type, char* name, t_type* record_type)
     t_field* current = NULL;
     t_field** next = NULL;
 
-    // [TODO] - support unnamed bit field ; at this moment field requires a name
+    /* [TODO] - support unnamed bit field ; at this moment field requires a name */
     HCC_ASSERT(field_type != NULL && name != NULL && record_type != NULL);
 
     next = &record_type->u.record->fields;
@@ -394,14 +391,11 @@ static int is_compatible_function(t_type* type1, t_type* type2)
         type1->u.function != NULL &&
         type2->u.function != NULL);
 
-    // incompatible return type
     if (!is_compatible_type(type1->link, type2->link))
     {
         return 0;
     }
     
-    // both functions have no prototype
-    // [TODO] they are compatible??
     if (!type1->u.function->prototype && !type2->u.function->prototype)
     {
         return 1;
@@ -412,8 +406,6 @@ static int is_compatible_function(t_type* type1, t_type* type2)
 
     if (p1 && p2)
     {
-        // both have prototype - iterate and check
-        // [TODO] stupid cast
         for (; p1 && p2; p1 = (t_param*)p1->next, p2 = (t_param*)p2->next)
         {
             if (!is_compatible_type(p1->type, p2->type))
@@ -427,7 +419,6 @@ static int is_compatible_function(t_type* type1, t_type* type2)
     }
     else if (!p1 && !p2)
     {
-        // both have no prototype - implicitly compatible?? [TODO]
         return 1;
     }
     else
@@ -437,7 +428,6 @@ static int is_compatible_function(t_type* type1, t_type* type2)
             return 0;
         }
 
-        // either p1 or p2 has to have prototype when the flow hits here..
         if (!p1)
         {
             p1 = p2;
@@ -490,10 +480,10 @@ int is_compatible_type(t_type* type1, t_type* type2)
 	{
 		return is_compatible_function(type1, type2);
 	}
-    // [TODO] - consider compatible type for struct, union, and enum..
-    // or leave it to semantic check??
-    // http://www.serc.iisc.ernet.in/ComputingFacilities/systems/cluster/vac-7.0/html/language/ref/clrc03compatible_types.htm
-
+    /* [TODO] - consider compatible type for struct, union, and enum..
+     * or leave it to semantic check??
+     * http://www.serc.iisc.ernet.in/ComputingFacilities/systems/cluster/vac-7.0/html/language/ref/clrc03compatible_types.htm
+	 */
     return 0;
 }
 
@@ -515,7 +505,7 @@ t_type* promote_type(t_type* type)
 
 int is_variadic_function(t_type* type)
 {
-    // [TODO] here we need to make sure the ellipse flag is properly set
+    /* [TODO] here we need to make sure the ellipse flag is properly set */
     if (IS_FUNCTION_TYPE(type) && type->u.function->ellipse)
     {
         return 1;
@@ -564,7 +554,6 @@ t_type* composite_type(t_type* type1, t_type* type2)
 {
 	int type_code = 0;
 
-    // note the assertion here - two types must be compatible before this func is called..
 	HCC_ASSERT(type1 != NULL && type2 != NULL && is_compatible_type(type1, type2));
 
 	if (type1 == type2)
@@ -579,21 +568,20 @@ t_type* composite_type(t_type* type1, t_type* type2)
 	}
 	else if (type_code == TYPE_ARRARY)
 	{
-        // array are compatible if and only if both have same size or both are incomplete
-        // [TODO][Caution] - note here directly modify one of input parameters..
-        // if this is a problem fix it later.. the same apply to below for function composition
+        /* array are compatible if and only if both have same size or both are incomplete
+         * [TODO][Caution] - note here directly modify one of input parameters..
+         * if this is a problem fix it later.. the same apply to below for function composition
+		 */
         return type1->size == 0 ? type1 : type2;
     }
 	else if (type_code == TYPE_FUNCTION)
 	{
-        //
-		// For two function types, it is a function type that returns a composite of the two return types. 
-        // If both specify types for their parameters, each parameter type in the composite type is the 
-        // composite of the two corresponding parameter types. If only one specifies types for its parameters, 
-        // it determines the parameter types in the composite type. Otherwise, the composite type specifies no types for its parameters.
-        //
- 
-        // return type
+        /*
+		 * For two function types, it is a function type that returns a composite of the two return types. 
+         * If both specify types for their parameters, each parameter type in the composite type is the 
+         * composite of the two corresponding parameter types. If only one specifies types for its parameters, 
+         * it determines the parameter types in the composite type. Otherwise, the composite type specifies no types for its parameters.
+         */
         type1->link = composite_type(type1->link, type2->link);
 
         if (type1->u.function->prototype && type2->u.function->prototype)
@@ -601,7 +589,7 @@ t_type* composite_type(t_type* type1, t_type* type2)
             t_param* p1 = type1->u.function->parameter;
             t_param* p2 = type2->u.function->parameter;
 
-            // both function would be compatible which implies they have same set of parameters
+            /* both function would be compatible which implies they have same set of parameters */
             for (; p1; p1 = (t_param*)p1->next, p2 = (t_param*)p2->next)
             {
                 p1->type = composite_type(p1->type, p2->type);
@@ -640,7 +628,6 @@ t_type* composite_type(t_type* type1, t_type* type2)
         return type1;
     }
 
-    // THIS SHOULD NOT HAPPEN
     HCC_ASSERT(0);
     return NULL;
 }
