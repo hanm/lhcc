@@ -29,6 +29,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 #include <string.h>
 
 static int error_count = 0;
+static int warning_count = 0;
 
 void error(char* expect_token, char* actual_token)
 {
@@ -61,33 +62,35 @@ void error(char* expect_token, char* actual_token)
 		actual = actual_token;
 	}
 
-	printf("Error : expect token %s but got token %s \n", exp, actual);
+	printf("Error in file %s on line %d : expect token %s but got token %s \n", 
+		coord.filename, coord.line, exp, actual);
 
 	error_count ++;
 }
 
-void syntax_error(t_coordinate* coordinate, char* error_msg)
+void syntax_error(char* error_msg)
 {
-    printf("Syntax Error on line: %d : %s", coordinate->line, error_msg);
+	printf("Syntax error detected in file %s on line %d : %s \n", coord.filename, coord.line, error_msg);
 
 	error_count ++;
 }
 
-void warning(t_coordinate* coordinate, char* warning_msg)
+void warning(char* warning_msg)
 {
-    printf("Warning : line %d %s", coordinate->line, warning_msg);
+	printf("Warning in file %s on line %d : %s \n", coord.filename, coord.line, warning_msg);
+	warning_count ++;
 }
 
-void lexeme_error(t_coordinate* coordinate, char* error_msg)
+void lexeme_error(char* error_msg)
 {
-    printf("Lexeme error : line %d %s", coordinate->line, error_msg);
+	printf("Lexeme error detected in file %s on line %d : %s \n", coord.filename, coord.line, error_msg);
 
 	error_count ++;
 }
 
 void type_error(char* msg)
 {
-	printf("type error : %s\n", msg);
+	printf("type error in file %s on line %d : %s\n", coord.filename, coord.line,msg);
 
 	error_count ++;
 }

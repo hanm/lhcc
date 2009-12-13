@@ -177,7 +177,10 @@ void reset_clexer(t_scanner_context* sc)
 	peek_token_code = TK_NULL;
     cached_token_code = TK_NULL;
 
-	
+	coord.filename = atom_string(sc->filename);
+	coord.column = 0;
+	coord.line = 0;
+
 	/* initialize static tables of preprocessor ucpp */
 	init_cpp();
 	
@@ -373,14 +376,14 @@ static int identify_integer_value(char* start, int length, int base)
             }
             else
             {
-                lexeme_error(&coord, "illegal hex character detected!");
+                lexeme_error("illegal hex character detected!");
                 break;
             }
 
             if (value &~(~0UL >> 4))
             {
                 overflow = 1;
-                warning(&coord, "overflow detected for hex integer!");
+                warning("overflow detected for hex integer!");
             }
             else
             {
@@ -395,7 +398,7 @@ static int identify_integer_value(char* start, int length, int base)
             if (value &~(~0UL >> 3))
             {
                 overflow = 1;
-                warning(&coord, "overflow detected for oct integer!");
+                warning("overflow detected for oct integer!");
             }
             else
             {
@@ -412,7 +415,7 @@ static int identify_integer_value(char* start, int length, int base)
             if (value > (~0UL - i)/10)
             {
                 overflow = 1;
-                warning(&coord, "overflow detected for decimal integer!");
+                warning("overflow detected for decimal integer!");
             }
             else
             {
@@ -465,7 +468,7 @@ static int identify_float_value(char* number)
         }
         else
         {
-            lexeme_error(&coord, "incorrect float constant detected!");
+            lexeme_error("incorrect float constant format detected!");
             return 0;
         }
     }
@@ -474,7 +477,7 @@ static int identify_float_value(char* number)
     value = strtod(number, NULL);
     if (errno == ERANGE)
     {
-        warning(&coord, "float value out of range!");
+        warning("float value out of range!");
     }
 
     fprintf(stderr, "float value %f\n", value);
