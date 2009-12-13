@@ -1193,7 +1193,7 @@ void direct_declarator(int storage_class)
     {
 		if (cptk != TK_ID)
 		{
-			syntax_error(&coord, "direct declarator must end with an identifier");
+			syntax_error("direct declarator must end with an identifier");
 		}
 
 		//
@@ -1281,7 +1281,7 @@ void direct_abstract_declarator()
 	}
 	else
 	{
-		syntax_error(&coord, "illegal token found in abstract declarator!");
+		syntax_error("illegal token found in abstract declarator!");
 	}
 }
 
@@ -1315,7 +1315,7 @@ void all_declarator(int storage_class)
     }
     else
     {
-        if (cptk != TK_LBRACKET) syntax_error(&coord, "declarator error");
+        if (cptk != TK_LBRACKET) syntax_error("declarator error");
     }
     
     while (cptk == TK_LPAREN || cptk == TK_LBRACKET)
@@ -1521,7 +1521,7 @@ void enum_specifier()
 
     if (0 == flag)
     {
-        syntax_error(&coord, "Error when parsing enum specifier : { or identifier expected");
+        syntax_error("Error when parsing enum specifier : { or identifier expected");
     }
 }
 
@@ -1544,7 +1544,7 @@ void enumerator()
 			return;
 		}
 
-        syntax_error(&coord, "enumerator must be identifier!");
+        syntax_error("enumerator must be identifier!");
         return;
     }
 

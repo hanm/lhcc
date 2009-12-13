@@ -186,66 +186,68 @@ void test_lexer()
 }
 
 
-void test_parser()
+void test_parser(char* filename, char** include_path)
 {
     t_scanner_context sc;
 
-    char* path[4] = {"E:\\Program Files\\Microsoft Visual Studio 9.0\\VC\\include", 
-		"C:\\Program Files\\Microsoft Visual Studio 9.0\\VC\\include", "G:\\src", 
-		"C:\\Program Files\\Microsoft SDKs\\Windows\\v6.0A\\Include"};
-
-#if 0
-	sc.filename = "G:\\src\\Jill.c";
-#else
-	//sc.filename = "G:\\src\\bloom-filter.c";
-	//sc.filename = "G:\\src\\stdio.h";
-	//sc.filename = "G:\\src\\stdlib.h";
-	//sc.filename = "G:\\src\\string.h";
-    //sc.filename = "G:\\src\\set.c";
-    //sc.filename = "G:\\src\\slist.c";
-    //sc.filename = "G:\\src\\avl-tree.c";
-    //sc.filename = "G:\\src\\arraylist.c";
-    //sc.filename = "G:\\src\\queue.c";
-    //sc.filename = "G:\\src\\list.c";
-    //sc.filename = "G:\\src\\hash-table.c";
-    //sc.filename = "G:\\src\\hash-string.c";
-    //sc.filename = "G:\\src\\hash-pointer.c";
-    //sc.filename = "G:\\src\\hash-int.c";
-    //sc.filename = "G:\\src\\binomial-heap.c";
-    //sc.filename = "G:\\src\\binary-heap.c";
-    //sc.filename = "G:\\src\\swprintf.inl"; // requires typedef _locale_t  to work. stand alone parsing doesn't work.
-    //sc.filename = "G:\\src\\specstrings.h"; 
-    //sc.filename = "G:\\src\\winnt.h";
-    sc.filename = "G:\\src\\sqlite3.c";
-#endif
-
-    sc.include_pathes = path;
-    sc.number_of_include_pathes = 4;
+	sc.filename = filename;
+	sc.include_pathes = include_path;
+	sc.number_of_include_pathes = 4;
 
     HCC_MEM_CHECK_START
 
-    reset_clexer(&sc);
+	reset_clexer(&sc);
 
-    initialize_parser();
+	initialize_parser();
 
-    translation_unit();
+	translation_unit();		
 
-    free_clexer();
-
-    hcc_free_all();
+	free_clexer();
+	hcc_free_all();
 
     HCC_MEM_CHECK_END
 }
 
 int main(int argc, char* argv[])
 {
-    (argc), (argv);
 
 #if 1
-    test_parser();
+	char* path[4] = {"E:\\Program Files\\Microsoft Visual Studio 9.0\\VC\\include", 
+		"C:\\Program Files\\Microsoft Visual Studio 9.0\\VC\\include", "G:\\src", 
+		"C:\\Program Files\\Microsoft SDKs\\Windows\\v6.0A\\Include"};
+
+	char* names[] = 
+	{
+		"G:\\src\\Jill.c",
+		"G:\\src\\bloom-filter.c",
+		"G:\\src\\stdio.h",
+		"G:\\src\\stdlib.h",
+		"G:\\src\\string.h",
+		"G:\\src\\set.c",
+		"G:\\src\\slist.c",
+		"G:\\src\\avl-tree.c",
+		"G:\\src\\arraylist.c",
+		"G:\\src\\queue.c",
+		"G:\\src\\list.c",
+		"G:\\src\\hash-table.c",
+		"G:\\src\\hash-string.c",
+		"G:\\src\\hash-pointer.c",
+		"G:\\src\\hash-int.c",
+		"G:\\src\\binomial-heap.c",
+		"G:\\src\\binary-heap.c",
+		"G:\\src\\swprintf.inl",// requires typedef _locale_t  to work. stand alone parsing doesn't work.
+		"G:\\src\\specstrings.h",
+		"G:\\src\\winnt.h",
+		"G:\\src\\sqlite3.c"
+	};
+
+	test_parser(names[20], path);
+
 #else
     test_lexer();
 #endif
 
+	(argc);
+	(argv);
     return 0;
 }

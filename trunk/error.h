@@ -27,16 +27,14 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 #ifndef __HCC_ERROR_HANDLING
 #define __HCC_TRACE_HANDLING
-#include "clexer.h" // for token coordinate
+/* include this file for getting literal token from token code */
+#include "clexer.h" 
 
-//
-// [TODO] - varadic error parameters 
-//
+/* [TODO] these error reporting funcs should accept varidic parameters */
 void error(char* expect_token, char* actual_token);
-void syntax_error(t_coordinate* coordinate, char* error_msg);
-
-void lexeme_error(t_coordinate* coordinate, char* error_msg);
-void warning(t_coordinate*, char*);
-
+void syntax_error(char* error_msg);
+void lexeme_error(char* error_msg);
+void warning(char*);
 void type_error(char* msg);
+
 #endif
