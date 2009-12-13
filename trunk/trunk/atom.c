@@ -48,17 +48,12 @@ static struct atom
 
 const char* atom_string(const char* string)
 {
-	assert(string);
-
-	// warning - convert size_t to int [tag]
 	return atom_string_number(string, (int)strlen(string));
 }
 
 const char* atom_string_number(const char* string, int length)
 {
-	//
-	// djb2 hash - [tag] research
-	//
+	/* djb2 hash */
 	unsigned long hash = 5381;
 	int i, c;
 	int k = 0;
@@ -90,7 +85,6 @@ const char* atom_string_number(const char* string, int length)
 		}
 	}
 
-	// allocate string into arena PERM - life time persist till compiler dies.
     p = hcc_alloc(sizeof(*p) + length + 1, PERM);
 	p->length = length;
 	p->string = (char *)(p + 1);
@@ -137,6 +131,5 @@ const char* atom_int(int n)
 		*--s = '-';
 	}
 
-	// [tag] VC warning convert from _w64 int to int possible lose of data
 	return atom_string_number(s, (int)((string + sizeof(string)) - s));
 }

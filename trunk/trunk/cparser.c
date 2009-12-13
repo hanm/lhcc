@@ -1748,9 +1748,6 @@ int is_typedef_id(char* token_name)
 
 int is_current_token_declaration_specifier_token()
 {
-    //
-    // native types
-    //
     if (cptk == TK_AUTO ||
         cptk == TK_EXTERN ||
         cptk == TK_REGISTER ||
@@ -1816,9 +1813,6 @@ int is_token_typename_token(int token_code, char* token_symbol)
         token_code == TK_UNION ||
         token_code == TK_ENUM)
     {
-        //
-        // ANSI build in type keywords
-        //
         return 1;
     }
     else if (token_symbol != NULL)

@@ -33,14 +33,14 @@ void hcc_free(unsigned a);
 
 void hcc_free_all();
 
-//
-// allocate object p in arena a
-//
+/*
+ * allocate object p in arena a
+ */
 #define ALLOC(p,a) ((p) = hcc_alloc(sizeof *(p), (a)))
 
-//
-// allocate object p and initialize it to zero in arena a
-//
+/*
+ * allocate object p and initialize it to zero in arena a
+ */
 #define CALLOC(p,a) memset(ALLOC((p),(a)), 0, sizeof *(p))
 
 #endif

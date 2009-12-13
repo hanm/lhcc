@@ -28,8 +28,6 @@ OTHER DEALINGS IN THE SOFTWARE.
 #ifndef __HCC_PARSER_H
 #define __HCC_PARSER_H
 
-// NOTE THIS IS A C89 COMPLIANT GRAMMAR
-// TODO - GET AN UPDATED C GRAMMAR
 /*
 primary_expression
         : IDENTIFIER
@@ -460,15 +458,15 @@ function_definition
 
 */
 
-// current parser token
+/* CURRENT PARSER TOKEN */
 int cptk;
 
 void initialize_parser();
 void match(int token);
 
-//
-// expressions
-//
+/*
+ * EXPRESSIONS 
+ */
 void primary_expression();
 void postfix_expression();
 void unary_expression();
@@ -488,41 +486,28 @@ void constant_expression();
 void assignment_expression();
 void expression();
 
-//
-// general statements
-//
+/*
+ * STATEMENTS
+ */
 void statement();
 void compound_statement();
 void expression_statement();
-
-//
-// selection statements
-//
 void if_statement(); 
 void switch_statement();
 void case_statement();
 void default_statement();
-
-//
-// iteration statements
-//
 void while_statement();
 void do_while_statement();
 void for_statement();
-
-//
-// jump statements
-//
 void break_statement();
 void continue_statement();
 void goto_statement();
 void return_statement();
-
 void labeled_statement();
 
-//
-// declarations
-//
+/*
+ * DECLARATIONS
+ */
 void declaration();
 int declaration_specifiers();
 void init_declarator(int storage_class);
@@ -546,21 +531,23 @@ void enumerator();
 void translation_unit();
 void external_declaration();
 
+/*
+ *  Utilities
+ */
 void type_name();
-
 int is_typedef_id(char* token_name);
-//
-// check if current token is in declaration specifier token set
-//
-// declarations are prefixed with type specifiers
-// which includes build in types and typedef 
-// identifier names
-//
+/*
+ * check if current token is in declaration specifier token set
+ *
+ * declarations are prefixed with type specifiers
+ * which includes build in types and typedef 
+ * identifier names
+ */
 int is_current_token_declaration_specifier_token();
-//
-// declarators are prefixed with pointers,
-// left parenthesis, or identifiers
-//
+/*
+ * declarators are prefixed with pointers,
+ * left parenthesis, or identifiers
+ */
 int is_current_token_declarator_token();
 
 int is_token_typename_token(int token_code, char* token_symbol);
