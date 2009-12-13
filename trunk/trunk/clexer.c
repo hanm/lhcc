@@ -62,12 +62,9 @@ OTHER DEALINGS IN THE SOFTWARE.
  * History
  * 10/12/2009 - add trace enable/disable to lexer
  */
-static char** ptr_includefiles;
-static char** ptr_compilefiles;
+
 static struct lexer_state ls;
 
-// current symbol
-static struct symbol sym;
 
 static int current_token_code;
 static int peek_token_code;
@@ -170,47 +167,37 @@ static unsigned char lexical_map[256] =
 
 void reset_clexer(t_scanner_context* sc)
 {
-	// include file loop counter
-	int i = 0;
-	
-	int r = 0;
-	(r);
-	assert(sc);
+	int i = 0;	
 
-	//
-	// clean previous states and memory if neccessary
-	//
-	//wipeout();
+	HCC_ASSERT(sc != NULL);
+
 	free_lexer_state(&ls);
 
 	current_token_code = TK_NULL;
 	peek_token_code = TK_NULL;
     cached_token_code = TK_NULL;
 
-	//
-	// initialize static tables of preprocessor ucpp
-	//
+	
+	/* initialize static tables of preprocessor ucpp */
 	init_cpp();
 	
 	/*
-	  non-zero if the special macros (__FILE__ and others)
-	  should not be defined. This is a global flag since
-	  it affects the redefinition of such macros (which are
-	  allowed if the special macros are not defined)
-	*/
+	 * non-zero if the special macros (__FILE__ and others)
+	 * should not be defined. This is a global flag since
+	 * it affects the redefinition of such macros (which are
+	 * allowed if the special macros are not defined)
+	 */
 	no_special_macros = 0;
 
 	/* 
-	  This function initializes the macro table
-	  and other things; it will intialize assertions if it has a non-zero
-	  argument
-	*/
+	 * This function initializes the macro table
+	 * and other things; it will intialize assertions if it has a non-zero
+	 * argument
+	 */
 	init_tables(1);
 	
-	//
-	// reset include path
-	//
-	// init_include_path(sc->include_pathes);
+	
+	/* init_include_path(sc->include_pathes); */
 	
 	/*
 	these are the set of "emit" macros use to debug or produce analysis information during
@@ -245,9 +232,7 @@ void reset_clexer(t_scanner_context* sc)
 	init_lexer_mode(&ls);
 	ls.flags |= HANDLE_ASSERTIONS | HANDLE_PRAGMA | LINE_NUM | CPLUSPLUS_COMMENTS;
 
-	//
-	// TODO - get current dir and concatenate the names
-	//
+	/* [TODO] - get current dir and concatenate the names */
 	ls.input = fopen(sc->filename, "rb");
 	if (ls.input == NULL)
 	{
@@ -256,11 +241,11 @@ void reset_clexer(t_scanner_context* sc)
 
 	for (; i < sc->number_of_include_pathes; i ++) add_incpath(sc->include_pathes[i]);
 
-    //
-    // [NOTICE] Inject macro from here
-    // [FIX ME] These macros should be put in HCC header file.
-    // Also these macros should be passed from command line or configuration file instead of hard coded
-    //
+    /*
+     * [NOTICE] Inject macro from here
+     * [FIX ME] These macros should be put in HCC header file.
+     * Also these macros should be passed from command line or configuration file instead of hard coded
+     */
     define_macro(&ls, "wchar_t=int");
     define_macro(&ls, "NULL=((void *)0)");
     define_macro(&ls, "size_t=unsigned int");
@@ -269,13 +254,13 @@ void reset_clexer(t_scanner_context* sc)
     define_macro(&ls, "_WIN32");
     define_macro(&ls, "_M_IX86=500");
 
-    //
-    // [FIX ME] 
-    // This is to work around non ANSI C extensions from Visual C++ compiler. 
-    // The work around simply define the VC specific extensions as empty macro so they will be filtered out before getting to parser.
-    // Not a good way as it abandons some information like calling convention from front end to back end, but is the only choice 
-    // at this moment given I don't have other headers / STD C library to use.
-    //
+    /*
+     * [FIX ME] 
+     * This is to work around non ANSI C extensions from Visual C++ compiler. 
+     * The work around simply define the VC specific extensions as empty macro so they will be filtered out before getting to parser.
+     * Not a good way as it abandons some information like calling convention from front end to back end, but is the only choice 
+     * at this moment given I don't have other headers / STD C library to use.
+     */
 #if defined(HCC_VISUAL_STUDIO_WORK_AROUND)
     define_macro(&ls, "__cdecl=");
     define_macro(&ls, "__stdcall=");
@@ -284,7 +269,7 @@ void reset_clexer(t_scanner_context* sc)
     define_macro(&ls, "dllimport(a)=");
 	define_macro(&ls, "__inline=");
     define_macro(&ls, "__forceinline=");
-	// temp solution
+
 	/*
     define_macro(&ls, "IN=");
 	define_macro(&ls, "PCONTEXT=int");
@@ -316,7 +301,6 @@ void reset_clexer(t_scanner_context* sc)
     set '$' as an acceptable identifier char because some windows SDK header files
     (for example, specstrings.h) has macro with identifier containing $. 
 */
-    // [NOTICE] - side effect?
     set_identifier_char('$');
 }
 
@@ -333,13 +317,16 @@ static int identify_keyword(char* id)
 	int index = 0;
 	if (*id != '_')
 	{
-		// convert *id to upper case letter if needed and calc diff as index (starting 0)
-		// deal special case "_" seperately which will generate index out of bounds (26)
+		/* convert *id to upper case letter if needed and calc diff as index (starting 0)
+		 * deal special case "_" seperately which will generate index out of bounds (26)
+		 */
 		index = (*id &~0x20) - 'A'; 
 	}
-	// [NON STD EXT][FIX ME]
-	// here is a hack to support __int64 extension
-	// otherwise this keyword will be omitted.
+
+	/* [NON STD EXT][FIX ME]
+	 * here is a hack to support __int64 extension
+	 * otherwise this keyword will be omitted.
+	 */
 	else if (!strcmp(id, "__int64"))
 	{
 		return TK_INT64;
@@ -378,7 +365,7 @@ static int identify_integer_value(char* start, int length, int base)
             if ( (*current >= 'A' && *current <= 'F') ||
                  (*current >= 'a' && *current <= 'f'))
             {
-                i = (*current & ~0x20) - 'A' + 10; // convert to upper 
+                i = (*current & ~0x20) - 'A' + 10;
             }
             else if (HCC_ISDECIMAL_DIGIT(*current)) 
             {
@@ -442,7 +429,7 @@ static int identify_integer_value(char* start, int length, int base)
 
 static int identify_float_value(char* number)
 {
-    // TODO - is this the right type?
+    /* TODO - is this the right type? */
     long double value = 0;
 
     HCC_ASSERT(number);
@@ -479,7 +466,6 @@ static int identify_float_value(char* number)
         else
         {
             lexeme_error(&coord, "incorrect float constant detected!");
-            // todo - here the upper modules should know how to recover 
             return 0;
         }
     }
@@ -493,9 +479,11 @@ static int identify_float_value(char* number)
 
     fprintf(stderr, "float value %f\n", value);
 
-    // todo - here maybe do one step further to identify that is it a double, or float?
-    // right now the value is just assigned to double which is garanteed to hold on both a double and a float
-    // so it doesn't hurt, so far...
+	/*
+     * todo - here maybe do one step further to identify that is it a double, or float?
+     * right now the value is just assigned to double which is garanteed to hold on both a double and a float
+     * so it doesn't hurt, so far...
+	 */
     lexeme_value.double_value = value;
     return TK_CONST_FLOAT;
 }
@@ -512,9 +500,11 @@ static int identify_numerical_value(char* number)
         return identify_float_value(number);
     }
 
-    // TODO - here we need to verify the valid suffixes
-    // ul, UL, uL, Ul. and detect invalid hex number, oct number, and decimal number
-    // currently number like 0xXYZ will survive the crossfire which is not right
+	/*
+     * [TODO] - here we need to verify the valid suffixes
+     * ul, UL, uL, Ul. and detect invalid hex number, oct number, and decimal number
+     * currently number like 0xXYZ will survive the crossfire which is not right
+	 */
     if ('0' == *number && 
         ('x' == number[1] ||
          'X' == number[1]))
@@ -564,17 +554,17 @@ static int get_token_internal()
     int retval;
     int r;
 
-    //
-    // This is the trick to implement the backup - restore feature such that
-    // lexer provides its caller the capability to peek a token (without consume).
-    //
+    /*
+	 * This is the trick to implement the backup - restore feature such that
+     * lexer provides its caller the capability to peek a token (without consume).
+     */
 	if (peek_token_code != TK_NULL)
 	{
-        //
-        // none NULL peek token indicates previously the peek_token is invoked.
-        // so we just return the cached peek token and restore the clexer state to 
-        // what it should be. 
-        //
+        /*
+         * none NULL peek token indicates previously the peek_token is invoked.
+         * so we just return the cached peek token and restore the clexer state to 
+         * what it should be. 
+         */
         current_token_code = peek_token_code;
 		peek_token_code = TK_NULL;
         lexeme_value = peek_lexeme_value;
@@ -583,10 +573,6 @@ static int get_token_internal()
 
     retval = TK_ID;
 
-    //
-    // Once lex is called the ucpp internal state is changed. So any book keepig stuff and tricks 
-    // must be done before this call.
-    //
     r = lex(&ls);
 
     /*
@@ -597,18 +583,14 @@ static int get_token_internal()
     */
     if (r == CPPERR_EOF)
     {
-        // end of file
         return TK_END;
     }
-	/*
     else if (r)
     {
-        // error - TODO what kind of error?
-        assert(0); // TODO
-		// [FIX ME]
-		// ucpp issues warning when parsing <windows.h>
+        /*TODO*/ 
+        assert(0); 
     }
-	*/
+	
     
     /* we print each token: its numerical value, and its
     string content; if this is a PRAGMA token, the
@@ -658,7 +640,7 @@ static int get_token_internal()
             ls.ctok->name, ls.ctok->line);
 #endif
 
-        // hack!
+		/* HACK! TODO */
         retval = TK_WHITESPACE;
     } 
     else if (ls.ctok->type == NEWLINE) 
@@ -671,16 +653,18 @@ static int get_token_internal()
     } 
     else 
     {
-         coord.line = ls.ctok->line; 
-        // todo - column and file name (should be set in translation unit)
+		/* todo - column and file name (should be set in translation unit) */
+        coord.line = ls.ctok->line; 
 
         if (STRING_TOKEN(ls.ctok->type))
         {
-            /* NUMBER, NAME, STRING, CHAR*/
-            // here lexer does proper categorization for the lexeme
-            // it identifies number (integer or float), string/char literal, identifier
-            // the associated value of lexeme is stored in lexeme_value, for parser usage in next stage.
-            switch (ls.ctok->type)
+            /* NUMBER, NAME, STRING, CHAR
+             * here lexer does proper categorization for the lexeme
+             * it identifies number (integer or float), string/char literal, identifier
+             * the associated value of lexeme is stored in lexeme_value, 
+			 * for parser usage in next stage.
+            */
+			switch (ls.ctok->type)
             {
             case NUMBER :
                 {
@@ -697,13 +681,6 @@ static int get_token_internal()
                         lexeme_value.string_value = atom_string(ls.ctok->name);
 
                         HCC_TRACE("identifier: %s\n", lexeme_value.string_value);
-
-                        // [DEBUG] [FIX ME]
-                        if (strcmp("_LUID", lexeme_value.string_value) == 0)
-                        {
-                            int a = 0;
-                            (a);
-                        }
                     }
                     else
                     {
@@ -769,9 +746,7 @@ int get_token()
 
     token = get_token_internal();
 
-    //
-    // [TODO] - tabs (vertical and horizontal) and form feed needs?
-    //
+    /* [TODO] - tabs (vertical and horizontal) and form feed needs? */
     while (token == TK_NEWLINE ||
         token == TK_CRETURN ||
         token == TK_WHITESPACE ||
@@ -784,11 +759,10 @@ int get_token()
         }
     }
 
-    //
-    // [WORK AROUND] 
-    // work around ucpp can't concat string literals
-    // a better fix should be done in ucpp
-    //
+    /* [WORK AROUND] 
+     * work around ucpp can't concat string literals
+     * a better fix should be done in ucpp
+     */
     while (token == TK_CONST_STRING_LITERAL)
     {
         cached_token_code = token;
@@ -825,7 +799,7 @@ int get_token()
 
 int peek_token()
 {
-    // [TODO] token coordinate value save and restore
+    /* [TODO] token coordinate value save and restore */
 	int backup_token = current_token_code;
     t_lexeme_value backup_lexeme_value = lexeme_value;
 
