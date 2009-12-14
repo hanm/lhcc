@@ -154,22 +154,21 @@ typedef struct function_type
 /*
  * ANSI C Defined Types
  */
-t_type* type_char;
-t_type* type_unsigned_char;
-t_type* type_short;
-t_type* type_unsigned_short;
-t_type* type_int;
-t_type* type_unsigned_int;
-t_type* type_long;
-t_type* type_unsigned_long;
-t_type* type_longlong;
-t_type* type_unsigned_longlong;
-t_type* type_float;
-t_type* type_double;
-t_type* type_longdouble;
-t_type* type_ptr;
-t_type* type_void;
-
+extern t_type* type_char;
+extern t_type* type_unsigned_char;
+extern t_type* type_short;
+extern t_type* type_unsigned_short;
+extern t_type* type_int;
+extern t_type* type_unsigned_int;
+extern t_type* type_long;
+extern t_type* type_unsigned_long;
+extern t_type* type_longlong;
+extern t_type* type_unsigned_longlong;
+extern t_type* type_float;
+extern t_type* type_double;
+extern t_type* type_longdouble;
+extern t_type* type_ptr;
+extern t_type* type_void;
 
 t_type* remove_type_qualifier(t_type* type);
 
