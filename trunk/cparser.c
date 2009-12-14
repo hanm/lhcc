@@ -1215,7 +1215,7 @@ void direct_declarator(int storage_class)
 		}
 
         // [DEBUG]
-        if (strcmp("sqlite3PcachePageRefcount"/*"PRKCRM_MARSHAL_HEADER"*/, lexeme_value.string_value) == 0)
+        if (strcmp("_locale_tstruct"/*"PRKCRM_MARSHAL_HEADER"*/, lexeme_value.string_value) == 0)
         {
 			int a = 0;
             (a);

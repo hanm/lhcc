@@ -142,4 +142,7 @@ t_symbol* find_symbol(char* name, t_symbol_table* table);
  */
 t_symbol* add_const(t_value val);
 
+/* free symbol tables for current parsing session */
+void free_symbol_tables();
+
 #endif
