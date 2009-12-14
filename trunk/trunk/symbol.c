@@ -24,11 +24,10 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 
 ****************************************************************/
+#include <assert.h>
 
 #include "symbol.h"
 #include "arena.h"
-#include "assert.h"
-#include "Hcc.h"
 
 /*
  * scope level
@@ -81,7 +80,7 @@ void exit_scope()
 		sym_table_identifiers = sym_table_identifiers->previous;
     }
 
-	HCC_ASSERT(scope_level > GLOBAL);
+	assert(scope_level > GLOBAL);
 	scope_level --;
 }
 
@@ -92,8 +91,8 @@ t_symbol* add_symbol(char* name, t_symbol_table** table, int level, int arena)
     struct entry* p;
     unsigned long h = (unsigned long)name&(TABLESIZE-1);  /*[tag] - to do need a better hashing*/
 
-    HCC_ASSERT(name != NULL && table != NULL && arena >= 0);
-    HCC_ASSERT(level >= tb->level);
+    assert(name != NULL && table != NULL && arena >= 0);
+    assert(level >= tb->level);
 
     /*
      * we need a new table with deeper level than current table passed in..
@@ -136,7 +135,7 @@ t_symbol* install_symbol(char* name, t_symbol_table* table)
     struct entry* p;
     unsigned long h = (unsigned long)name&(TABLESIZE-1); 
 
-    HCC_ASSERT(name != NULL && table != NULL);
+    assert(name != NULL && table != NULL);
 
     CALLOC(p, FUNC);
 
@@ -155,7 +154,7 @@ struct symbol* find_symbol(char* name, t_symbol_table* table)
 	struct entry* p = NULL;
     unsigned long h = (unsigned long)name&(TABLESIZE-1); 
 
-    HCC_ASSERT(table);
+    assert(table);
     
 	for (;;)
 	{

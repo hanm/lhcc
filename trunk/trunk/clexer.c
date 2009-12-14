@@ -24,6 +24,8 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 
 ****************************************************************/
+#include <math.h>
+#include <assert.h>
 
 #include "clexer.h"
 #include "keywords.h"
@@ -34,8 +36,6 @@ OTHER DEALINGS IN THE SOFTWARE.
 #include "atom.h"
 #include "preprocessor/mem.h"
 #include "preprocessor/cpp.h"
-
-#include <math.h>
 
 // enable trace in lexical analysis
 #define HCC_TRACE_ENABLE
@@ -169,7 +169,7 @@ void reset_clexer(t_scanner_context* sc)
 {
 	int i = 0;	
 
-	HCC_ASSERT(sc != NULL);
+	assert(sc != NULL);
 
 	free_lexer_state(&ls);
 
@@ -335,7 +335,7 @@ static int identify_keyword(char* id)
 		return TK_INT64;
 	}
   
-    HCC_ASSERT(id);
+    assert(id);
 
     p = kw_table[index];
     while (p->name)
@@ -359,7 +359,7 @@ static int identify_integer_value(char* start, int length, int base)
     int i = 0;
     int overflow = 0;
 
-    HCC_ASSERT(start);
+    assert(start);
 
     for (; length > 0; length -- , current ++)
     {
@@ -392,7 +392,7 @@ static int identify_integer_value(char* start, int length, int base)
         }
         else if (8 == base)
         {
-            HCC_ASSERT(HCC_ISOCT_DIGIT(*current));
+            assert(HCC_ISOCT_DIGIT(*current));
         
             i = *current - '0';
             if (value &~(~0UL >> 3))
@@ -407,8 +407,8 @@ static int identify_integer_value(char* start, int length, int base)
         }
         else
         {
-            HCC_ASSERT(base == 10);
-            HCC_ASSERT(HCC_ISDECIMAL_DIGIT(*current));
+            assert(base == 10);
+            assert(HCC_ISDECIMAL_DIGIT(*current));
             
             i = *current - '0';
 
@@ -435,7 +435,7 @@ static int identify_float_value(char* number)
     /* TODO - is this the right type? */
     long double value = 0;
 
-    HCC_ASSERT(number);
+    assert(number);
 
     if ('.' == *number)
     {
@@ -496,7 +496,7 @@ static int identify_numerical_value(char* number)
     int base = 10;
     char* begin = number;
 
-    HCC_ASSERT(number);
+    assert(number);
     
     if ('.' == *number)
     {

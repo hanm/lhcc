@@ -177,10 +177,6 @@
 				Name="infrastructure"
 				>
 				<File
-					RelativePath=".\assert.h"
-					>
-				</File>
-				<File
 					RelativePath=".\trace.h"
 					>
 				</File>

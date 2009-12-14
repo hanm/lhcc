@@ -24,11 +24,11 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 
 ****************************************************************/
+#include <assert.h>
 
 #include "hcc.h"
 #include "type.h"
 #include "symbol.h"
-#include "assert.h"
 #include "arena.h"
 #include "atom.h"
 #include "error.h"
@@ -51,7 +51,7 @@ static t_type* atomic_type(t_type* type, int code, int align, int size, t_symbol
 	struct type_entry* p;
 	unsigned long h = (code^((unsigned long)type>>3))& __HCC_TYPE_TABLE_HASHSIZE;
 
-	HCC_ASSERT(code >= 0 && align >= 0 && size >= 0);
+	assert(code >= 0 && align >= 0 && size >= 0);
 
 	/*
 	 * Here function and zero sized (incomplete) array
@@ -172,7 +172,7 @@ t_type* pointer_type(t_type* pointed)
 
 t_type* dereference_type(t_type* type)
 {
-	HCC_ASSERT(type != NULL);
+	assert(type != NULL);
 
 	if (IS_PTR_TYPE(type))
 	{
@@ -195,8 +195,8 @@ t_type* dereference_type(t_type* type)
 
 t_type* make_array_type(t_type* type, int size)
 {
-	HCC_ASSERT(type != NULL);
-	HCC_ASSERT(size >= 0);
+	assert(type != NULL);
+	assert(size >= 0);
 	
 	if (IS_FUNCTION_TYPE(type))
 	{
@@ -221,7 +221,7 @@ t_type* make_array_type(t_type* type, int size)
 
 t_type* array_to_ptr_type(t_type* type)
 {
-	HCC_ASSERT(type != NULL);
+	assert(type != NULL);
 
 	if (IS_ARRAY_TYPE(type))
 	{
@@ -253,8 +253,8 @@ t_type* remove_type_qualifier(t_type* type)
 
 t_type* qualify_type(t_type* type, int code)
 {
-	HCC_ASSERT(IS_TYPE_QUALIFIERS(code));
-	HCC_ASSERT(type != NULL);
+	assert(IS_TYPE_QUALIFIERS(code));
+	assert(type != NULL);
 
 	if ((IS_CONST_TYPE(type) && code == TYPE_CONST) ||
 		(IS_VOLATILE_TYPE(type) && code == TYPE_VOLATILE) ||
@@ -281,7 +281,7 @@ t_type* make_function_type(t_type* type, t_param* parameter, int prototype, int 
 {
 	t_function* function = NULL;
 
-	HCC_ASSERT(type != NULL && parameter != NULL && prototype >= 0 && ellipse >= 0);
+	assert(type != NULL && parameter != NULL && prototype >= 0 && ellipse >= 0);
 
 	if (IS_ARRAY_TYPE(type) || IS_FUNCTION_TYPE(type))
 	{
@@ -310,7 +310,7 @@ t_type* make_record_type(int record_type, char* name)
     t_record* record = NULL;
     static int a = 0; /* for anonymous record hcc generate the name */
 
-    HCC_ASSERT(record_type == TYPE_ENUM || record_type == TYPE_STRUCT || record_type == TYPE_UNION);
+    assert(record_type == TYPE_ENUM || record_type == TYPE_STRUCT || record_type == TYPE_UNION);
 
     if (name == NULL)
     {
@@ -359,7 +359,7 @@ t_field* make_field_type(t_type* field_type, char* name, t_type* record_type)
     t_field** next = NULL;
 
     /* [TODO] - support unnamed bit field ; at this moment field requires a name */
-    HCC_ASSERT(field_type != NULL && name != NULL && record_type != NULL);
+    assert(field_type != NULL && name != NULL && record_type != NULL);
 
     next = &record_type->u.record->fields;
     current = *next;
@@ -385,7 +385,7 @@ static int is_compatible_function(t_type* type1, t_type* type2)
     t_param* p1 = NULL;
     t_param* p2 = NULL;
 
-    HCC_ASSERT(type1 != NULL && type2 != NULL && 
+    assert(type1 != NULL && type2 != NULL && 
         type1->code == TYPE_FUNCTION && 
         type2->code == TYPE_FUNCTION &&
         type1->u.function != NULL &&
@@ -489,7 +489,7 @@ int is_compatible_type(t_type* type1, t_type* type2)
 
 t_type* promote_type(t_type* type)
 {
-    HCC_ASSERT(type != NULL);
+    assert(type != NULL);
     
     if (type->code <= TYPE_UNSIGNED_SHORT)
     {
@@ -545,7 +545,7 @@ static int get_type_qualifiers(t_type* type)
 
 int has_same_type_qualifier(t_type* type1, t_type* type2)
 {
-    HCC_ASSERT(type1 != NULL && type2 != NULL);
+    assert(type1 != NULL && type2 != NULL);
     return get_type_qualifiers(type1) == get_type_qualifiers(type2); 
 }
 
@@ -554,7 +554,7 @@ t_type* composite_type(t_type* type1, t_type* type2)
 {
 	int type_code = 0;
 
-	HCC_ASSERT(type1 != NULL && type2 != NULL && is_compatible_type(type1, type2));
+	assert(type1 != NULL && type2 != NULL && is_compatible_type(type1, type2));
 
 	if (type1 == type2)
 	{
@@ -628,6 +628,6 @@ t_type* composite_type(t_type* type1, t_type* type2)
         return type1;
     }
 
-    HCC_ASSERT(0);
+    assert(0);
     return NULL;
 }

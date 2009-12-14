@@ -26,10 +26,12 @@ OTHER DEALINGS IN THE SOFTWARE.
 ****************************************************************/
 
 #include "error.h"
+#include <stdio.h>
 #include <string.h>
 
 static int error_count = 0;
 static int warning_count = 0;
+static FILE* fp = NULL;
 
 void error(char* expect_token, char* actual_token)
 {
@@ -93,4 +95,14 @@ void type_error(char* msg)
 	printf("type error in file %s on line %d : %s\n", coord.filename, coord.line,msg);
 
 	error_count ++;
+}
+
+void log_initialize(char* filename)
+{
+    (filename);
+}
+
+void log_terminate()
+{
+
 }

@@ -31,10 +31,15 @@ OTHER DEALINGS IN THE SOFTWARE.
 #include "clexer.h" 
 
 /* [TODO] these error reporting funcs should accept varidic parameters */
+
 void error(char* expect_token, char* actual_token);
 void syntax_error(char* error_msg);
 void lexeme_error(char* error_msg);
 void warning(char*);
 void type_error(char* msg);
+
+/* prelimary logging system */
+void log_initialize(char* filename);
+void log_terminate();
 
 #endif
