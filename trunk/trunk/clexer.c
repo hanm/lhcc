@@ -70,6 +70,11 @@ static int current_token_code;
 static int peek_token_code;
 static int cached_token_code;
 
+t_lexeme_value lexeme_value;
+t_lexeme_value peek_lexeme_value;
+t_lexeme_value cached_lexeme_value;
+t_coordinate coord;
+
 /* 
 	Lexical Map
 	

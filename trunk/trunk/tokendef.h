@@ -75,7 +75,7 @@ TK(TK_CONST,     "const")
 TK(TK_VOLATILE, "volatile")
 
 TK(TK_SIZEOF,        "sizeof")
-TK(TK_TYPEDEF,       "typedef") // VALUE 16
+TK(TK_TYPEDEF,       "typedef") /* 16 */
 
 TK(TK_AUTO,         "auto")
 TK(TK_REGISTER,       "register")
@@ -96,7 +96,7 @@ TK(TK_GOTO,      "goto")
 TK(TK_RETURN,      "return")
 
 /* identifier */
-TK(TK_ID, "identifier") // value 33
+TK(TK_ID, "identifier") /* 33 */
 
 /* constants */
 TK(TK_CONSTTODO, "constants")
@@ -151,7 +151,7 @@ TK(TK_RPAREN,        ")")
 TK(TK_LBRACKET,      "[")
 TK(TK_RBRACKET,      "]")
 
-//punctuators
+/* punctuators */
 TK(TK_LBRACE,        "{")
 TK(TK_RBRACE,        "}")
 TK(TK_SEMICOLON,     ";")
@@ -162,12 +162,7 @@ TK(TK_NEWLINE,       "\n")
 
 TK(TK_END,           "EOF")
 
-//
-// [JILL] [WARNING]
-// these are compiler extensions so HCC can use headers from other compilers like VC which may have
-// their private extension like __cdecl
-//
-// extension to support 64 bit integer
+/* extension to ANSI C for type int 64*/
 TK(TK_INT64, "__int64")
 
 TK(TK_NULL, "null")

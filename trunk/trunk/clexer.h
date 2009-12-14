@@ -64,30 +64,28 @@ typedef union lexeme_value
 	char* string_value;
 } t_lexeme_value;
 
-//
-// lexeme value of current lexer token
-//
-t_lexeme_value lexeme_value;
+/*
+ * lexeme value of current lexer token
+ */
+extern t_lexeme_value lexeme_value;
 
-//
-// lexeme value of peeked lexer token
-//
-t_lexeme_value peek_lexeme_value;
+/*
+ * lexeme value of peeked lexer token
+ */
+extern t_lexeme_value peek_lexeme_value;
 
-//
-// lexeme value of cached token
-//
-t_lexeme_value cached_lexeme_value;
+/*
+ * lexeme value of cached token
+ */
+extern t_lexeme_value cached_lexeme_value;
 
-//
-// current token coordinate (file, line, column)
-// [FIX ME] - currently it has a problem to support column and file
-//
-t_coordinate coord;
+/*
+ * current token coordinate (file, line, column)
+ * [FIX ME] - currently it has a problem to support column and file
+ */
+extern t_coordinate coord;
 
-//
-// get next token
-//
+/* get next token from lexer and consume it */
 int get_token();
 
 /*
