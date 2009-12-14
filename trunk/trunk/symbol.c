@@ -214,3 +214,13 @@ t_symbol* add_const(t_value val)
 	 */
 	return &p->symbol;
 }
+
+void free_symbol_tables()
+{
+    scope_level = GLOBAL;
+    memset(global_symbol_tables, 0, sizeof(global_symbol_tables));
+    sym_table_constants->level = CONSTANTS;
+    sym_table_identifiers->level = GLOBAL;
+    sym_table_types->level = GLOBAL;
+    sym_table_externals->level = GLOBAL;
+}

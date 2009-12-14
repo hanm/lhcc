@@ -120,7 +120,7 @@ void test_lexer()
 
 	HCC_MEM_CHECK_START
     
-	reset_clexer(&sc);
+	initialize_clexer(&sc);
 
 	initialize_parser();
 	
@@ -189,30 +189,24 @@ void test_lexer()
 
 void test_parser(char* filename, char** include_path)
 {
+    /* this is a typical parsing session */
     t_scanner_context sc;
 
 	sc.filename = filename;
 	sc.include_pathes = include_path;
 	sc.number_of_include_pathes = 4;
 
-    HCC_MEM_CHECK_START
-
-        log_initialize("G:\\athena.txt");
-	reset_clexer(&sc);
-
+	initialize_clexer(&sc);
 	initialize_parser();
 
 	translation_unit();		
 
 	free_clexer();
-	hcc_free_all();
-
-    HCC_MEM_CHECK_END
+    free_symbol_tables();
 }
 
 int main(int argc, char* argv[])
 {
-
 #if 1
 	char* path[4] = {"E:\\Program Files\\Microsoft Visual Studio 9.0\\VC\\include", 
 		"C:\\Program Files\\Microsoft Visual Studio 9.0\\VC\\include", "G:\\src", 
@@ -237,13 +231,30 @@ int main(int argc, char* argv[])
 		"G:\\src\\hash-int.c",
 		"G:\\src\\binomial-heap.c",
 		"G:\\src\\binary-heap.c",
-		"G:\\src\\swprintf.inl",// requires typedef _locale_t  to work. stand alone parsing doesn't work.
 		"G:\\src\\specstrings.h",
-		"G:\\src\\winnt.h",
 		"G:\\src\\sqlite3.c"
 	};
 
-	test_parser(names[20], path);
+   int i = 0;
+HCC_MEM_CHECK_START
+    (i);
+    log_initialize("G:\\athena.txt");
+
+//#define ATOMIC_TEST
+#ifdef ATOMIC_TEST
+    test_parser(names[1], path);
+
+#else
+for (; i < NUMBEROFELEMENTS(names); i ++)
+    {
+        test_parser(names[i], path);
+    }
+#endif
+    log_terminate();
+
+hcc_free_all();
+
+HCC_MEM_CHECK_END
 
 #else
     test_lexer();

@@ -165,13 +165,11 @@ static unsigned char lexical_map[256] =
 
 };
 
-void reset_clexer(t_scanner_context* sc)
+void initialize_clexer(t_scanner_context* sc)
 {
 	int i = 0;	
 
 	assert(sc != NULL);
-
-	free_lexer_state(&ls);
 
 	current_token_code = TK_NULL;
 	peek_token_code = TK_NULL;
@@ -641,6 +639,9 @@ static int get_token_internal()
 #ifdef HCC_TRACE_ENABLE
         printf("new context: file '%s', line %ld\n",
             ls.ctok->name, ls.ctok->line);
+
+        coord.filename = atom_string(ls.ctok->name);
+        coord.line = ls.ctok->line;
 #endif
 
 		/* HACK! TODO */
