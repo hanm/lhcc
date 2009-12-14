@@ -27,6 +27,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 #ifndef __HCC_SYMBOL_H
 #define __HCC_SYMBOL_H
+
 #include "hcc.h"
 #include "type.h"
 

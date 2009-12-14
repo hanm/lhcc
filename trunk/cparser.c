@@ -25,9 +25,10 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 ****************************************************************/
 
+#include <assert.h>
+
 #include "clexer.h"
 #include "cparser.h"
-#include "assert.h"
 #include "symbol.h"
 
 static char* tokens[] = 
@@ -1059,7 +1060,7 @@ void parameter_declaration()
 	}
 	else
 	{
-		HCC_ASSERT(cptk == TK_LPAREN);
+		assert(cptk == TK_LPAREN);
 		GET_NEXT_TOKEN;
 		
 		if (cptk == TK_RPAREN)
@@ -1333,7 +1334,7 @@ struct_or_union_specifier
 */
 void struct_or_union_specifier()
 {
-    HCC_ASSERT(cptk == TK_STRUCT || cptk == TK_UNION);
+    assert(cptk == TK_STRUCT || cptk == TK_UNION);
 
     GET_NEXT_TOKEN;
     if (cptk  == TK_ID)
