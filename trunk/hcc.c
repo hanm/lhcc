@@ -26,6 +26,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 ****************************************************************/
 
 #include "hcc.h"
+#include "error.h"
 #include "clexer.h"
 #include "cparser.h"
 #include "hconfig.h"
@@ -196,6 +197,7 @@ void test_parser(char* filename, char** include_path)
 
     HCC_MEM_CHECK_START
 
+        log_initialize("G:\\athena.txt");
 	reset_clexer(&sc);
 
 	initialize_parser();

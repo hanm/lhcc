@@ -64,28 +64,50 @@ void error(char* expect_token, char* actual_token)
 		actual = actual_token;
 	}
 
-	printf("Error in file %s on line %d : expect token %s but got token %s \n", 
+	printf("Error in file %s on line %d : expect token %s but got token %s \r\n", 
 		coord.filename, coord.line, exp, actual);
+
+    if (fp) 
+    {
+        fprintf(fp, "Error in file %s on line %d : expect token %s but got token %s \r\n", 
+		coord.filename, coord.line, exp, actual);
+    }
 
 	error_count ++;
 }
 
 void syntax_error(char* error_msg)
 {
-	printf("Syntax error detected in file %s on line %d : %s \n", coord.filename, coord.line, error_msg);
+	printf("Syntax error detected in file %s on line %d : %s \r\n", coord.filename, coord.line, error_msg);
+    
+    if (fp) 
+    {
+        fprintf(fp, "Syntax error detected in file %s on line %d : %s \r\n", coord.filename, coord.line, error_msg);
+    }
 
 	error_count ++;
 }
 
 void warning(char* warning_msg)
 {
-	printf("Warning in file %s on line %d : %s \n", coord.filename, coord.line, warning_msg);
+	printf("Warning in file %s on line %d : %s \r\n", coord.filename, coord.line, warning_msg);
+
+    if (fp) 
+    {
+        fprintf(fp, "Warning in file %s on line %d : %s \r\n", coord.filename, coord.line, warning_msg);
+    }
+
 	warning_count ++;
 }
 
 void lexeme_error(char* error_msg)
 {
-	printf("Lexeme error detected in file %s on line %d : %s \n", coord.filename, coord.line, error_msg);
+	printf("Lexeme error detected in file %s on line %d : %s \r\n", coord.filename, coord.line, error_msg);
+
+    if (fp) 
+    {
+        fprintf(fp, "Lexeme error detected in file %s on line %d : %s \r\n", coord.filename, coord.line, error_msg);
+    }
 
 	error_count ++;
 }
@@ -94,15 +116,21 @@ void type_error(char* msg)
 {
 	printf("type error in file %s on line %d : %s\n", coord.filename, coord.line,msg);
 
+    if (fp) 
+    {
+        fprintf(fp, "type error in file %s on line %d : %s \r\n", coord.filename, coord.line,msg);
+    }
+
 	error_count ++;
 }
 
 void log_initialize(char* filename)
 {
-    (filename);
+    fp = fopen(filename, "wb+");
+    if (!fp) printf("warning - log file is not accessible");
 }
 
 void log_terminate()
 {
-
+    if (!fp) fclose(fp);
 }
