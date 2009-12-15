@@ -112,6 +112,8 @@ extern t_symbol_table* sym_table_identifiers; /* store identifiers */
 extern t_symbol_table* sym_table_types;/* store types */
 extern t_symbol_table* sym_table_externals; /* []*/
 
+extern t_symbol_table* sym_table_typedefs;
+
 t_symbol_table* make_symbol_table(int arena);
 
 void enter_scope(void);
@@ -144,5 +146,7 @@ t_symbol* add_const(t_symbol_value val);
 
 /* free symbol tables for current parsing session */
 void free_symbol_tables();
+
+t_symbol* record_typedef_name(char* name);
 
 #endif
