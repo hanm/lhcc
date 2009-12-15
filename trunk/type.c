@@ -368,10 +368,10 @@ t_type* make_record_type(int record_type, char* name)
 }
 
 
-t_field* make_field_type(t_type* field_type, char* name, t_type* record_type)
+t_record_field* make_field_type(t_type* field_type, char* name, t_type* record_type)
 {
-    t_field* current = NULL;
-    t_field** next = NULL;
+    t_record_field* current = NULL;
+    t_record_field** next = NULL;
 
     /* [TODO] - support unnamed bit field ; at this moment field requires a name */
     assert(field_type != NULL && name != NULL && record_type != NULL);

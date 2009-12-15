@@ -53,7 +53,7 @@ enum {
 /*
  * symbol value
  */
-typedef union value
+typedef union union_value
 {
 	char sc;
 	unsigned char uc;
@@ -67,7 +67,7 @@ typedef union value
 	double d;
 	long double ld;
 	void* p;
-} t_value;
+} t_symbol_value;
 
 
 /*
@@ -86,7 +86,7 @@ typedef struct symbol
 
 	struct symbol* previous;
 
-	t_value value;
+	t_symbol_value value;
 
 } t_symbol;
 
@@ -140,7 +140,7 @@ t_symbol* find_symbol(char* name, t_symbol_table* table);
  *
  * [TODO] - add type information
  */
-t_symbol* add_const(t_value val);
+t_symbol* add_const(t_symbol_value val);
 
 /* free symbol tables for current parsing session */
 void free_symbol_tables();
