@@ -39,12 +39,13 @@ int symbol_scope = GLOBAL;
 
 #define TABLESIZE NUMBEROFELEMENTS(((t_symbol_table*)0)->buckets)
 
-static t_symbol_table global_symbol_tables[] = {{CONSTANTS}, {GLOBAL}, {GLOBAL}, {GLOBAL} };
+static t_symbol_table global_symbol_tables[] = {{CONSTANTS}, {GLOBAL}, {GLOBAL}, {GLOBAL}, {GLOBAL} };
 
 t_symbol_table* sym_table_constants = &global_symbol_tables[0]; 
 t_symbol_table* sym_table_identifiers = &global_symbol_tables[1]; 
 t_symbol_table* sym_table_types = &global_symbol_tables[2]; 
 t_symbol_table* sym_table_externals = &global_symbol_tables[3]; 
+t_symbol_table* sym_table_typedefs = &global_symbol_tables[4];
 
 t_symbol_table* make_symbol_table(int arena)
 {
@@ -223,4 +224,25 @@ void free_symbol_tables()
     sym_table_identifiers->level = GLOBAL;
     sym_table_types->level = GLOBAL;
     sym_table_externals->level = GLOBAL;
+	sym_table_typedefs->level = GLOBAL;
+}
+
+t_symbol* record_typedef_name(char* name)
+{
+	struct entry* p;
+	unsigned long h = (unsigned long)name&(TABLESIZE-1); 
+
+	assert(name != NULL && sym_table_typedefs != NULL);
+
+	/* TODO - is this the right arena for typedef to go??*/
+	CALLOC(p, FUNC);
+
+	p->symbol.name = name;
+	p->symbol.scope = symbol_scope;
+	p->symbol.previous = sym_table_typedefs->all_symbols;
+	sym_table_typedefs->all_symbols = &p->symbol;
+	p->next = sym_table_typedefs->buckets[h];
+	sym_table_typedefs->buckets[h] = p;
+
+	return &p->symbol;
 }
