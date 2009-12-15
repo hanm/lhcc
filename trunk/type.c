@@ -336,8 +336,8 @@ t_type* make_record_type(int record_type, char* name)
         symbol = find_symbol(name, sym_table_types);
         if (symbol != NULL)
         {
-            /* this implicitly means a new record type is only created in current scope (scope_level) */
-            if (symbol->scope == scope_level || symbol->scope == PARAM && scope_level == PARAM + 1)
+            /* this implicitly means a new record type is only created in current scope (symbol_scope) */
+            if (symbol->scope == symbol_scope || symbol->scope == PARAM && symbol_scope == PARAM + 1)
             {
                 if (symbol->type->code == record_type && !symbol->defined)
                 {
@@ -356,7 +356,7 @@ t_type* make_record_type(int record_type, char* name)
      * so create a new one and set up links with sym table
      * the fields of record will be added later and size/align will be adjusted accordingly.
 	 */
-    symbol = add_symbol(name, &sym_table_types, scope_level, PERM);
+    symbol = add_symbol(name, &sym_table_types, symbol_scope, PERM);
     symbol->type = atomic_type(NULL, record_type, 0, 0, symbol); /* a new record type has align 0 and size 0 */
     
     CALLOC(record, sizeof *record);

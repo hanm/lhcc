@@ -31,7 +31,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 #include "hcc.h"
 #include "type.h"
 
-extern int scope_level;
+extern int symbol_scope;
 
 typedef struct token_coordinate
 {
@@ -121,12 +121,12 @@ void exit_scope(void);
 t_symbol* install_symbol(char* name, t_symbol_table* table);
 
 /*
- * add a symbol to symbol table chain. scope_level should be no less than table's level.. in other words, hcc
+ * add a symbol to symbol table chain. symbol_scope should be no less than table's level.. in other words, hcc
  * only calls this function in current or nested scope. This reflects the actual processing for parser that
  * outer scope is to be processed first then inner scope..etc
  *
  */
-t_symbol* add_symbol(char* name, t_symbol_table** table, int scope_level, int arena);
+t_symbol* add_symbol(char* name, t_symbol_table** table, int symbol_scope, int arena);
 
 /* search a symbol in symbol table - if the symbol is not there then search previous chained symbol tables if any
  * (it doesn't make sense to search next chained symbol table constrained by C binding rules)

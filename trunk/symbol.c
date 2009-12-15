@@ -35,7 +35,7 @@ OTHER DEALINGS IN THE SOFTWARE.
  * level ++ when entering scope
  * level -- when leaving scope
 */
-int scope_level = GLOBAL;
+int symbol_scope = GLOBAL;
 
 #define TABLESIZE NUMBEROFELEMENTS(((t_symbol_table*)0)->buckets)
 
@@ -56,7 +56,7 @@ t_symbol_table* make_symbol_table(int arena)
 
 void enter_scope()
 {
-	scope_level ++;
+	symbol_scope ++;
 	/*
 	 * I don't allocate a symbol table here because in practice when entering a scope
      * there might be no need to create a new symbol context at all
@@ -69,19 +69,19 @@ void enter_scope()
 
 void exit_scope()
 {
-	remove_types(scope_level);
-	if (sym_table_types->level == scope_level)
+	remove_types(symbol_scope);
+	if (sym_table_types->level == symbol_scope)
 	{
 		sym_table_types = sym_table_types->previous;
 	}
 
-    if (scope_level == sym_table_identifiers->level)
+    if (symbol_scope == sym_table_identifiers->level)
     {
 		sym_table_identifiers = sym_table_identifiers->previous;
     }
 
-	assert(scope_level > GLOBAL);
-	scope_level --;
+	assert(symbol_scope > GLOBAL);
+	symbol_scope --;
 }
 
 
@@ -217,7 +217,7 @@ t_symbol* add_const(t_symbol_value val)
 
 void free_symbol_tables()
 {
-    scope_level = GLOBAL;
+    symbol_scope = GLOBAL;
     memset(global_symbol_tables, 0, sizeof(global_symbol_tables));
     sym_table_constants->level = CONSTANTS;
     sym_table_identifiers->level = GLOBAL;
