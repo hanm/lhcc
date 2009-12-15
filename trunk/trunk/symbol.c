@@ -183,7 +183,7 @@ struct symbol* find_symbol(char* name, t_symbol_table* table)
 	return NULL;
 }
 
-t_symbol* add_const(t_value val)
+t_symbol* add_const(t_symbol_value val)
 {
 	struct entry* p = NULL;
 	unsigned long h = (unsigned long)val.ul&(TABLESIZE-1); 

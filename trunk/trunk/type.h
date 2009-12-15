@@ -109,7 +109,7 @@ typedef struct field_type
 	int bits; /* number of bits if the field is a bit field; otherwise 0 by default */
 	t_type* type; /* field type */
 	struct field_type* next; /* link to next field in the same record */
-} t_field;
+} t_record_field;
 
 /*
  * struct / union
@@ -117,7 +117,7 @@ typedef struct field_type
 typedef struct record_type
 {
 	char* name; 
-	t_field* fields; 
+	t_record_field* fields; 
 } t_record;
 
 
@@ -267,7 +267,7 @@ t_type* make_record_type(int record_type, char* name);
 /*
  * construct a field type and associate it with specified record type
  */
-t_field* make_field_type(t_type* field_type, char* name, t_type* record_type);
+t_record_field* make_field_type(t_type* field_type, char* name, t_type* record_type);
 
 /*
  * Check type compatibility
