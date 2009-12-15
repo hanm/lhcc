@@ -1182,8 +1182,6 @@ direct_declarator
 */
 void direct_declarator(int storage_class)
 {
-    t_symbol* symbol = NULL;
-
     if (cptk == TK_LPAREN)
     {
         GET_NEXT_TOKEN;
@@ -1197,14 +1195,14 @@ void direct_declarator(int storage_class)
 			syntax_error("direct declarator must end with an identifier");
 		}
 
-		//
-		// parser has to know if an ID is typedefined type name or not to make some decisions
-		// this is the place where C grammar's LL(0) is violated
-		// otherwise symbol management could all be done in semantic checking phase.
-		//
+		/*
+		 * parser has to know if an ID is typedefined type name or not to make some decisions
+		 * this is the place where C grammar's LL(0) is violated
+		 * otherwise symbol management could all be done in semantic checking phase.
+		*/
 		if (storage_class == TK_TYPEDEF)
 		{
-			symbol = add_symbol(lexeme_value.string_value, &sym_table_identifiers, symbol_scope, FUNC);
+			t_symbol* symbol = add_symbol(lexeme_value.string_value, &sym_table_identifiers, symbol_scope, FUNC);
 			symbol->storage = TK_TYPEDEF;
 		}
 		else
@@ -1286,9 +1284,10 @@ void direct_abstract_declarator()
 	}
 }
 
-// this function parse declarator regardless of its type - that is, it could parse
-// both declarator and abstract declarator. it should only be used when absolutely neccessary
-// because a function should only do one thing well. 
+/* this function parse declarator regardless of its type - that is, it could parse
+ * both declarator and abstract declarator. it should only be used when absolutely neccessary
+ * because a function should only do one thing well. 
+ */
 void all_declarator(int storage_class)
 {
     if (cptk == TK_MUL)
@@ -1305,8 +1304,12 @@ void all_declarator(int storage_class)
 
     if (cptk == TK_ID)
     {
-        t_symbol* symbol = install_symbol(lexeme_value.string_value, sym_table_identifiers);
-        symbol->storage = storage_class;
+		/* only typedef symbol should be recorded at parsing stage */
+		if (storage_class == TK_TYPEDEF)
+		{
+			t_symbol* symbol = add_symbol(lexeme_value.string_value, &sym_table_identifiers, symbol_scope, FUNC);
+			symbol->storage = TK_TYPEDEF;
+		}
 
         GET_NEXT_TOKEN;
     }
