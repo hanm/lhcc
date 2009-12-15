@@ -1204,7 +1204,7 @@ void direct_declarator(int storage_class)
 		//
 		if (storage_class == TK_TYPEDEF)
 		{
-			symbol = add_symbol(lexeme_value.string_value, &sym_table_identifiers, scope_level, FUNC);
+			symbol = add_symbol(lexeme_value.string_value, &sym_table_identifiers, symbol_scope, FUNC);
 			symbol->storage = TK_TYPEDEF;
 		}
 		else
@@ -1744,7 +1744,7 @@ int is_typedef_id(char* token_name)
 {
     t_symbol* sym = find_symbol(token_name, sym_table_identifiers);
 
-    return (sym != NULL) && (sym->storage == TK_TYPEDEF) && (sym->scope <= scope_level);
+    return (sym != NULL) && (sym->storage == TK_TYPEDEF) && (sym->scope <= symbol_scope);
 }
 
 int is_current_token_declaration_specifier_token()
