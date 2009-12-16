@@ -217,10 +217,22 @@ t_symbol* add_const(t_symbol_value val)
 
 void free_symbol_tables()
 {
+    /* reset all symbol table to orignial state */
     symbol_scope = GLOBAL;
+    
     memset(global_symbol_tables, 0, sizeof(global_symbol_tables));
+    sym_table_constants = &global_symbol_tables[0]; 
+    sym_table_identifiers = &global_symbol_tables[1]; 
+    sym_table_types = &global_symbol_tables[2]; 
+    sym_table_externals = &global_symbol_tables[3]; 
+
     sym_table_constants->level = CONSTANTS;
     sym_table_identifiers->level = GLOBAL;
     sym_table_types->level = GLOBAL;
     sym_table_externals->level = GLOBAL;
+
+    /* note thoese dangling symbol tables binding with the 4 tables avbove
+     * will be deallocated all at once when the host arena is 
+     * explicitly destroyed.
+     */
 }

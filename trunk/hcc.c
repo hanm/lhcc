@@ -181,7 +181,7 @@ void test_lexer()
 
 	free_clexer();
 
-    hcc_free_all();
+    hcc_deallocate_all();
 
 	HCC_MEM_CHECK_END
 }
@@ -243,16 +243,17 @@ HCC_MEM_CHECK_START
 //#define ATOMIC_TEST
 #ifdef ATOMIC_TEST
     test_parser(names[1], path);
-
 #else
-for (; i < NUMBEROFELEMENTS(names); i ++)
+    for (; i < NUMBEROFELEMENTS(names); i ++)
     {
         test_parser(names[i], path);
+        hcc_free_arena(FUNC);
+        hcc_free_arena(STMT);
     }
 #endif
     log_terminate();
 
-hcc_free_all();
+hcc_deallocate_all();
 
 HCC_MEM_CHECK_END
 

@@ -70,7 +70,7 @@ void* hcc_alloc(unsigned long n, unsigned a)
 
 	while (n > (unsigned)(ap->limit - ap->avail)) 
     {
-		/* [IMPROVE] - this could be optimized - the orignial impl in lcc
+		/* [IMPROVE] - this could be optimized - the orignial impl in the book "C interfaces and implementations"
 		 * will never stop remove free blocks from the list and put them
 		 * into the arena if the free block it checks is not big enough for this allocation.
 		 * as a result these removd free blocks are wasted and never gonna be used.
@@ -101,7 +101,7 @@ void* hcc_alloc(unsigned long n, unsigned a)
 	return ap->avail - n;
 }
 
-void hcc_free(unsigned a)
+void hcc_free_arena(unsigned a)
 {
     assert(a < NUMBEROFELEMENTS(arena));
 	arena[a]->next = freeblocks;
@@ -110,7 +110,7 @@ void hcc_free(unsigned a)
 	arena[a] = &first[a];
 }
 
-void hcc_free_all()
+void hcc_deallocate_all()
 {
     int arenas = NUMBEROFELEMENTS(arena);
     int n = 0;
@@ -127,8 +127,18 @@ void hcc_free_all()
             if (cblock->limit != NULL)
             {
                 free(cblock);
+                cblock = NULL;
             }
             cblock = nblock;
         }
+
+        arena[n] = &first[n];
+    }
+
+    while (freeblocks != NULL)
+    {
+        nblock = freeblocks->next;
+        free(freeblocks);
+        freeblocks = nblock;
     }
 }
