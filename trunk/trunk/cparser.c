@@ -792,13 +792,15 @@ void compound_statement()
 {
 	match(TK_LBRACE);
 
+    enter_scope();
+
 	while (cptk != TK_RBRACE && cptk != TK_END)
 	{
 		if (is_current_token_declaration_specifier_token())
 		{
 			if (cptk == TK_ID && peek_token() == TK_COLON)
 			{
-				// labeled statement
+				/* label statement */
 				statement();
 			}
 			else
@@ -813,6 +815,8 @@ void compound_statement()
 	}
 
     match(TK_RBRACE);
+
+    exit_scope();
 }
 
 /*
@@ -838,9 +842,7 @@ void declaration()
 		init_declarator(storage_class);
 	}
 
-    //
-    // [FIX ME] beginning of a compound statement
-    // 
+    /* beginning of a compound statement */ 
     if (cptk == TK_LBRACE)
     {
         return;
@@ -995,9 +997,7 @@ void parameter_declaration()
 {
 	int storage_class = declaration_specifiers();
     
-    //
-    // look ahead is neither in declarator nor in abstract declarator, we are done
-    //
+    /* look ahead is neither in declarator nor in abstract declarator, we are done */
     if (!is_current_token_declarator_token() && cptk != TK_LBRACKET)
     {
         return;
@@ -1011,33 +1011,28 @@ void parameter_declaration()
 		{
             if (cptk == TK_ID && is_typedef_id(lexeme_value.string_value))
             {
-                // [FIX ME][PRIORITY FIX] -  need to update symbol table and mark this specific typedefined name out of range
-                // This happens rare but it does happen
-                // Typedef name is hidden by a declaration of function parameter
-
+                /* [FIX ME][PRIORITY FIX] -  need to update symbol table and mark this specific typedefined name out of range
+                 * This happens rare but it does happen
+                 * Typedef name is hidden by a declaration of function parameter
+                */
             }
             else
             {
-                //
-                // look ahead is neither a possible start of a direct declarator, nor
-                // an direct abstract direclarator. 
-                // This is a case where the parameter declaration is just typename*
-                //
+                /*
+                 * look ahead is neither a possible start of a direct declarator, nor
+                 * an direct abstract direclarator. 
+                 * This is a case where the parameter declaration is just typename*
+                 */
                 return;
             }
 		}
 	}  
     
-    //
-    // [FIX ME] - this needs be fixed. 
-	// Now it can deal with
-    // int foo(const void*, int (__cdecl * _PtFuncCompare)(void *, const void *, const void *), const void*);
-    //
-	// but with direct declarator hard coded ...
-	//
-	// now only has to deal with two possible choices: 
-	// direct declarator or direct abstract declarator
-	//
+    /*
+     * sample torture:
+     * int foo(const void*, int (__cdecl * _PtFuncCompare)(void *, const void *, const void *), const void*);
+     *
+	 */
 	/*
 	direct_declarator
 	: IDENTIFIER
@@ -1065,19 +1060,22 @@ void parameter_declaration()
 		
 		if (cptk == TK_RPAREN)
 		{
-			// empty suffix declarator
+			/* empty suffix declarator */
 			return;
 		}
 		else if (is_current_token_declaration_specifier_token())
 		{
-			// ( parameter_type_list) in suffix declarator
+			/* ( parameter_type_list) in suffix declarator */
+            enter_scope();
 			parameter_type_list();
 			match(TK_RPAREN);
+            if (cptk != TK_LBRACE)
+            {
+                exit_scope();
+            }
 		}
 		else
 		{
-            // [FIX ME] [PRIORITY FIX]
-			//declarator(storage_class);
             all_declarator(storage_class);
 			match(TK_RPAREN);
 		}
@@ -1130,11 +1128,15 @@ void suffix_declarator()
     }
     else if (cptk == TK_LPAREN)
     {
+        int new_scope = 0;
+
         GET_NEXT_TOKEN;
         
-        // parameter type list always starts with declaration specifiers
+        /* parameter type list always starts with declaration specifiers */
 		if (is_current_token_declaration_specifier_token())
         {
+            enter_scope();
+            new_scope = 1;
             parameter_type_list();
         }
         else
@@ -1151,6 +1153,14 @@ void suffix_declarator()
         }
 
         match(TK_RPAREN);
+
+        if (new_scope)
+        {
+            if (cptk != TK_LBRACE)
+            {
+                exit_scope();
+            }
+        }
     }
 }
 
@@ -1612,23 +1622,19 @@ void external_declaration()
 
     if (is_current_token_declarator_token())
     {
-        // [FIX ME] - IS THAT NEEDED? function omit types have extern int assumed...
+        /* [FIX ME] - IS THAT NEEDED? function omit types have extern int assumed... */
         declarator(TK_AUTO);
 
         if (cptk != TK_LBRACE)
         {
-            //
-            // declaration list
-            //
+            /* declaration list */
             while (is_current_token_declaration_specifier_token())
             {
                 declaration();
             }
         }
         
-        //
-        // function definition body
-        //
+        /* function body */
         compound_statement();
         return;
     }

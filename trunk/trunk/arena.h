@@ -28,10 +28,17 @@ OTHER DEALINGS IN THE SOFTWARE.
 #ifndef __HCC_ALLOC_H
 #define __HCC_ALLOC_H
 
+/* allocate a memory block with length n bytes in arena a */
 void* hcc_alloc(unsigned long n, unsigned a);
-void hcc_free(unsigned a);
 
-void hcc_free_all();
+/* free a specific arena indexed by a by putting all memory blocks in the arena to free block list 
+ * so these blocks can be reused by other arena or the same arena later.
+ * note it doesn't really free all memory allocated for the arena.
+ */
+void hcc_free_arena(unsigned a);
+
+/* free all arenas and deallocate memory allocated for arenas. */
+void hcc_deallocate_all();
 
 /*
  * allocate object p in arena a
