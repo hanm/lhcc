@@ -240,7 +240,7 @@ HCC_MEM_CHECK_START
     (i);
     log_initialize("G:\\athena.txt");
 
-#define ATOMIC_TEST
+//#define ATOMIC_TEST
 #ifdef ATOMIC_TEST
     test_parser(names[NUMBEROFELEMENTS(names) - 1], path);
 #else
