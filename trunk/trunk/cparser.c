@@ -1643,45 +1643,29 @@ void external_declaration()
     
     if (cptk == TK_SEMICOLON)
     {
-        //
-        // an external declaration
-        // warning - this would be an empty declaration with just type specifiers but no variables
-        // [FIX ME] - we should initiate a warning here
-        //
+		/* for non struct/union declaration this should issue a warning */
+		/* TODO - for example, int; long; is by itself not meaningful declarations */
         GET_NEXT_TOKEN;
         return;
     }
 
     declarator(storage_class);
     
-    //
-    // here is again LL(0) 
-    //
 	if (cptk == TK_SEMICOLON)
 	{
-        //
-        // got a declaration ending here which just contains one declarator
-        //
+        /* declaration_specifiers declarator ;*/
 		GET_NEXT_TOKEN;
         return;
 	}
     else if (cptk == TK_LBRACE)
     {
-        //
-        // look ahead is brace next is compound statement to parse. 
-        // we have a function definition here where the grammar looks like :
-        // declaration_specifiers declarator compound_statement
-        //
+        /* declaration_specifiers declarator compound_statement */
         compound_statement();
         return;
     }
     else if (is_current_token_declaration_specifier_token())
     {
-        //
-        // look ahead is from a declaration_list - still a function definition
-        //
-        // declaration_list
-        // 
+        /* declaration_specifiers declarator declaration_list compound_statement*/
         while (is_current_token_declaration_specifier_token())
         {
             declaration();
@@ -1691,13 +1675,12 @@ void external_declaration()
         return;
     }
   
-    //
-    // otherwise in parsing a declaration ....
-    //
+    /*
+     * survive crossfire
+	 * declaration_specifiers init_declarator_list
+     */
 
-    //
-    // init_declarator_list parsing
-    //
+    /* init_declarator_list */
     if (cptk == TK_COMMA || cptk == TK_ASSIGN)
     {
         if (cptk == TK_ASSIGN)
@@ -1716,19 +1699,7 @@ void external_declaration()
     }
     else
     {
-		// [FIX ME]
-		// This else is too harssel. Could still be parsing declarator. Should fix.
-        // function definition
-        if (is_current_token_declaration_specifier_token())
-        {
-            // declaration list
-            while (is_current_token_declaration_specifier_token())
-            {
-                declaration();
-            }
-        }
-
-        compound_statement();
+		syntax_error("illegal token detected in declaration parsing");
     }
 }
 
