@@ -855,6 +855,8 @@ int declaration_specifiers()
 {
     int storage_specifier = TK_AUTO;
 
+	int alien_type_engaged = 0;
+
     for(;;)
     {
         switch(cptk)
@@ -865,13 +867,10 @@ int declaration_specifiers()
         case TK_STATIC:
         case TK_TYPEDEF:
             storage_specifier = cptk;
-            // storage specifiers
             GET_NEXT_TOKEN;
             break;
         case TK_CONST:
         case TK_VOLATILE:
-            // TODO - C99 restrict
-            // type qualifiers
             GET_NEXT_TOKEN;
             break;
         case TK_FLOAT:
@@ -884,13 +883,12 @@ int declaration_specifiers()
         case TK_VOID:
         case TK_LONG:
 		case TK_INT64:
-            // "native" type specifiers
             GET_NEXT_TOKEN;
             break;
         case TK_ID:
-            if (is_typedef_id(lexeme_value.string_value))
+			if (!alien_type_engaged && is_typedef_id(lexeme_value.string_value))
             {
-                // TYPEDEF names
+				alien_type_engaged = 1;
                 GET_NEXT_TOKEN;
 				break;
             }
@@ -898,9 +896,11 @@ int declaration_specifiers()
         case TK_STRUCT:
         case TK_UNION:
             struct_or_union_specifier();
+			alien_type_engaged = 1;
             break;
         case TK_ENUM:
             enum_specifier();
+			alien_type_engaged = 1;
             break;
         default:
             return storage_specifier;
@@ -1000,7 +1000,18 @@ void parameter_declaration()
     /* look ahead is neither in declarator nor in abstract declarator, we are done */
     if (!is_current_token_declarator_token() && cptk != TK_LBRACKET)
     {
-        return;
+		if (cptk == TK_ID && is_typedef_id(lexeme_value.string_value))
+		{
+			/* TODO - reuse typedef name as identifier */
+			/*
+			 * token is a typedef ID but ID now is using as identifier
+			 * TODO - somehow mark symbol table to tell the type hiding
+			 */
+		}
+		else
+		{
+			return;
+		}
     }
 
     if (cptk == TK_MUL)
@@ -1223,7 +1234,7 @@ void direct_declarator(int storage_class)
 		}
 
         // [DEBUG]
-        if (strcmp("_locale_tstruct"/*"PRKCRM_MARSHAL_HEADER"*/, lexeme_value.string_value) == 0)
+        if (strcmp("CreatePrivateObjectSecurity"/*"PRKCRM_MARSHAL_HEADER"*/, lexeme_value.string_value) == 0)
         {
 			int a = 0;
             (a);
@@ -1439,7 +1450,7 @@ specifier_qualifier_list
 */
 void specifiers_qualifier_list()
 {
-    int has_met_typedefined = 0;
+    int alien_type_engaged = 0;
 
     for(;;)
     {
@@ -1447,8 +1458,6 @@ void specifiers_qualifier_list()
         {
         case TK_CONST:
         case TK_VOLATILE:
-            // TODO - C99 restrict
-            // type qualifiers
             GET_NEXT_TOKEN;
             break;
         case TK_FLOAT:
@@ -1461,35 +1470,29 @@ void specifiers_qualifier_list()
         case TK_VOID:
         case TK_LONG:
 		case TK_INT64:
-            // "native" type specifiers
             GET_NEXT_TOKEN;
             break;
         case TK_ID:
-            if (!has_met_typedefined && is_typedef_id(lexeme_value.string_value))
+			if (!alien_type_engaged && is_typedef_id(lexeme_value.string_value))
             {
-                // TYPEDEF names
                 GET_NEXT_TOKEN;
-                //
-                // [FIX ME]? this is to short circuit specifier list parsing code 
-                // otherwise we may get two typedef names straight in one line'
-                // which the later might actually be redefined as a variable. without the short circuit
-                // we would never have a chance to process that redefined variable.
-                //
-                has_met_typedefined = 1; 
+                alien_type_engaged = 1; 
                 break;
             }
             return;
         case TK_STRUCT:
         case TK_UNION:
             struct_or_union_specifier();
+			alien_type_engaged = 1;
             break;
         case TK_ENUM:
             enum_specifier();
+			alien_type_engaged = 1;
             break;
         default:
             return;
-        } // end switch
-    } // end for
+        }
+    }
 }
 
 /*
