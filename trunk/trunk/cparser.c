@@ -36,7 +36,7 @@ static char* tokens[] =
 #define TK(a, b) b,
 #include "tokendef.h"
 #undef TK
-    "END OF TOKEN" // syntactic suguar
+    "END OF TOKEN" /* syntactic surgar */
 };
 
 #define GET_NEXT_TOKEN cptk = get_token()
@@ -46,8 +46,7 @@ void initialize_parser()
 	GET_NEXT_TOKEN;
 }
 
-// todo static
-void match(int token)
+static void match(int token)
 {  
 	if (cptk == token)
     {
@@ -201,21 +200,17 @@ void unary_expression()
 		}
     case TK_LPAREN :
         {
-            //
-            // Two possibilites here - 
-            // 1. (type name) unary_expression
-            // 2. postfix_expression
-            // The trick here is postfix_expression requires parsing the '(' itself. 
-            // So here we need to peek next token instead of consume TK_LPAREN
-            //
+            /*
+             * Two possibilites here - 
+             * 1. (type name) unary_expression
+             * 2. postfix_expression
+             * The trick here is postfix_expression requires parsing the '(' itself. 
+             * So here we need to peek next token instead of consume TK_LPAREN
+             */
             int peek_token_code = peek_token();
 
             if (is_token_typename_token(peek_token_code, peek_lexeme_value.string_value))
             {
-                //
-                // [TODO] - well, not sure. this is a cast op, what else to do? parse type name??
-                // anyways, this place looks suspicious.
-                //
                 GET_NEXT_TOKEN; 
                 
                 type_name();
@@ -260,7 +255,6 @@ void sizeof_expression()
         }
         else
         {
-            // [NOTICE] [IMPROVE]
             unary_expression();
         }
 
@@ -487,10 +481,10 @@ assignment_expression
 */
 void assignment_expression()
 {
-    //
-    // todo - this sounds not conform with grammar described above
-    // the parser always asusme it encurs a conditional expression
-    // 
+    /* here is anothe twist - parsing conditional expression always
+     * yield parsing a unary expression and there is no trailing parsing needed
+     * so it's absolutely safe to start with parsing a conditional expression first
+    */
     conditional_expression();
 
     if (cptk >= TK_ASSIGN && cptk <= TK_MOD_ASSIGN)
@@ -502,10 +496,10 @@ void assignment_expression()
 
 void expression()
 {
-    //
-    // empty expression. Note the implicit contract through out cparser is expression parsing doesn't consume semicolons,
-    // because I want to explicit handle semicolon whenever possible which is clean and easy for debugging purpose.
-    //
+    /* empty expression. Note the implicit contract through out cparser is expression parsing 
+     * doesn't consume semicolons, I want to explicit handle semicolon whenever possible which 
+     * is clean and easy for debugging purpose.
+    */
     if (cptk == TK_SEMICOLON)
     {
         return;
@@ -592,27 +586,24 @@ void expression_statement()
     }
     else if (cptk == TK_ID && strcmp(lexeme_value.string_value, "__asm") == 0)
     {
-        //
-        // [FIX ME] work around inline assembly parsing. this is temp solution and needs be fixed asap.
-        // Ideally I need my own assembler routine to help this out.
-        //
+        /* [FIX ME][ASSEMBLY] 
+         * this is a temp workaround to skip inline assembly parsing 
+         * parser should invoke assembler to deal with these snippets
+        */
         GET_NEXT_TOKEN;
 
         if (cptk == TK_LBRACE)
         {
-            //
-            // skip __asm {} block
-            //
+            /* skip __asm {} block */
             while (cptk != TK_RBRACE) GET_NEXT_TOKEN;
             match(TK_RBRACE); 
         }
         else
         {
-            //
-            // skip single __asm statement - it [TODO] can't deal with multiple asm statements at this moment
-            //
+            /* skip single __asm statement */
              while (cptk != TK_RBRACE) GET_NEXT_TOKEN;
         }
+        /* else skip multiple single asm stmt.. bang! it can't do that now! [TODO] */
     }
     else
     {
@@ -1228,12 +1219,12 @@ void direct_declarator(int storage_class)
 		}
 		else
 		{
-			// [DEBUG]
+			/* [DEBUG] */
 			(lexeme_value.string_value);
 			(storage_class);
 		}
 
-        // [DEBUG]
+        /* DEBUG */
         if (strcmp("CreatePrivateObjectSecurity"/*"PRKCRM_MARSHAL_HEADER"*/, lexeme_value.string_value) == 0)
         {
 			int a = 0;
@@ -1257,10 +1248,10 @@ void abstract_declarator()
 	{
 		pointer();
 
-		//
-		// look ahead is neither '(' nor '[', we are done.
-		// In this case abstract declarator is just a plain pointer.
-		//
+		/*
+		 * look ahead is neither '(' nor '[', we are done.
+		 * In this case abstract declarator is just a plain pointer.
+         */
 		if (cptk != TK_LPAREN && cptk != TK_LBRACKET)
 		{
 			return;
@@ -1286,9 +1277,9 @@ void direct_abstract_declarator()
 	{
 		GET_NEXT_TOKEN;
 
-		//
-		// look ahead is either ')' or parameter_type_list, so we must processing the suffix declarator.
-		//
+		/*
+	     * look ahead is either ')' or parameter_type_list, so we must processing the suffix declarator.
+		 */
 		if (cptk == TK_RPAREN || is_current_token_declaration_specifier_token())
 		{
 			suffix_declarator();
@@ -1363,7 +1354,7 @@ void struct_or_union_specifier()
     GET_NEXT_TOKEN;
     if (cptk  == TK_ID)
     {
-        // [TODO] [SYMBOL MANAGE] - install tag name into the types table?
+        /* [TODO] [SYMBOL MANAGE] - install tag name into the types table? */
         GET_NEXT_TOKEN;
     }
 
@@ -1415,21 +1406,14 @@ struct_declarator
 */
 void struct_declarator()
 {
-    //
-    // [WARNING][NON ANSI]
-    //
-    // This is to deal with unnamed struct / union. Unnamed struct and union is not in ANSI C
-    // and portable code should avoid its usage. Limited support for unnamed struct / union
-    // in hcc is simply for compatibility with other compilers. 
-    //
+    /* short circuit anonymous struct / union */
     if (cptk == TK_SEMICOLON)
     {
         return;
     }
-
+   
     if (cptk != TK_COLON)
     {
-        // [FIX ME] - need to pass the correct storage class from struct_declarator
         declarator(TK_AUTO);
     }
 
@@ -1489,6 +1473,15 @@ void specifiers_qualifier_list()
             enum_specifier();
 			alien_type_engaged = 1;
             break;
+        case TK_AUTO:
+        case TK_REGISTER:
+        case TK_EXTERN:
+        case TK_STATIC:
+        case TK_TYPEDEF:
+            {
+                syntax_error("illegal storage class appears");
+                return;
+            }
         default:
             return;
         }
@@ -1552,10 +1545,10 @@ void enumerator()
 {
     if (cptk != TK_ID)
     {
-		//
-		// deal with "unclosed" enum member declaration like
-		// enum { a, b, c, }
-		//
+		/*
+		 * deal with "unclosed" enum member declaration like
+		 * enum { a, b, c, }
+		 */
 		if (cptk == TK_RBRACE)
 		{
 			return;
