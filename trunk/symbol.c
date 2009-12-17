@@ -41,10 +41,32 @@ int symbol_scope = GLOBAL;
 
 static t_symbol_table global_symbol_tables[] = {{CONSTANTS}, {GLOBAL}, {GLOBAL}, {GLOBAL}};
 
+/* array holding pointers to symbols which by themselves are typedef but hidden in current scope
+ * because of redeclaring as normal identifiers. 
+ * the array will be reset each time exit_scope is invoked to make sure no side effect (for modifying)
+ * on existing symbol tables preserves cross scope.
+ *
+ * [NOTE] I think 256 symbols are enough for most practical usage. If there is a bug, reconsider this later.
+ */
+static t_symbol* hidden_typedef_symbols[256] = {NULL};
+
 t_symbol_table* sym_table_constants = &global_symbol_tables[0]; 
 t_symbol_table* sym_table_identifiers = &global_symbol_tables[1]; 
 t_symbol_table* sym_table_types = &global_symbol_tables[2]; 
 t_symbol_table* sym_table_externals = &global_symbol_tables[3]; 
+
+static void reset_hidden_typedefs()
+{
+    int n = 0;
+    for (; n < NUMBEROFELEMENTS(hidden_typedef_symbols); n ++)
+    {
+        if (hidden_typedef_symbols[n] != NULL)
+        {
+            hidden_typedef_symbols[n]->hidden_typedef = 0;
+            hidden_typedef_symbols[n] = NULL;
+        }
+    }
+}
 
 t_symbol_table* make_symbol_table(int arena)
 {
@@ -69,6 +91,8 @@ void enter_scope()
 
 void exit_scope()
 {
+    reset_hidden_typedefs();
+
 	remove_types(symbol_scope);
 	if (sym_table_types->level == symbol_scope)
 	{
