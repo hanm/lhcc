@@ -998,6 +998,9 @@ void parameter_declaration()
         if (cptk == TK_ID && is_typedef_id(lexeme_value.string_value))
         {
             /* typedef name is hidden by redeclaring the name as a normal identifier */
+            t_symbol* sym = find_symbol(lexeme_value.string_value, sym_table_identifiers);
+            sym->hidden_typedef = 1;
+            record_hidden_typedef_name(sym);
         }
         else
         {

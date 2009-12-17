@@ -260,3 +260,20 @@ void free_symbol_tables()
      * explicitly destroyed.
      */
 }
+
+void record_hidden_typedef_name(t_symbol* sym)
+{
+    int n = 0;
+    assert(sym);
+
+    for (; n < NUMBEROFELEMENTS(hidden_typedef_symbols); n ++)
+    {
+        if (hidden_typedef_symbols[n] == NULL)
+        {
+            hidden_typedef_symbols[n] = sym;
+            break;
+        }
+    }
+
+    assert(n <= NUMBEROFELEMENTS(hidden_typedef_symbols));
+}
