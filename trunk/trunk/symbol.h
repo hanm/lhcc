@@ -120,6 +120,8 @@ void enter_scope(void);
 
 void exit_scope(void);
 
+void record_hidden_typedef_name(t_symbol* sym);
+
 t_symbol* install_symbol(char* name, t_symbol_table* table);
 
 /*
