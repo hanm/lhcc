@@ -987,48 +987,28 @@ parameter_declaration
 void parameter_declaration()
 {
 	int storage_class = declaration_specifiers();
-    
-    /* look ahead is neither in declarator nor in abstract declarator, we are done */
-    if (!is_current_token_declarator_token() && cptk != TK_LBRACKET)
-    {
-		if (cptk == TK_ID && is_typedef_id(lexeme_value.string_value))
-		{
-			/* TODO - reuse typedef name as identifier */
-			/*
-			 * token is a typedef ID but ID now is using as identifier
-			 * TODO - somehow mark symbol table to tell the type hiding
-			 */
-		}
-		else
-		{
-			return;
-		}
-    }
 
     if (cptk == TK_MUL)
     {
         pointer();
-
-		if (!is_current_token_declarator_token() && cptk != TK_LBRACKET)
-		{
-            if (cptk == TK_ID && is_typedef_id(lexeme_value.string_value))
-            {
-                /* [FIX ME][PRIORITY FIX] -  need to update symbol table and mark this specific typedefined name out of range
-                 * This happens rare but it does happen
-                 * Typedef name is hidden by a declaration of function parameter
-                */
-            }
-            else
-            {
-                /*
-                 * look ahead is neither a possible start of a direct declarator, nor
-                 * an direct abstract direclarator. 
-                 * This is a case where the parameter declaration is just typename*
-                 */
-                return;
-            }
-		}
 	}  
+
+    if (!is_current_token_declarator_token() && cptk != TK_LBRACKET)
+    {
+        if (cptk == TK_ID && is_typedef_id(lexeme_value.string_value))
+        {
+            /* typedef name is hidden by redeclaring the name as a normal identifier */
+        }
+        else
+        {
+            /*
+            * look ahead is neither a possible start of a direct declarator, nor
+            * an direct abstract direclarator. 
+            * This is a case where the parameter declaration is just typename*
+            */
+            return;
+        }
+    }
     
     /*
      * sample torture:
