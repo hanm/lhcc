@@ -82,6 +82,8 @@ typedef struct symbol
 	t_type* type; /* symbol type */
 
     int defined; /* symbol definition flag */
+
+    int hidden_typedef;
     t_token_coordinate coordinate;
 
 	struct symbol* previous;
