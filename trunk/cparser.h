@@ -462,7 +462,6 @@ function_definition
 int cptk;
 
 void initialize_parser();
-void match(int token);
 
 /*
  * EXPRESSIONS 
