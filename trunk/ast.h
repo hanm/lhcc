@@ -52,4 +52,16 @@ typedef struct Exp
       } op;
 } ast;
 */
+
+enum ast_expression_kind
+{
+    AST_EXP_BINARYOP_KIND,
+    AST_EXP_UNARYOP_KIND,
+    AST_EXP_TERNARY_KIND,
+    AST_EXP_IDENTIFIER_KIND,
+    AST_EXP_FUNCTION_CALL_KIND,
+    AST_EXP_SUBSCRIPT_KIND,
+    AST_EXP_ACCESS_KIND
+} t_ast_expression_kind;
+
 #endif
