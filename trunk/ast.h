@@ -53,7 +53,10 @@ typedef struct Exp
 } ast;
 */
 
-enum ast_expression_kind
+typedef struct hcc_ast_exp t_ast_exp;
+
+/* kinds of expressions */
+typedef enum hcc_ast_expression_kind
 {
     AST_EXP_BINARYOP_KIND,
     AST_EXP_UNARYOP_KIND,
@@ -62,6 +65,67 @@ enum ast_expression_kind
     AST_EXP_FUNCTION_CALL_KIND,
     AST_EXP_SUBSCRIPT_KIND,
     AST_EXP_ACCESS_KIND
-} t_ast_expression_kind;
+} t_ast_exp_kind;
+
+
+typedef enum hcc_ast_operator
+{
+	AST_OP_NONE,
+
+	/* unary operators
+	 * &, *, +, -, ~, !
+	*/
+	AST_OP_ADDR,
+	AST_OP_DEREF,
+	AST_OP_POS,
+	AST_OP_NEGATE,
+	AST_OP_INVERT,
+	AST_OP_NOT,
+	
+	/* binary arithematic operators */
+	AST_OP_ADD,
+	AST_OP_SUB,
+	AST_OP_MUL,
+	AST_OP_DIV,
+	AST_OP_MOD,
+	AST_OP_BIT_AND,
+	AST_OP_BIT_OR,
+	AST_OP_BIT_XOR,
+	AST_OP_LSHIFT,
+	AST_OP_RSHIFT,
+
+	/* relational operators */
+	AST_OP_LESS,
+	AST_OP_LESS_EQ,
+	AST_OP_GREAT,
+	AST_OP_GREAT_EQ,
+	AST_OP_EQUAL,
+	AST_OP_UNEQUAL,
+
+	AST_OP_AND,
+	AST_OP_OR
+
+} t_ast_exp_op;
+
+/*
+ * variant record represents C expression ast node
+ * the enclosing record represents a generic expression ast node
+ * the embeded records represent the specific expression ast node, 
+ * which is specified by expression kind enum
+*/
+typedef struct hcc_ast_exp
+{
+	t_ast_exp_kind kind;
+
+	union 
+	{
+		struct 
+		{
+			t_ast_exp_op op;
+			t_ast_exp* exp;
+		} ast_unary_exp;
+	} u;
+
+} t_ast_exp;
 
 #endif
