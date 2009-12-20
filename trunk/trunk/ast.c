@@ -25,6 +25,8 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 ****************************************************************/
 
+#include "hcc.h"
+#include "arena.h"
 #include "ast.h"
 
 // guide line on creating ast http://lambda.uta.edu/cse5317/notes/node25.html
@@ -77,7 +79,58 @@ This would require hundreds of recursive structs in C or classes in Java.
 An alternative method is to use just one generic tree structure to capture all possible tree structures. 
 */
 
+#define ALLOCATE_GENERIC_AST  t_ast_exp* exp; \
+	CALLOC(exp, PERM)
+
 static int ast_place_holder()
 {
     return 0;
+}
+
+t_ast_exp* make_ast_id_exp(char* name)
+{
+	ALLOCATE_GENERIC_AST;
+
+	assert(name);
+
+	exp->kind = AST_EXP_IDENTIFIER_KIND;
+	exp->u.ast_id_exp.name = name;
+	
+	return exp;
+}
+
+t_ast_exp* make_ast_const_exp(t_ast_exp_val val)
+{
+	ALLOCATE_GENERIC_AST;
+
+	exp->kind = AST_EXP_CONST_KIND;
+	exp->u.ast_const_exp.val = val;
+
+	return exp;
+}
+
+t_ast_exp* make_ast_subscript_exp(t_ast_exp* main, t_ast_exp* index)
+{
+	ALLOCATE_GENERIC_AST;
+
+	assert(main && index);
+
+	exp->kind = AST_EXP_SUBSCRIPT_KIND;
+	exp->u.ast_subscript_exp.main = main;
+	exp->u.ast_subscript_exp.index = index;
+
+	return exp;
+}
+
+t_ast_exp* make_ast_call_exp(t_ast_exp* func, t_ast_list args)
+{
+	ALLOCATE_GENERIC_AST;
+
+	assert(func);
+
+	exp->kind = AST_EXP_FUNCTION_CALL_KIND;
+	exp->u.ast_call_exp.func = func;
+	exp->u.ast_call_exp.args = args;
+
+	return exp;
 }

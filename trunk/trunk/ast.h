@@ -52,7 +52,10 @@ typedef struct Exp
       } op;
 } ast;
 */
-
+/*
+ * the overall structure of the ast nodes are pretty like what described in the Tiger book
+ * and/or specified by ASDL.
+*/
 typedef struct hcc_ast_exp t_ast_exp;
 
 /* kinds of expressions */
@@ -62,9 +65,10 @@ typedef enum hcc_ast_expression_kind
     AST_EXP_UNARYOP_KIND,
     AST_EXP_TERNARY_KIND,
     AST_EXP_IDENTIFIER_KIND,
+	AST_EXP_CONST_KIND,
     AST_EXP_FUNCTION_CALL_KIND,
     AST_EXP_SUBSCRIPT_KIND,
-    AST_EXP_ACCESS_KIND
+    AST_EXP_INDIR_KIND /* indirect access */
 } t_ast_exp_kind;
 
 
@@ -103,9 +107,37 @@ typedef enum hcc_ast_operator
 	AST_OP_UNEQUAL,
 
 	AST_OP_AND,
-	AST_OP_OR
+	AST_OP_OR,
+
+	/* misc : '->', '.', '++', '--'*/
+	AST_OP_PTR,
+	AST_OP_DOT,
+	AST_OP_INC,
+	AST_OP_DEC
 
 } t_ast_exp_op;
+
+typedef union hcc_ast_exp_value
+{
+	char sc;
+	unsigned char uc;
+	short ss;
+	unsigned short us;
+	int i;
+	unsigned int ui;
+	long l;
+	unsigned long ul;
+	float f;
+	double d;
+	long double ld;
+	void* p;
+} t_ast_exp_val;
+
+typedef struct hcc_ast_list
+{
+	int size;
+	void* item[1];
+} t_ast_list;
 
 /*
  * variant record represents C expression ast node
@@ -124,8 +156,52 @@ typedef struct hcc_ast_exp
 			t_ast_exp_op op;
 			t_ast_exp* exp;
 		} ast_unary_exp;
+
+		struct
+		{
+			t_ast_exp_op op;
+			t_ast_exp* left;
+			t_ast_exp* right;
+		} ast_binary_exp;
+
+		struct
+		{
+			char* name;
+		} ast_id_exp;
+
+		struct
+		{
+			t_ast_exp_val val;
+		} ast_const_exp;
+
+		struct
+		{
+			t_ast_exp* main;
+			t_ast_exp* index;
+		} ast_subscript_exp;
+
+		struct
+		{
+			t_ast_exp* func;
+			t_ast_list args;
+		} ast_call_exp;
+
+		struct
+		{
+			t_ast_exp* main;
+			t_ast_exp_op op;
+			char* id;
+		} ast_indir_exp;
+
 	} u;
 
 } t_ast_exp;
+
+
+/* ast constructors */
+t_ast_exp* make_ast_id_exp(char* name);
+t_ast_exp* make_ast_const_exp(t_ast_exp_val val);
+t_ast_exp* make_ast_subscript_exp(t_ast_exp* main, t_ast_exp* index);
+t_ast_exp* make_ast_call_exp(t_ast_exp* func, t_ast_list args);
 
 #endif
