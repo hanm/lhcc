@@ -433,12 +433,13 @@ static int identify_integer_value(char* start, int length, int base)
     return TK_CONST_INTEGER;
 }
 
-static int identify_float_value(char* number)
+static int identify_float_value(char* number, char* begin)
 {
-    /* TODO - is this the right type? */
+    int return_val = TK_CONST_FLOAT;
     long double value = 0;
 
     assert(number);
+    assert(begin);
 
     if ('.' == *number)
     {
@@ -477,7 +478,7 @@ static int identify_float_value(char* number)
     }
 
     errno = 0;
-    value = strtod(number, NULL);
+    value = strtod(begin, NULL);
     if (errno == ERANGE)
     {
         warning("float value out of range!");
@@ -485,13 +486,22 @@ static int identify_float_value(char* number)
 
     fprintf(stderr, "float value %f\n", value);
 
-	/*
-     * todo - here maybe do one step further to identify that is it a double, or float?
-     * right now the value is just assigned to double which is garanteed to hold on both a double and a float
-     * so it doesn't hurt, so far...
-	 */
     lexeme_value.double_value = value;
-    return TK_CONST_FLOAT;
+
+    if (*number == 'f' || *number == 'F')
+    {
+        lexeme_value.float_value = (float)value;    
+    }
+    else if (*number == 'l' || *number == 'L')
+    {
+        return_val = TK_CONST_LONG_DOUBLE;
+    }
+    else
+    {
+        return_val = TK_CONST_DOUBLE;
+    }
+
+    return return_val;
 }
 
 static int identify_numerical_value(char* number)
@@ -503,7 +513,7 @@ static int identify_numerical_value(char* number)
     
     if ('.' == *number)
     {
-        return identify_float_value(number);
+        return identify_float_value(number, number);
     }
 
 	/*
@@ -550,7 +560,7 @@ static int identify_numerical_value(char* number)
     }
     else
     {
-        return identify_float_value(begin);
+        return identify_float_value(number, begin);
     }
 }
 
