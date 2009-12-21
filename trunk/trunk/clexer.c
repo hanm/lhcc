@@ -88,13 +88,13 @@ static unsigned char lexical_map[256] =
 	TK_WHITESPACE,
 	TK_NEWLINE, 
 	0, /* comment left undefined */
-	TK_CONST_NUMBER, /* number constant including integer constant and float constant. */
+	0, /* number constant including integer constant and float constant. */
 	TK_ID,
 	0,		/* non-C characters */
 	0,		/* a #pragma directive */
 	0,	/* new file or #line */
-	TK_CONSTTODO,		/* constant "xxx" */
-	TK_CONSTTODO,		/* constant 'xxx' */
+	TK_CONST_STRING_LITERAL,		/* constant "xxx" */
+	TK_CONST_CHAR_LITERAL,		/* constant 'xxx' */
 	TK_DIV,		/*	/	*/
 	TK_DIV_ASSIGN,	/*	/=	*/
 	TK_SUB,		/*	-	*/
