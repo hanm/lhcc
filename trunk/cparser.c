@@ -86,6 +86,11 @@ void primary_expression()
     case TK_CONST_DOUBLE :
     case TK_CONST_LONG_DOUBLE :
     case TK_CONST_INTEGER :
+	case TK_CONST_LONG_INTEGER :
+	case TK_CONST_LONG_LONG :
+	case TK_CONST_UNSIGNED_INTEGER :
+	case TK_CONST_UNSIGNED_LONG_INTEGER :
+	case TK_CONST_UNSIGNED_LONG_LONG :
         GET_NEXT_TOKEN;
         break;
     case TK_CONST_CHAR_LITERAL :
