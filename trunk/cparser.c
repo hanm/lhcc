@@ -31,6 +31,8 @@ OTHER DEALINGS IN THE SOFTWARE.
 #include "cparser.h"
 #include "symbol.h"
 
+#include "ast.h"
+
 static char* tokens[] = 
 {
 #define TK(a, b) b,
@@ -68,27 +70,34 @@ primary_expression
 */
 void primary_expression()
 {
+    t_ast_exp* exp = NULL;
+
     switch (cptk)
     {
     case TK_ID :
-        GET_NEXT_TOKEN;
-        return;
+        {
+            exp = make_ast_id_exp(lexeme_value.string_value);
+
+            GET_NEXT_TOKEN;
+
+            break;
+        }
     case TK_CONST_FLOAT :
     case TK_CONST_INTEGER :
         GET_NEXT_TOKEN;
-        return;
+        break;
     case TK_CONST_CHAR_LITERAL :
     case TK_CONST_STRING_LITERAL:
         GET_NEXT_TOKEN;
-        return;
+        break;
     case TK_LPAREN :
         GET_NEXT_TOKEN;
         expression();
         match(TK_RPAREN);
-        return;
+        break;
     default :
         error(&coord, "expect identifier, constant, string literal or (");
-        return;
+
     }
 }
 
