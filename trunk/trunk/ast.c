@@ -218,3 +218,48 @@ t_ast_exp* make_ast_binary_exp(t_ast_exp* left, t_ast_exp_op op, t_ast_exp* righ
 
     return exp;
 }
+
+t_ast_exp* make_ast_conditional_exp(t_ast_exp* cond_exp, t_ast_exp* true_exp, t_ast_exp* false_exp)
+{
+    ALLOCATE_GENERIC_AST;
+
+    assert(cond_exp);
+    assert(!(!true_exp && !false_exp));
+
+    exp->kind = AST_EXP_CONDITION_KIND;
+    exp->u.ast_conditional_exp.cond_exp = cond_exp;
+    exp->u.ast_conditional_exp.true_exp = true_exp;
+    exp->u.ast_conditional_exp.false_exp =  false_exp;
+
+    return exp;
+}
+
+t_ast_exp* make_ast_assignment_exp(t_ast_exp* cond_exp, t_ast_exp_op op, t_ast_exp* assign_exp)
+{
+    ALLOCATE_GENERIC_AST;
+
+    assert(cond_exp);
+
+    exp->kind = AST_EXP_ASSIGNMENT_KIND;
+    exp->u.ast_assignment_exp.cond_exp = cond_exp;
+    exp->u.ast_assignment_exp.assign_exp = assign_exp;
+    exp->u.ast_assignment_exp.op = op;
+
+    return exp;
+}
+
+t_ast_exp* make_ast_comma_exp(t_ast_exp* comma_exp, t_ast_exp* assign_exp)
+{
+    ALLOCATE_GENERIC_AST;
+
+    assert(assign_exp);
+
+    exp->kind = AST_EXP_COMMA_KIND;
+    exp->u.ast_comma_exp.assign_exp = assign_exp;
+    exp->u.ast_comma_exp.comma_exp = comma_exp; /* optional, may be NULL */
+
+    /* note comma expression could decay to just single assignment expression 
+     * which is the normal expression so called.
+    */
+    return exp;
+}

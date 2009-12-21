@@ -64,7 +64,6 @@ typedef enum hcc_ast_expression_kind
 {
     AST_EXP_BINARY_KIND,
     AST_EXP_UNARY_KIND,
-    AST_EXP_TERNARY_KIND,
     AST_EXP_IDENTIFIER_KIND,
 	AST_EXP_CONST_KIND,
     AST_EXP_FUNCTION_CALL_KIND,
@@ -72,7 +71,10 @@ typedef enum hcc_ast_expression_kind
     AST_EXP_INDIR_KIND, /* indirect access */
     AST_EXP_POSTOP_KIND, /* post increment or post decrement */
     AST_EXP_CAST_KIND, /* type cast */
-    AST_EXP_SIZEOF_KIND /* size of expression */
+    AST_EXP_SIZEOF_KIND, /* size of expression */
+    AST_EXP_CONDITION_KIND,  /* conditional expression */
+    AST_EXP_ASSIGNMENT_KIND,  /* assignment expression */
+    AST_EXP_COMMA_KIND /* comma expression */
 } t_ast_exp_kind;
 
 
@@ -112,6 +114,19 @@ typedef enum hcc_ast_operator
 
 	AST_OP_AND,
 	AST_OP_OR,
+
+    /* assignment */
+    AST_OP_ASSIGN,
+    AST_OP_MUL_ASSIGN,
+    AST_OP_DIV_ASSIGN,
+    AST_OP_MOD_ASSIGN,
+    AST_OP_ADD_ASSIGN,
+    AST_OP_SUB_ASSIGN,
+    AST_OP_LSHIFT_ASSIGN,
+    AST_OP_RSHIFT_ASSIGN,
+    AST_OP_AND_ASSIGN,
+    AST_OP_OR_ASSIGN,
+    AST_OP_XOR_ASSIGN,
 
 	/* misc : '->', '.', '++', '--'*/
 	AST_OP_PTR,
@@ -216,6 +231,30 @@ typedef struct hcc_ast_exp
             t_ast_exp* exp;
             t_ast_exp* type; /* [FIX ME] Same as above */
         } ast_sizeof_exp;
+
+        struct
+        {
+            /* cond_exp 
+             * cond_exp ? true_exp : false_exp
+             */
+            t_ast_exp* cond_exp; 
+            t_ast_exp* true_exp;
+            t_ast_exp* false_exp;
+        } ast_conditional_exp;
+
+        struct
+        {
+            t_ast_exp* cond_exp;
+            t_ast_exp_op op;
+            t_ast_exp* assign_exp;
+        } ast_assignment_exp;
+
+        struct
+        {
+            t_ast_exp* comma_exp;
+            t_ast_exp* assign_exp;
+        } ast_comma_exp;
+
 	} u;
 
 } t_ast_exp;
@@ -232,6 +271,9 @@ t_ast_exp* make_ast_cast_exp(t_ast_exp* type, t_ast_exp* exp);
 t_ast_exp* make_ast_sizeof_exp(t_ast_exp* type, t_ast_exp* exp);
 t_ast_exp* make_ast_unary_exp(t_ast_exp* exp, t_ast_exp_op op);
 t_ast_exp* make_ast_binary_exp(t_ast_exp* left, t_ast_exp_op op, t_ast_exp* right);
+t_ast_exp* make_ast_conditional_exp(t_ast_exp* cond_exp, t_ast_exp* true_exp, t_ast_exp* false_exp);
+t_ast_exp* make_ast_assignment_exp(t_ast_exp* cond_exp, t_ast_exp_op op, t_ast_exp* assign_exp);
+t_ast_exp* make_ast_comma_exp(t_ast_exp* comma_exp, t_ast_exp* assign_exp);
 
 
 
