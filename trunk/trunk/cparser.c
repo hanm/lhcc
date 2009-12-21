@@ -83,6 +83,8 @@ void primary_expression()
             break;
         }
     case TK_CONST_FLOAT :
+    case TK_CONST_DOUBLE :
+    case TK_CONST_LONG_DOUBLE :
     case TK_CONST_INTEGER :
         GET_NEXT_TOKEN;
         break;
