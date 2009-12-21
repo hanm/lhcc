@@ -50,11 +50,8 @@ TK(TK_WHITESPACE, "")
 	const float short unsigned
 	continue for signed void
 	default goto sizeof volatile
-	do if static while
-
-	extended in this compiler - register, static, enum, typedef
-
-	C99 restrict and ?? TODO
+	do if static while register static
+    enum typedef
 */
 TK(TK_FLOAT,  "float")
 TK(TK_DOUBLE,  "double")
@@ -98,14 +95,32 @@ TK(TK_RETURN,      "return")
 /* identifier */
 TK(TK_ID, "identifier") /* 33 */
 
-/* constants */
-TK(TK_CONSTTODO, "constants")
-TK(TK_CONST_NUMBER, "const_number")
+/* constants 
+ * 
+ * The suffixes [lL] traditionally indicate integer constants of type long. These suffixes
+ * are allowed, but are superfluous, because int and long are the same size normally.
+ *
+ * An integer constant can also be suffixed with uU, in which case its type is
+ * unsigned. (One or both of uU and lL can appear.) An integer constant also has type
+ * unsigned if its value cannot be represented as an int. Otherwise, the type of an
+ * integer constant is int. 
+ * 
+ * The ll, LL, lL, and Ll suffixes indicate a long long constant (a 64-bit integral type). 
+ * Note that long long is not a strict ANSI C type.
+ */
+TK(TK_CONST_INTEGER,     "int const")
+TK(TK_CONST_UNSIGNED_INTEGER,     "unsigned int const")
+TK(TK_CONST_LONG_INTEGER,     "long int const")
+TK(TK_CONST_UNSIGNED_LONG_INTEGER,     "unsigned long int const")
+TK(TK_CONST_LONG_LONG,     "long long const")
+TK(TK_CONST_UNSIGNED_LONG_LONG,     "unsigned long long const")
 
-TK(TK_CONST_INTEGER,     "const_integer")
-TK(TK_CONST_FLOAT,    "const_float")
-TK(TK_CONST_STRING_LITERAL,    "const_string_literal")
-TK(TK_CONST_CHAR_LITERAL,   "const_char_literal")
+TK(TK_CONST_FLOAT,    "float const")
+TK(TK_CONST_DOUBLE, "double const")
+TK(TK_CONST_LONG_DOUBLE, "long double const")
+
+TK(TK_CONST_STRING_LITERAL,    "string literal")
+TK(TK_CONST_CHAR_LITERAL,   "char literal")
 
 /* operator */
 TK(TK_COMMA,         ",")
