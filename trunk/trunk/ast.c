@@ -82,10 +82,6 @@ An alternative method is to use just one generic tree structure to capture all p
 #define ALLOCATE_GENERIC_AST  t_ast_exp* exp; \
 	CALLOC(exp, PERM)
 
-static int ast_place_holder()
-{
-    return 0;
-}
 
 t_ast_exp* make_ast_id_exp(char* name)
 {
@@ -133,4 +129,92 @@ t_ast_exp* make_ast_call_exp(t_ast_exp* func, t_ast_list args)
 	exp->u.ast_call_exp.args = args;
 
 	return exp;
+}
+
+t_ast_exp* make_ast_indir_exp(t_ast_exp* expression, t_ast_exp_op op, char* id)
+{
+    ALLOCATE_GENERIC_AST;
+
+    assert(expression && id);
+    assert(op == AST_OP_PTR || op == AST_OP_DOT);
+
+    exp->kind = AST_EXP_INDIR_KIND;
+    exp->u.ast_indir_exp.exp = expression;
+    exp->u.ast_indir_exp.op = op;
+    exp->u.ast_indir_exp.id = id;
+
+    return exp;
+}
+
+t_ast_exp* make_ast_postop_exp(t_ast_exp* expression, t_ast_exp_op op)
+{
+    ALLOCATE_GENERIC_AST;
+
+    assert(expression);
+    assert(op == AST_OP_INC || op == AST_OP_DEC);
+
+    exp->kind = AST_EXP_POSTOP_KIND;
+    exp->u.ast_postop_exp.exp = expression;
+    exp->u.ast_postop_exp.op = op;
+
+    return exp;
+}
+
+t_ast_exp* make_ast_unary_exp(t_ast_exp* expression, t_ast_exp_op op)
+{
+    ALLOCATE_GENERIC_AST;
+
+    assert(expression);
+    assert(op == AST_OP_ADDR ||
+	          op == AST_OP_DEREF ||
+              op == AST_OP_POS ||
+              op == AST_OP_NEGATE ||
+              op == AST_OP_INVERT ||
+              op == AST_OP_NOT);
+
+    exp->kind = AST_EXP_UNARY_KIND;
+    exp->u.ast_unary_exp.exp = expression;
+    exp->u.ast_unary_exp.op = op;
+
+    return exp;
+}
+
+t_ast_exp* make_ast_cast_exp(t_ast_exp* type, t_ast_exp* expression)
+{
+    ALLOCATE_GENERIC_AST;
+    
+    assert(type && expression);
+
+    exp->kind = AST_EXP_CAST_KIND;
+    exp->u.ast_cast_exp.type = type;
+    exp->u.ast_cast_exp.exp = expression;
+
+    return exp;
+}
+
+t_ast_exp* make_ast_sizeof_exp(t_ast_exp* type, t_ast_exp* expression)
+{
+    ALLOCATE_GENERIC_AST;
+
+    assert(type || exp); 
+
+    exp->kind = AST_EXP_SIZEOF_KIND;
+    exp->u.ast_sizeof_exp.type = type;
+    exp->u.ast_sizeof_exp.exp = expression;
+
+    return exp;
+}
+
+t_ast_exp* make_ast_binary_exp(t_ast_exp* left, t_ast_exp_op op, t_ast_exp* right)
+{
+    ALLOCATE_GENERIC_AST;
+
+    assert(left && right);
+
+    exp->kind = AST_EXP_BINARY_KIND;
+    exp->u.ast_binary_exp.left = left;
+    exp->u.ast_binary_exp.op = op;
+    exp->u.ast_binary_exp.right = right;
+
+    return exp;
 }

@@ -52,6 +52,7 @@ typedef struct Exp
       } op;
 } ast;
 */
+
 /*
  * the overall structure of the ast nodes are pretty like what described in the Tiger book
  * and/or specified by ASDL.
@@ -61,14 +62,17 @@ typedef struct hcc_ast_exp t_ast_exp;
 /* kinds of expressions */
 typedef enum hcc_ast_expression_kind
 {
-    AST_EXP_BINARYOP_KIND,
-    AST_EXP_UNARYOP_KIND,
+    AST_EXP_BINARY_KIND,
+    AST_EXP_UNARY_KIND,
     AST_EXP_TERNARY_KIND,
     AST_EXP_IDENTIFIER_KIND,
 	AST_EXP_CONST_KIND,
     AST_EXP_FUNCTION_CALL_KIND,
     AST_EXP_SUBSCRIPT_KIND,
-    AST_EXP_INDIR_KIND /* indirect access */
+    AST_EXP_INDIR_KIND, /* indirect access */
+    AST_EXP_POSTOP_KIND, /* post increment or post decrement */
+    AST_EXP_CAST_KIND, /* type cast */
+    AST_EXP_SIZEOF_KIND /* size of expression */
 } t_ast_exp_kind;
 
 
@@ -167,7 +171,7 @@ typedef struct hcc_ast_exp
 		struct
 		{
 			char* name;
-		} ast_id_exp;
+		} ast_id_exp; /* identifier */
 
 		struct
 		{
@@ -188,11 +192,30 @@ typedef struct hcc_ast_exp
 
 		struct
 		{
-			t_ast_exp* main;
+			t_ast_exp* exp;
 			t_ast_exp_op op;
 			char* id;
-		} ast_indir_exp;
+		} ast_indir_exp; /* indirect access via post fix: dot and arrow*/
 
+        struct
+        {
+            t_ast_exp* exp;
+            t_ast_exp_op op;
+        } ast_postop_exp; 
+
+        struct
+        {
+            t_ast_exp* type; /* [FIX ME] this needs to be type declaration or such. 
+                                      * type name can't be expressed as an expression.
+                                      */
+            t_ast_exp* exp;
+        } ast_cast_exp;
+
+        struct
+        {
+            t_ast_exp* exp;
+            t_ast_exp* type; /* [FIX ME] Same as above */
+        } ast_sizeof_exp;
 	} u;
 
 } t_ast_exp;
@@ -203,5 +226,13 @@ t_ast_exp* make_ast_id_exp(char* name);
 t_ast_exp* make_ast_const_exp(t_ast_exp_val val);
 t_ast_exp* make_ast_subscript_exp(t_ast_exp* main, t_ast_exp* index);
 t_ast_exp* make_ast_call_exp(t_ast_exp* func, t_ast_list args);
+t_ast_exp* make_ast_indir_exp(t_ast_exp* exp, t_ast_exp_op op, char* id);
+t_ast_exp* make_ast_postop_exp(t_ast_exp* exp, t_ast_exp_op op);
+t_ast_exp* make_ast_cast_exp(t_ast_exp* type, t_ast_exp* exp);
+t_ast_exp* make_ast_sizeof_exp(t_ast_exp* type, t_ast_exp* exp);
+t_ast_exp* make_ast_unary_exp(t_ast_exp* exp, t_ast_exp_op op);
+t_ast_exp* make_ast_binary_exp(t_ast_exp* left, t_ast_exp_op op, t_ast_exp* right);
+
+
 
 #endif
