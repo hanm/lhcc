@@ -62,6 +62,14 @@ typedef union lexeme_value
 	float float_value;
 	long double double_value;
 	char* string_value;
+	
+	/* store value of integer which is too big to place in integer_value.
+	 * this field can hold 128bits which certainly can represent long long
+	 * or unsigned long long. 
+	 * not using long long / unsigned long long directly because this is 
+	 * not strictly an ANSI type.
+	 */
+	int long_integer_value[4];
 } t_lexeme_value;
 
 /*

@@ -359,8 +359,13 @@ static int identify_integer_value(char* start, int length, int base)
 {
     unsigned long value = 0;
     char* current = start;
+	char* trailer = start + length;
     int i = 0;
     int overflow = 0;
+	int ret_val = TK_CONST_INTEGER;
+	int engage_unsign = 0;
+	int engage_long = 0;
+	int engage_long_long = 0;
 
     assert(start);
 
@@ -427,10 +432,67 @@ static int identify_integer_value(char* start, int length, int base)
         }
     }
 
-    HCC_TRACE("value is %d\n", value);
+    HCC_TRACE("integer value is %d\n", value);
 
-    lexeme_value.integer_value = value;
-    return TK_CONST_INTEGER;
+	if (*trailer == 'u' || *trailer == 'U')
+	{
+		trailer ++;
+		engage_unsign = 1;
+	}
+
+	if (*trailer == 'l' || *trailer == 'L')
+	{
+		trailer ++;
+		
+		if (*trailer == '1' || *trailer == 'L')
+		{
+			engage_long_long = 1;
+		}
+		else
+		{
+			engage_long = 1;
+		}
+	}
+
+	if (engage_unsign)
+	{
+		if (engage_long)
+		{
+			ret_val = TK_CONST_UNSIGNED_LONG_INTEGER;
+		}
+		else if (engage_long_long)
+		{
+			assert(!engage_long);
+			ret_val = TK_CONST_UNSIGNED_LONG_LONG;
+		}
+		else
+		{
+			ret_val = TK_CONST_UNSIGNED_INTEGER;
+		}
+	}
+	else
+	{
+		if (engage_long)
+		{
+			ret_val = TK_CONST_LONG_INTEGER;
+		}
+		else if (engage_long_long)
+		{
+			assert(!engage_long);
+			ret_val = TK_CONST_LONG_LONG;
+		}
+		else
+		{
+			ret_val = TK_CONST_INTEGER;
+		}
+	}
+
+	lexeme_value.integer_value = value;  
+
+	/* TODO - consider possible overflow here.
+	 * use the integer array to hold larger values.
+	 */
+	return ret_val;
 }
 
 static int identify_float_value(char* number, char* begin)
