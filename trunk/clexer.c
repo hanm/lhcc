@@ -443,6 +443,7 @@ static int identify_float_value(char* number, char* begin)
 
     if ('.' == *number)
     {
+        number ++;
         for (;;number ++)
         {
             if (!HCC_ISDECIMAL_DIGIT(*number)) 
