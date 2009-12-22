@@ -458,6 +458,8 @@ function_definition
 
 */
 
+#include "ast.h"
+
 /* CURRENT PARSER TOKEN */
 int cptk;
 
@@ -466,10 +468,10 @@ void initialize_parser();
 /*
  * EXPRESSIONS 
  */
-void primary_expression();
+t_ast_exp* primary_expression();
 void postfix_expression();
-void unary_expression();
-void sizeof_expression();
+t_ast_exp* unary_expression();
+t_ast_exp* sizeof_expression();
 void mul_expression();
 void add_expression();
 void shift_expression();
@@ -483,7 +485,7 @@ void logical_or_expression();
 void conditional_expression();
 void constant_expression();
 void assignment_expression();
-void expression();
+t_ast_exp* expression();
 
 /*
  * STATEMENTS

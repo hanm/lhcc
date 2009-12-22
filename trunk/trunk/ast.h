@@ -89,7 +89,10 @@ typedef enum hcc_ast_expression_kind
 
     /* string literal expression kind */
     AST_EXP_LITERAL_STRING_KIND,
-    AST_EXP_LITERAL_STRING_WIDE_KIND
+    AST_EXP_LITERAL_STRING_WIDE_KIND,
+
+    /* [FIX ME] temp solutoin */
+    AST_EXP_GENERIC_EXP_KIND
 } t_ast_exp_kind;
 
 
@@ -290,6 +293,9 @@ t_ast_exp* make_ast_conditional_exp(t_ast_exp* cond_exp, t_ast_exp* true_exp, t_
 t_ast_exp* make_ast_assignment_exp(t_ast_exp* cond_exp, t_ast_exp_op op, t_ast_exp* assign_exp);
 t_ast_exp* make_ast_comma_exp(t_ast_exp* comma_exp, t_ast_exp* assign_exp);
 
-
+/* temp solution for typename ast ctor 
+ * [TODO] hook with declaration ast construction
+ */
+t_ast_exp* make_ast_typename_exp();
 
 #endif

@@ -107,7 +107,9 @@ t_ast_exp* make_ast_const_exp(t_ast_exp_val val, t_ast_exp_kind kind)
 	          kind == AST_EXP_CONST_LONG_LONG_KIND ||
 	          kind == AST_EXP_CONST_UNSIGNED_INTEGER_KIND ||
 	          kind == AST_EXP_CONST_UNSIGNED_LONG_INTEGER_KIND ||
-	          kind == AST_EXP_CONST_UNSIGNED_LONG_LONG_KIND);
+	          kind == AST_EXP_CONST_UNSIGNED_LONG_LONG_KIND ||
+              kind == AST_EXP_LITERAL_STRING_KIND ||
+              kind == AST_EXP_LITERAL_STRING_WIDE_KIND);
 
 	exp->kind = kind;
 	exp->u.ast_const_exp.val = val;
@@ -160,7 +162,8 @@ t_ast_exp* make_ast_postop_exp(t_ast_exp* expression, t_ast_exp_op op)
 {
     ALLOCATE_GENERIC_AST;
 
-    assert(expression);
+    /* [FIX ME] */
+    /* assert(expression); */
     assert(op == AST_OP_INC || op == AST_OP_DEC);
 
     exp->kind = AST_EXP_POSTOP_KIND;
@@ -174,13 +177,16 @@ t_ast_exp* make_ast_unary_exp(t_ast_exp* expression, t_ast_exp_op op)
 {
     ALLOCATE_GENERIC_AST;
 
-    assert(expression);
+    /* [FIX ME] */
+    /* assert(expression); */
     assert(op == AST_OP_ADDR ||
 	          op == AST_OP_DEREF ||
               op == AST_OP_POS ||
               op == AST_OP_NEGATE ||
               op == AST_OP_INVERT ||
-              op == AST_OP_NOT);
+              op == AST_OP_NOT ||
+              op == AST_OP_INC ||
+              op == AST_OP_DEC);
 
     exp->kind = AST_EXP_UNARY_KIND;
     exp->u.ast_unary_exp.exp = expression;
@@ -193,7 +199,8 @@ t_ast_exp* make_ast_cast_exp(t_ast_exp* type, t_ast_exp* expression)
 {
     ALLOCATE_GENERIC_AST;
     
-    assert(type && expression);
+    /* [FIX ME][TYPE AST] assert needs on type */
+    /* assert(type && expression); */
 
     exp->kind = AST_EXP_CAST_KIND;
     exp->u.ast_cast_exp.type = type;
@@ -271,5 +278,13 @@ t_ast_exp* make_ast_comma_exp(t_ast_exp* comma_exp, t_ast_exp* assign_exp)
     /* note comma expression could decay to just single assignment expression 
      * which is the normal expression so called.
     */
+    return exp;
+}
+
+t_ast_exp* make_ast_typename_exp()
+{
+    ALLOCATE_GENERIC_AST;
+    exp->kind = AST_EXP_GENERIC_EXP_KIND;
+
     return exp;
 }
