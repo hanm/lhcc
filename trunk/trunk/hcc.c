@@ -238,6 +238,7 @@ int main(int argc, char* argv[])
    int i = 0;
 HCC_MEM_CHECK_START
     (i);
+
     log_initialize("G:\\athena.txt");
 
 //#define ATOMIC_TEST

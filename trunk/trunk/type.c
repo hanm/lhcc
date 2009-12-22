@@ -35,6 +35,8 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 #define __HCC_TYPE_TABLE_HASHSIZE 512
 
+static int type_system_initialized = 0;
+
 /*
  * this table exits simply to provide singleton of types
  * it would make sure identical type has only one runtime representation.
@@ -116,6 +118,8 @@ static t_type* install_type_symbol(int code, char*name, int size, int align)
 
 void type_system_initialize()
 {
+    if (type_system_initialized) return;
+
 	type_char = install_type_symbol(TYPE_CHAR, atom_string("char"), HCC_CHAR_SIZE, HCC_CHAR_SIZE);
 	
 	type_unsigned_char = install_type_symbol(TYPE_UNSIGNED_CHAR, atom_string("unsigned char"), HCC_CHAR_SIZE, HCC_CHAR_SIZE);
@@ -145,6 +149,8 @@ void type_system_initialize()
 	type_ptr = install_type_symbol(TYPE_PTR, atom_string("T*"), HCC_PTR_SIZE, HCC_PTR_SIZE);
 	
 	type_void = install_type_symbol(TYPE_VOID, atom_string("void"), 0, 0);
+
+    type_system_initialized = 1;
 }
 
 
