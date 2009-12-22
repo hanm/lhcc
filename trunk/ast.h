@@ -62,10 +62,10 @@ typedef struct hcc_ast_exp t_ast_exp;
 /* kinds of expressions */
 typedef enum hcc_ast_expression_kind
 {
+    /* 'complex' expression kind */
     AST_EXP_BINARY_KIND,
     AST_EXP_UNARY_KIND,
     AST_EXP_IDENTIFIER_KIND,
-	AST_EXP_CONST_KIND,
     AST_EXP_FUNCTION_CALL_KIND,
     AST_EXP_SUBSCRIPT_KIND,
     AST_EXP_INDIR_KIND, /* indirect access */
@@ -74,7 +74,22 @@ typedef enum hcc_ast_expression_kind
     AST_EXP_SIZEOF_KIND, /* size of expression */
     AST_EXP_CONDITION_KIND,  /* conditional expression */
     AST_EXP_ASSIGNMENT_KIND,  /* assignment expression */
-    AST_EXP_COMMA_KIND /* comma expression */
+    AST_EXP_COMMA_KIND, /* comma expression */
+
+    /* constant expression kind */
+    AST_EXP_CONST_FLOAT_KIND,
+    AST_EXP_CONST_DOUBLE_KIND,
+    AST_EXP_CONST_LONG_DOUBLE_KIND,
+    AST_EXP_CONST_INTEGER_KIND,
+	AST_EXP_CONST_LONG_INTEGER_KIND,
+	AST_EXP_CONST_LONG_LONG_KIND,
+	AST_EXP_CONST_UNSIGNED_INTEGER_KIND,
+	AST_EXP_CONST_UNSIGNED_LONG_INTEGER_KIND,
+	AST_EXP_CONST_UNSIGNED_LONG_LONG_KIND,
+
+    /* string literal expression kind */
+    AST_EXP_LITERAL_STRING_KIND,
+    AST_EXP_LITERAL_STRING_WIDE_KIND
 } t_ast_exp_kind;
 
 
@@ -262,7 +277,7 @@ typedef struct hcc_ast_exp
 
 /* ast constructors */
 t_ast_exp* make_ast_id_exp(char* name);
-t_ast_exp* make_ast_const_exp(t_ast_exp_val val);
+t_ast_exp* make_ast_const_exp(t_ast_exp_val val, t_ast_exp_kind kind);
 t_ast_exp* make_ast_subscript_exp(t_ast_exp* main, t_ast_exp* index);
 t_ast_exp* make_ast_call_exp(t_ast_exp* func, t_ast_list args);
 t_ast_exp* make_ast_indir_exp(t_ast_exp* exp, t_ast_exp_op op, char* id);

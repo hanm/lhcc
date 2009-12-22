@@ -95,11 +95,21 @@ t_ast_exp* make_ast_id_exp(char* name)
 	return exp;
 }
 
-t_ast_exp* make_ast_const_exp(t_ast_exp_val val)
+t_ast_exp* make_ast_const_exp(t_ast_exp_val val, t_ast_exp_kind kind)
 {
 	ALLOCATE_GENERIC_AST;
 
-	exp->kind = AST_EXP_CONST_KIND;
+    assert(kind == AST_EXP_CONST_FLOAT_KIND ||
+              kind == AST_EXP_CONST_DOUBLE_KIND ||
+              kind == AST_EXP_CONST_LONG_DOUBLE_KIND ||
+              kind == AST_EXP_CONST_INTEGER_KIND ||
+	          kind == AST_EXP_CONST_LONG_INTEGER_KIND ||
+	          kind == AST_EXP_CONST_LONG_LONG_KIND ||
+	          kind == AST_EXP_CONST_UNSIGNED_INTEGER_KIND ||
+	          kind == AST_EXP_CONST_UNSIGNED_LONG_INTEGER_KIND ||
+	          kind == AST_EXP_CONST_UNSIGNED_LONG_LONG_KIND);
+
+	exp->kind = kind;
 	exp->u.ast_const_exp.val = val;
 
 	return exp;

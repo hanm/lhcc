@@ -71,6 +71,8 @@ primary_expression
 void primary_expression()
 {
     t_ast_exp* exp = NULL;
+    t_ast_exp_val exp_val;
+    memset(&exp_val, 0, sizeof(exp_val));
 
     switch (cptk)
     {
@@ -79,24 +81,88 @@ void primary_expression()
             exp = make_ast_id_exp(lexeme_value.string_value);
 
             GET_NEXT_TOKEN;
+            break;
+        }
+    case TK_CONST_INTEGER :
+    case TK_CONST_CHAR_LITERAL :
+        {
+            exp_val.i = lexeme_value.integer_value;
+            exp = make_ast_const_exp(exp_val, AST_EXP_CONST_INTEGER_KIND);
 
+            GET_NEXT_TOKEN;
             break;
         }
     case TK_CONST_FLOAT :
+        {
+            exp_val.f = lexeme_value.float_value;
+            exp = make_ast_const_exp(exp_val, AST_EXP_CONST_FLOAT_KIND);
+            
+            GET_NEXT_TOKEN;
+            break;
+        }
     case TK_CONST_DOUBLE :
+        {
+            exp_val.d = (double)lexeme_value.double_value;
+            exp = make_ast_const_exp(exp_val, AST_EXP_CONST_DOUBLE_KIND);
+            
+            GET_NEXT_TOKEN;
+            break;
+        }
     case TK_CONST_LONG_DOUBLE :
-    case TK_CONST_INTEGER :
+        {
+            exp_val.ld = lexeme_value.double_value;
+            exp = make_ast_const_exp(exp_val, AST_EXP_CONST_LONG_DOUBLE_KIND);
+            
+            GET_NEXT_TOKEN;
+            break;
+        }
 	case TK_CONST_LONG_INTEGER :
+        {
+            exp_val.l = lexeme_value.integer_value;
+            exp = make_ast_const_exp(exp_val, AST_EXP_CONST_LONG_INTEGER_KIND);
+            
+            GET_NEXT_TOKEN;
+            break;
+        }
 	case TK_CONST_LONG_LONG :
+        {
+            /* [TODO] support long long*/
+            exp = make_ast_const_exp(exp_val, AST_EXP_CONST_LONG_LONG_KIND);
+            
+            GET_NEXT_TOKEN;
+            break;
+        }
 	case TK_CONST_UNSIGNED_INTEGER :
+        {
+            exp_val.ui = lexeme_value.integer_value;
+            exp = make_ast_const_exp(exp_val, AST_EXP_CONST_UNSIGNED_INTEGER_KIND);
+            
+            GET_NEXT_TOKEN;
+            break;
+        }
 	case TK_CONST_UNSIGNED_LONG_INTEGER :
+        {
+            exp_val.ul = lexeme_value.integer_value;
+            exp = make_ast_const_exp(exp_val, AST_EXP_CONST_UNSIGNED_LONG_INTEGER_KIND);
+            
+            GET_NEXT_TOKEN;
+            break;
+        }
 	case TK_CONST_UNSIGNED_LONG_LONG :
-        GET_NEXT_TOKEN;
-        break;
-    case TK_CONST_CHAR_LITERAL :
+        {
+            /* [TODO] support unsigned long long*/
+            exp = make_ast_const_exp(exp_val, AST_EXP_CONST_UNSIGNED_LONG_LONG_KIND);
+            
+            GET_NEXT_TOKEN;
+            break;
+        }
     case TK_CONST_STRING_LITERAL:
-        GET_NEXT_TOKEN;
-        break;
+        {
+            /* [TODO] pass string values to AST here */
+            /* [TODO] wide string in lexer */
+            GET_NEXT_TOKEN;
+            break;
+        }
     case TK_LPAREN :
         GET_NEXT_TOKEN;
         expression();
