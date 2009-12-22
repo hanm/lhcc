@@ -31,8 +31,6 @@ OTHER DEALINGS IN THE SOFTWARE.
 #include "cparser.h"
 #include "symbol.h"
 
-#include "ast.h"
-
 static char* tokens[] = 
 {
 #define TK(a, b) b,
@@ -68,7 +66,7 @@ primary_expression
         | '(' expression ')'
         ;
 */
-void primary_expression()
+t_ast_exp* primary_expression()
 {
     t_ast_exp* exp = NULL;
     t_ast_exp_val exp_val;
@@ -160,18 +158,24 @@ void primary_expression()
         {
             /* [TODO] pass string values to AST here */
             /* [TODO] wide string in lexer */
+            exp = make_ast_const_exp(exp_val, AST_EXP_LITERAL_STRING_KIND);
+
             GET_NEXT_TOKEN;
             break;
         }
     case TK_LPAREN :
-        GET_NEXT_TOKEN;
-        expression();
-        match(TK_RPAREN);
-        break;
+        {
+            /* [TODO] [AST] */
+            GET_NEXT_TOKEN;
+            exp = expression();
+            match(TK_RPAREN);
+            break;
+        }
     default :
         error(&coord, "expect identifier, constant, string literal or (");
-
     }
+
+    return exp;
 }
 
 /*
@@ -191,7 +195,10 @@ argument_expression_list : assignment_expression
 */
 void postfix_expression()
 {
-    primary_expression();
+    t_ast_exp* primary_exp = NULL;
+
+    primary_exp = primary_expression();
+    //assert(primary_exp);
 
     for (;;)
     {
@@ -261,25 +268,60 @@ unary_operator
         | '--'
         ;
 */
-void unary_expression()
+t_ast_exp* unary_expression()
 {
+    t_ast_exp* exp = NULL;
+
 	switch (cptk)
 	{
 	case TK_BITAND :
+        {
+            GET_NEXT_TOKEN;
+            exp = make_ast_unary_exp(unary_expression(), AST_OP_ADDR);
+            break;
+        }
 	case TK_MUL :
+        {
+            GET_NEXT_TOKEN; 
+            exp = make_ast_unary_exp(unary_expression(), AST_OP_DEREF);
+            break;
+        }
 	case TK_ADD :
+        {
+            GET_NEXT_TOKEN;
+            exp = make_ast_unary_exp(unary_expression(), AST_OP_POS);
+            break;
+        }
 	case TK_SUB :
+        {
+            GET_NEXT_TOKEN;
+            exp = make_ast_unary_exp(unary_expression(), AST_OP_NEGATE);
+            break;
+        }
     case TK_COMP :
+        {
+            GET_NEXT_TOKEN;
+            exp = make_ast_unary_exp(unary_expression(), AST_OP_INVERT);
+            break;
+        }
     case TK_NOT :
+        {
+            GET_NEXT_TOKEN;
+            exp = make_ast_unary_exp(unary_expression(), AST_OP_NOT);
+            break;
+        }
     case TK_INC :
+        {
+            GET_NEXT_TOKEN;
+            exp = make_ast_unary_exp(unary_expression(), AST_OP_INC);
+            break;
+        }
     case TK_DEC :
 		{
-			GET_NEXT_TOKEN;
-
-			unary_expression();
-
+            GET_NEXT_TOKEN;
+            exp = make_ast_unary_exp(unary_expression(), AST_OP_DEC);
             break;
-		}
+        }
     case TK_LPAREN :
         {
             /*
@@ -295,14 +337,15 @@ void unary_expression()
             {
                 GET_NEXT_TOKEN; 
                 
+                /* [TODO][AST] hook type declaration ast with unary ast */
                 type_name();
-
                 match(TK_RPAREN);
 
-                unary_expression();
+                exp = make_ast_cast_exp(make_ast_typename_exp(), unary_expression());
             }
             else
             {
+                /* [TODO][AST] hook with postfix exp ast */
                 postfix_expression();
             }
 
@@ -310,12 +353,16 @@ void unary_expression()
         }
     case TK_SIZEOF :
         {
-            sizeof_expression();
+            /* [TODO][AST]*/
+            exp = sizeof_expression();
             break;
         }
     default :
+        /* [TODO][AST]*/
         postfix_expression();
 	}
+
+    return exp;
 }
 
 /*
@@ -323,8 +370,11 @@ sizeof_expression
     : SIZEOF unary_expression
 	| SIZEOF '(' type_name ')'
 */
-void sizeof_expression()
+t_ast_exp* sizeof_expression()
 {
+    t_ast_exp* exp = NULL;
+    t_ast_exp* type = NULL;
+
     GET_NEXT_TOKEN;
     
     if (cptk == TK_LPAREN)
@@ -334,18 +384,21 @@ void sizeof_expression()
         if (is_token_typename_token(cptk, lexeme_value.string_value))
         {
             type_name();
+            type = make_ast_typename_exp();
         }
         else
         {
-            unary_expression();
+            exp = unary_expression();
         }
 
         match(TK_RPAREN);
     }
     else
     {
-        unary_expression();
+        exp = unary_expression();
     }
+
+    return make_ast_sizeof_exp(type, exp);
 }
 
 /*
@@ -576,15 +629,23 @@ void assignment_expression()
     }
 }
 
-void expression()
+/**
+ *  expression:
+ *      assignment-expression
+ *      expression , assignment-expression
+ */
+t_ast_exp* expression()
 {
-    /* empty expression. Note the implicit contract through out cparser is expression parsing 
+    t_ast_exp* exp = NULL;
+    t_ast_exp* assign_exp = NULL;
+
+    /* empty expression. Note the implicit contract in cparser is expression parsing 
      * doesn't consume semicolons, I want to explicit handle semicolon whenever possible which 
      * is clean and easy for debugging purpose.
     */
     if (cptk == TK_SEMICOLON)
     {
-        return;
+        return exp;
     }
 
     assignment_expression();
@@ -594,6 +655,9 @@ void expression()
         GET_NEXT_TOKEN;
         assignment_expression();
     }
+
+    (assign_exp);
+    return exp;
 }
 
 /*
