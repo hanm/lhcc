@@ -58,6 +58,178 @@ static void match(int token)
     }
 }
 
+/* get the ast op code from corresponding token code for unary expression
+ * some token code, like TK_BITAND has both unary and binary semantic
+ * so two seperate mapping functions needed.
+ * [TODO][IMPROVE] - maybe a look up table is faster?
+ */
+static t_ast_exp_op unary_ast_op(int token_code)
+{
+    t_ast_exp_op op = AST_OP_NONE;
+
+	switch (token_code)
+	{
+	case TK_BITAND :
+        {
+            op = AST_OP_ADDR;
+            break;
+        }
+	case TK_MUL :
+        {
+            op = AST_OP_DEREF;
+            break;
+        }
+	case TK_ADD :
+        {
+            op = AST_OP_POS;
+            break;
+        }
+	case TK_SUB :
+        {
+            op = AST_OP_NEGATE;
+            break;
+        }
+    case TK_COMP :
+        {
+            op = AST_OP_INVERT;
+            break;
+        }
+    case TK_NOT :
+        {
+            op = AST_OP_NOT;
+            break;
+        }
+    case TK_INC :
+        {
+            op = AST_OP_INC;
+            break;
+        }
+    case TK_DEC :
+		{
+            op = AST_OP_DEC;
+            break;
+        }
+    default :
+        assert(op == AST_OP_NONE);
+    }
+
+    return op;
+}
+
+/* get ast exp op code from corresponding bianry token code 
+ * this is a loooooong but simple function. yes a look up table or macro
+ * replacement trick would make the mapping looks simpler but I'd
+ * to keep the coding style clear and maintainable.
+ */
+static t_ast_exp_op binary_ast_op(int token_code)
+{
+    t_ast_exp_op op = AST_OP_NONE;
+
+	switch (token_code)
+	{
+    case TK_MUL :
+        {
+            op = AST_OP_MUL;
+            break;
+        }
+    case TK_DIV :
+        {
+            op = AST_OP_DIV;
+            break;
+        }
+    case TK_MOD :
+        {
+            op = AST_OP_MOD;
+            break;
+        }
+	case TK_SUB :
+        {
+            op = AST_OP_SUB;
+            break;
+        }
+    case TK_ADD :
+        {
+            op = AST_OP_ADD;
+            break;
+        }
+    case TK_NOT :
+        {
+            op = AST_OP_NOT;
+            break;
+        }
+    case TK_GREAT :
+        {
+            op = AST_OP_GREAT;
+            break;
+        }
+    case TK_GREAT_EQ :
+		{
+            op = AST_OP_GREAT_EQ;
+            break;
+        }
+    case TK_LESS :
+        {
+            op = AST_OP_LESS;
+            break;
+        }
+    case TK_LESS_EQ :
+        {
+            op = AST_OP_LESS_EQ;
+            break;
+        }
+    case TK_LSHIFT :
+        {
+            op = AST_OP_LSHIFT;
+            break;
+        }
+    case TK_RSHIFT :
+        {
+            op = AST_OP_RSHIFT;
+            break;
+        }
+    case TK_EQUAL :
+        {
+            op = AST_OP_EQUAL;
+            break;
+        }
+    case TK_UNEQUAL :
+        {
+            op = AST_OP_UNEQUAL;
+            break;
+        }
+    case TK_BITAND :
+        {
+            op = AST_OP_BIT_AND;
+            break;
+        }
+    case TK_BITOR :
+        {
+            op = AST_OP_BIT_OR;
+            break;
+        }
+    case TK_BITXOR :
+        {
+            op = AST_OP_BIT_XOR;
+            break;
+        }
+    case TK_AND :
+        {
+            op = AST_OP_AND;
+            break;
+        }
+    case TK_OR :
+        {
+            op = AST_OP_OR;
+            break;
+        }
+    default :
+        assert(op == AST_OP_NONE);
+    }
+
+    return op;
+}
+
+
 /*
 primary_expression
         : IDENTIFIER
@@ -271,55 +443,24 @@ unary_operator
 t_ast_exp* unary_expression()
 {
     t_ast_exp* exp = NULL;
-
+    
 	switch (cptk)
 	{
 	case TK_BITAND :
-        {
-            GET_NEXT_TOKEN;
-            exp = make_ast_unary_exp(unary_expression(), AST_OP_ADDR);
-            break;
-        }
 	case TK_MUL :
-        {
-            GET_NEXT_TOKEN; 
-            exp = make_ast_unary_exp(unary_expression(), AST_OP_DEREF);
-            break;
-        }
 	case TK_ADD :
-        {
-            GET_NEXT_TOKEN;
-            exp = make_ast_unary_exp(unary_expression(), AST_OP_POS);
-            break;
-        }
 	case TK_SUB :
-        {
-            GET_NEXT_TOKEN;
-            exp = make_ast_unary_exp(unary_expression(), AST_OP_NEGATE);
-            break;
-        }
     case TK_COMP :
-        {
-            GET_NEXT_TOKEN;
-            exp = make_ast_unary_exp(unary_expression(), AST_OP_INVERT);
-            break;
-        }
     case TK_NOT :
-        {
-            GET_NEXT_TOKEN;
-            exp = make_ast_unary_exp(unary_expression(), AST_OP_NOT);
-            break;
-        }
     case TK_INC :
-        {
-            GET_NEXT_TOKEN;
-            exp = make_ast_unary_exp(unary_expression(), AST_OP_INC);
-            break;
-        }
     case TK_DEC :
 		{
+            t_ast_exp_op op = unary_ast_op(cptk);
+            assert(op != AST_OP_NONE);
+
             GET_NEXT_TOKEN;
-            exp = make_ast_unary_exp(unary_expression(), AST_OP_DEC);
+
+            exp = make_ast_unary_exp(unary_expression(), op);
             break;
         }
     case TK_LPAREN :
@@ -409,17 +550,22 @@ multiplicative_expression
         | multiplicative_expression '%' cast_expression
         ;
 */
-void mul_expression()
+t_ast_exp* mul_expression()
 {
-    unary_expression();
+    t_ast_exp* exp = unary_expression();
 
     while (cptk == TK_MUL ||
         cptk == TK_DIV ||
         cptk == TK_MOD)
     {
+        t_ast_exp_op op = binary_ast_op(cptk);
+
         GET_NEXT_TOKEN;
-        unary_expression();
+
+        exp = make_ast_binary_exp(exp, op, unary_expression());
     }
+
+    return exp;
 }
 
 /*
@@ -429,15 +575,19 @@ additive_expression
         | additive_expression '-' multiplicative_expression
         ;
 */
-void add_expression()
+t_ast_exp* add_expression()
 {
-    mul_expression();
+    t_ast_exp* exp = mul_expression();
 
     while (cptk == TK_ADD || cptk == TK_SUB)
     {
+        t_ast_exp_op op = binary_ast_op(cptk);
+
         GET_NEXT_TOKEN;
-        mul_expression();
+        exp = make_ast_binary_exp(exp, op, mul_expression());
     }
+
+    return exp;
 }
 
 /*

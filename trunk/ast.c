@@ -226,7 +226,8 @@ t_ast_exp* make_ast_binary_exp(t_ast_exp* left, t_ast_exp_op op, t_ast_exp* righ
 {
     ALLOCATE_GENERIC_AST;
 
-    assert(left && right);
+    /* [FIX ME] this assertion is absolutely needed */
+    /* assert(left && right); */
 
     exp->kind = AST_EXP_BINARY_KIND;
     exp->u.ast_binary_exp.left = left;
