@@ -469,7 +469,7 @@ void initialize_parser();
  * EXPRESSIONS 
  */
 t_ast_exp* primary_expression();
-void postfix_expression();
+t_ast_exp* postfix_expression();
 t_ast_exp* unary_expression();
 t_ast_exp* sizeof_expression();
 t_ast_exp* mul_expression();

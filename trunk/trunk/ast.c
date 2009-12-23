@@ -162,8 +162,7 @@ t_ast_exp* make_ast_postop_exp(t_ast_exp* expression, t_ast_exp_op op)
 {
     ALLOCATE_GENERIC_AST;
 
-    /* [FIX ME] */
-    /* assert(expression); */
+	assert(expression);
     assert(op == AST_OP_INC || op == AST_OP_DEC);
 
     exp->kind = AST_EXP_POSTOP_KIND;
@@ -177,8 +176,7 @@ t_ast_exp* make_ast_unary_exp(t_ast_exp* expression, t_ast_exp_op op)
 {
     ALLOCATE_GENERIC_AST;
 
-    /* [FIX ME] */
-    /* assert(expression); */
+    assert(expression);
     assert(op == AST_OP_ADDR ||
 	          op == AST_OP_DEREF ||
               op == AST_OP_POS ||
@@ -199,8 +197,7 @@ t_ast_exp* make_ast_cast_exp(t_ast_exp* type, t_ast_exp* expression)
 {
     ALLOCATE_GENERIC_AST;
     
-    /* [FIX ME][TYPE AST] assert needs on type */
-    /* assert(type && expression); */
+    assert(type && expression);
 
     exp->kind = AST_EXP_CAST_KIND;
     exp->u.ast_cast_exp.type = type;
@@ -226,8 +223,7 @@ t_ast_exp* make_ast_binary_exp(t_ast_exp* left, t_ast_exp_op op, t_ast_exp* righ
 {
     ALLOCATE_GENERIC_AST;
 
-    /* [FIX ME] this assertion is absolutely needed */
-    /* assert(left && right); */
+    assert(left && right);
 
     exp->kind = AST_EXP_BINARY_KIND;
     exp->u.ast_binary_exp.left = left;
@@ -241,12 +237,9 @@ t_ast_exp* make_ast_conditional_exp(t_ast_exp* cond_exp, t_ast_exp* true_exp, t_
 {
     ALLOCATE_GENERIC_AST;
 
-	/* [TODO] Enable ASSERT HERE*/
-	/*
     assert(cond_exp);
     assert(!(!true_exp && !false_exp));
-	*/
-
+	
     exp->kind = AST_EXP_CONDITION_KIND;
     exp->u.ast_conditional_exp.cond_exp = cond_exp;
     exp->u.ast_conditional_exp.true_exp = true_exp;
@@ -259,7 +252,7 @@ t_ast_exp* make_ast_assignment_exp(t_ast_exp* cond_exp, t_ast_exp_op op, t_ast_e
 {
     ALLOCATE_GENERIC_AST;
 
-    /* assert(cond_exp); */
+    assert(cond_exp);
 
     exp->kind = AST_EXP_ASSIGNMENT_KIND;
     exp->u.ast_assignment_exp.cond_exp = cond_exp;
@@ -273,7 +266,7 @@ t_ast_exp* make_ast_comma_exp(t_ast_exp* comma_exp, t_ast_exp* assign_exp)
 {
     ALLOCATE_GENERIC_AST;
 
-    /* assert(assign_exp); */
+    assert(assign_exp);
 
     exp->kind = AST_EXP_COMMA_KIND;
     exp->u.ast_comma_exp.assign_exp = assign_exp;
