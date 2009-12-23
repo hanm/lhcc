@@ -480,11 +480,11 @@ t_ast_exp* eql_expression();
 t_ast_exp* and_expression();
 t_ast_exp* xor_expression();
 t_ast_exp* or_expression();
-void logical_and_expression();
-void logical_or_expression();
-void conditional_expression();
-void constant_expression();
-void assignment_expression();
+t_ast_exp* logical_and_expression();
+t_ast_exp* logical_or_expression();
+t_ast_exp* conditional_expression();
+t_ast_exp* constant_expression();
+t_ast_exp* assignment_expression();
 t_ast_exp* expression();
 
 /*
