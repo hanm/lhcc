@@ -440,12 +440,13 @@ argument_expression_list : assignment_expression
                                         | argument_expression_list ',' assignment_expression
                                         ;
 */
-void postfix_expression()
+t_ast_exp* postfix_expression()
 {
-    t_ast_exp* primary_exp = NULL;
-
-    primary_exp = primary_expression();
-    //assert(primary_exp);
+    t_ast_exp* exp = primary_expression();
+	t_ast_list arguments;
+	memset(&arguments, 0, sizeof(t_ast_list));
+    
+	assert(exp);
 
     for (;;)
     {
@@ -454,7 +455,7 @@ void postfix_expression()
         case TK_LBRACKET :
             {
                 GET_NEXT_TOKEN;
-                expression();
+				exp = make_ast_subscript_exp(exp, expression());
                 match(TK_RBRACKET);
                 break;
             }
@@ -470,24 +471,47 @@ void postfix_expression()
                         assignment_expression();
                     }
                 }
+				/* [TODO] argument list parsing */
+				exp = make_ast_call_exp(exp, arguments);
                 match(TK_RPAREN);
                 break;
             }
         case TK_DOT :
         case TK_ARROW :
             {
+				t_ast_exp_op op;
+				if (cptk == TK_DOT)
+				{
+					op = AST_OP_DOT;
+				}
+				else
+				{
+					op = AST_OP_PTR;
+				}
+
                 GET_NEXT_TOKEN;
-                match(TK_ID);
+				if (cptk != TK_ID)
+				{
+					syntax_error("expect an identifier as a member of struct or union");
+					break;
+				}
+				
+				exp = make_ast_indir_exp(exp, op, lexeme_value.string_value);
+                
+				GET_NEXT_TOKEN;
                 break;
             }
         case TK_INC :
         case TK_DEC :
             {
+				t_ast_exp_op op = unary_ast_op(cptk);
+				exp = make_ast_postop_exp(exp, op);
+
                 GET_NEXT_TOKEN;
                 break;
             }
         default:
-            return;
+            return exp;
         }
     }
 }
@@ -561,21 +585,18 @@ t_ast_exp* unary_expression()
             }
             else
             {
-                /* [TODO][AST] hook with postfix exp ast */
-                postfix_expression();
+                exp = postfix_expression();
             }
 
             break;
         }
     case TK_SIZEOF :
         {
-            /* [TODO][AST]*/
             exp = sizeof_expression();
             break;
         }
     default :
-        /* [TODO][AST]*/
-        postfix_expression();
+        exp = postfix_expression();
 	}
 
     return exp;
@@ -851,8 +872,7 @@ t_ast_exp* conditional_expression()
         match(TK_COLON);
         false_exp = conditional_expression();
 
-		/* [TODO] ENABLE ASSERT HERE */
-		/* assert(true_exp && false_exp); */
+		assert(true_exp && false_exp);
 
 		exp = make_ast_conditional_exp(exp, true_exp, false_exp);
     }
