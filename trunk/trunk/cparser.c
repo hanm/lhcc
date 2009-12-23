@@ -152,11 +152,6 @@ static t_ast_exp_op binary_ast_op(int token_code)
             op = AST_OP_ADD;
             break;
         }
-    case TK_NOT :
-        {
-            op = AST_OP_NOT;
-            break;
-        }
     case TK_GREAT :
         {
             op = AST_OP_GREAT;
@@ -597,15 +592,19 @@ shift_expression
         | shift_expression '>>' additive_expression
         ;
 */
-void shift_expression()
+t_ast_exp* shift_expression()
 {
-    add_expression();
+	t_ast_exp* exp = add_expression();
 
     while (cptk == TK_LSHIFT || cptk == TK_RSHIFT)
     {
+		t_ast_exp_op op = binary_ast_op(cptk);
+
         GET_NEXT_TOKEN;
-        add_expression();
+		exp = make_ast_binary_exp(exp, op, add_expression());
     }
+
+	return exp;
 }
 
 /*
@@ -617,18 +616,22 @@ relational_expression
         | relational_expression '>=' shift_expression
         ;
 */
-void rel_expression()
+t_ast_exp* rel_expression()
 {
-    shift_expression();
+	t_ast_exp* exp = shift_expression();
 
     while (cptk == TK_GREAT ||
         cptk == TK_GREAT_EQ ||
         cptk == TK_LESS ||
         cptk == TK_LESS_EQ)
     {
+		t_ast_exp_op op = binary_ast_op(cptk);
+
         GET_NEXT_TOKEN;
-        shift_expression();
+		exp = make_ast_binary_exp(exp, op, shift_expression());
     }
+
+	return exp;
 }
 
 /*
@@ -638,15 +641,19 @@ equality_expression
         | equality_expression '!=' relational_expression
         ;
 */
-void eql_expression()
+t_ast_exp* eql_expression()
 {
-    rel_expression();
+	t_ast_exp* exp = rel_expression();
 
     while (cptk == TK_EQUAL || cptk == TK_UNEQUAL)
     {
+		t_ast_exp_op op = binary_ast_op(cptk);
+
         GET_NEXT_TOKEN;
-        rel_expression();
+		exp = make_ast_binary_exp(exp, op, rel_expression());
     }
+
+	return exp;
 }
 
 /*
@@ -655,15 +662,17 @@ and_expression
         | and_expression '&' equality_expression
         ;
 */
-void and_expression()
+t_ast_exp* and_expression()
 {
-    eql_expression();
+	t_ast_exp* exp = eql_expression();
 
     while (cptk == TK_BITAND)
     {
         GET_NEXT_TOKEN;
-        eql_expression();
+		exp = make_ast_binary_exp(exp, AST_OP_BIT_AND, eql_expression());
     }
+
+	return exp;
 }
 
 /*
@@ -672,15 +681,17 @@ exclusive_or_expression
         | exclusive_or_expression '^' and_expression
         ;
 */
-void xor_expression()
+t_ast_exp* xor_expression()
 {
-    and_expression();
+	t_ast_exp* exp = and_expression();
 
     while (cptk == TK_BITXOR)
     {
         GET_NEXT_TOKEN;
-        and_expression();
+		exp = make_ast_binary_exp(exp, AST_OP_BIT_XOR, and_expression());
     }
+
+	return exp;
 }
 
 /*
@@ -689,15 +700,17 @@ inclusive_or_expression
         | inclusive_or_expression '|' exclusive_or_expression
         ;
 */
-void or_expression()
+t_ast_exp* or_expression()
 {
-    xor_expression();
+	t_ast_exp* exp = xor_expression();
 
     while (cptk == TK_BITOR)
     {
         GET_NEXT_TOKEN;
-        xor_expression();
+		exp = make_ast_binary_exp(exp, AST_OP_BIT_OR, xor_expression());
     }
+
+	return exp;
 }
 
 /*
