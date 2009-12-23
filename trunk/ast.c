@@ -241,8 +241,11 @@ t_ast_exp* make_ast_conditional_exp(t_ast_exp* cond_exp, t_ast_exp* true_exp, t_
 {
     ALLOCATE_GENERIC_AST;
 
+	/* [TODO] Enable ASSERT HERE*/
+	/*
     assert(cond_exp);
     assert(!(!true_exp && !false_exp));
+	*/
 
     exp->kind = AST_EXP_CONDITION_KIND;
     exp->u.ast_conditional_exp.cond_exp = cond_exp;
@@ -256,7 +259,7 @@ t_ast_exp* make_ast_assignment_exp(t_ast_exp* cond_exp, t_ast_exp_op op, t_ast_e
 {
     ALLOCATE_GENERIC_AST;
 
-    assert(cond_exp);
+    /* assert(cond_exp); */
 
     exp->kind = AST_EXP_ASSIGNMENT_KIND;
     exp->u.ast_assignment_exp.cond_exp = cond_exp;
@@ -270,7 +273,7 @@ t_ast_exp* make_ast_comma_exp(t_ast_exp* comma_exp, t_ast_exp* assign_exp)
 {
     ALLOCATE_GENERIC_AST;
 
-    assert(assign_exp);
+    /* assert(assign_exp); */
 
     exp->kind = AST_EXP_COMMA_KIND;
     exp->u.ast_comma_exp.assign_exp = assign_exp;
@@ -288,4 +291,12 @@ t_ast_exp* make_ast_typename_exp()
     exp->kind = AST_EXP_GENERIC_EXP_KIND;
 
     return exp;
+}
+
+t_ast_exp* make_ast_generic_exp()
+{
+	ALLOCATE_GENERIC_AST;
+	exp->kind = AST_EXP_GENERIC_EXP_KIND;
+
+	return exp;
 }

@@ -142,9 +142,9 @@ typedef enum hcc_ast_operator
     AST_OP_SUB_ASSIGN,
     AST_OP_LSHIFT_ASSIGN,
     AST_OP_RSHIFT_ASSIGN,
-    AST_OP_AND_ASSIGN,
-    AST_OP_OR_ASSIGN,
-    AST_OP_XOR_ASSIGN,
+    AST_OP_BIT_AND_ASSIGN,
+    AST_OP_BIT_OR_ASSIGN,
+    AST_OP_BIT_XOR_ASSIGN,
 
 	/* misc : '->', '.', '++', '--'*/
 	AST_OP_PTR,
@@ -278,7 +278,9 @@ typedef struct hcc_ast_exp
 } t_ast_exp;
 
 
-/* ast constructors */
+/* ast constructors 
+ * use these functions to construct specific type of expression ast node
+ */
 t_ast_exp* make_ast_id_exp(char* name);
 t_ast_exp* make_ast_const_exp(t_ast_exp_val val, t_ast_exp_kind kind);
 t_ast_exp* make_ast_subscript_exp(t_ast_exp* main, t_ast_exp* index);
@@ -292,6 +294,11 @@ t_ast_exp* make_ast_binary_exp(t_ast_exp* left, t_ast_exp_op op, t_ast_exp* righ
 t_ast_exp* make_ast_conditional_exp(t_ast_exp* cond_exp, t_ast_exp* true_exp, t_ast_exp* false_exp);
 t_ast_exp* make_ast_assignment_exp(t_ast_exp* cond_exp, t_ast_exp_op op, t_ast_exp* assign_exp);
 t_ast_exp* make_ast_comma_exp(t_ast_exp* comma_exp, t_ast_exp* assign_exp);
+/* make an empty ast expression node.
+ * it's a simple canary value to fill in leaf nodes
+ * so code to manipulate ast doesn't have to check null-ability.
+ */
+t_ast_exp* make_ast_generic_exp(); 
 
 /* temp solution for typename ast ctor 
  * [TODO] hook with declaration ast construction

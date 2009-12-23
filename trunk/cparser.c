@@ -217,6 +217,86 @@ static t_ast_exp_op binary_ast_op(int token_code)
             op = AST_OP_OR;
             break;
         }
+	/*
+	   AST_OP_ASSIGN,
+    AST_OP_MUL_ASSIGN,
+    AST_OP_DIV_ASSIGN,
+    AST_OP_MOD_ASSIGN,
+    AST_OP_ADD_ASSIGN,
+    AST_OP_SUB_ASSIGN,
+    AST_OP_LSHIFT_ASSIGN,
+    AST_OP_RSHIFT_ASSIGN,
+    AST_OP_AND_ASSIGN,
+    AST_OP_OR_ASSIGN,
+    AST_OP_XOR_ASSIGN,
+
+	TK(TK_ASSIGN,        "=")
+TK(TK_BITOR_ASSIGN,  "|=")
+TK(TK_BITXOR_ASSIGN, "^=")
+TK(TK_BITAND_ASSIGN, "&=")
+TK(TK_LSHIFT_ASSIGN, "<<=")
+TK(TK_RSHIFT_ASSIGN, ">>=")
+TK(TK_ADD_ASSIGN,    "+=")
+TK(TK_SUB_ASSIGN,    "-=")
+TK(TK_MUL_ASSIGN,    "*=")
+TK(TK_DIV_ASSIGN,    "/=")
+TK(TK_MOD_ASSIGN,    "%=")
+	*/
+	case TK_ASSIGN :
+		{
+			op = AST_OP_ASSIGN;
+			break;
+		}
+	case TK_BITOR_ASSIGN :
+		{
+			op = AST_OP_BIT_OR_ASSIGN;
+			break;
+		}
+	case TK_BITXOR_ASSIGN :
+		{
+			op = AST_OP_BIT_XOR_ASSIGN;
+			break;
+		}
+	case TK_BITAND_ASSIGN :
+		{
+			op = AST_OP_BIT_AND_ASSIGN;
+			break;
+		}
+	case TK_LSHIFT_ASSIGN :
+		{
+			op = AST_OP_LSHIFT_ASSIGN;
+			break;
+		}
+	case TK_RSHIFT_ASSIGN :
+		{
+			op = AST_OP_RSHIFT_ASSIGN;
+			break;
+		}
+	case TK_ADD_ASSIGN :
+		{
+			op = AST_OP_ADD_ASSIGN;
+			break;
+		}
+	case TK_SUB_ASSIGN :
+		{
+			op = AST_OP_SUB_ASSIGN;
+			break;
+		}
+	case TK_MUL_ASSIGN :
+		{
+			op = AST_OP_MUL_ASSIGN;
+			break;
+		}
+	case TK_DIV_ASSIGN :
+		{
+			op = AST_OP_DIV_ASSIGN;
+			break;
+		}
+	case TK_MOD_ASSIGN :
+		{
+			op = AST_OP_MOD_ASSIGN;
+			break;
+		}
     default :
         assert(op == AST_OP_NONE);
     }
@@ -719,15 +799,17 @@ logical_and_expression
         | logical_and_expression '&&' inclusive_or_expression
         ;
 */
-void logical_and_expression()
+t_ast_exp* logical_and_expression()
 {
-    or_expression();
+    t_ast_exp* exp = or_expression();
 
     while (cptk == TK_AND)
     {
         GET_NEXT_TOKEN;
-        or_expression();
+		exp = make_ast_binary_exp(exp, AST_OP_AND, or_expression());
     }
+
+	return exp;
 }  
 
 /*
@@ -736,15 +818,17 @@ logical_or_expression
         | logical_or_expression '||' logical_and_expression
         ;
 */
-void logical_or_expression()
+t_ast_exp* logical_or_expression()
 {
-    logical_and_expression();
+    t_ast_exp* exp = logical_and_expression();
 
     while (cptk == TK_OR)
     {
         GET_NEXT_TOKEN;
-        logical_and_expression();
+		exp = make_ast_binary_exp(exp, AST_OP_OR, logical_and_expression());
     }
+
+	return exp;
 }
 
 /*
@@ -753,22 +837,32 @@ conditional_expression
         | logical_or_expression '?' expression ':' conditional_expression
         ;
 */
-void conditional_expression()
+t_ast_exp* conditional_expression()
 {
-    logical_or_expression();
+    t_ast_exp* exp = logical_or_expression();
 
     if (cptk == TK_QUESTION)
     {
+		t_ast_exp* true_exp = NULL;
+		t_ast_exp* false_exp = NULL;
+
         GET_NEXT_TOKEN;
-        expression();
+        true_exp = expression();
         match(TK_COLON);
-        conditional_expression();
+        false_exp = conditional_expression();
+
+		/* [TODO] ENABLE ASSERT HERE */
+		/* assert(true_exp && false_exp); */
+
+		exp = make_ast_conditional_exp(exp, true_exp, false_exp);
     }
+
+	return exp;
 }
 
-void constant_expression()
+t_ast_exp* constant_expression()
 {
-    conditional_expression(); 
+    return conditional_expression(); 
 }
 
 /*
@@ -777,19 +871,23 @@ assignment_expression
         | unary_expression assignment_operator assignment_expression
         ;
 */
-void assignment_expression()
+t_ast_exp* assignment_expression()
 {
     /* here is anothe twist - parsing conditional expression always
      * yield parsing a unary expression and there is no trailing parsing needed
      * so it's absolutely safe to start with parsing a conditional expression first
     */
-    conditional_expression();
+	t_ast_exp* exp = conditional_expression();
 
     if (cptk >= TK_ASSIGN && cptk <= TK_MOD_ASSIGN)
     {
+		t_ast_exp_op op = binary_ast_op(cptk);
+
         GET_NEXT_TOKEN;
-        assignment_expression();
+		exp = make_ast_assignment_exp(exp, op, assignment_expression());
     }
+
+	return exp;
 }
 
 /**
@@ -799,8 +897,7 @@ void assignment_expression()
  */
 t_ast_exp* expression()
 {
-    t_ast_exp* exp = NULL;
-    t_ast_exp* assign_exp = NULL;
+	t_ast_exp* exp = NULL;
 
     /* empty expression. Note the implicit contract in cparser is expression parsing 
      * doesn't consume semicolons, I want to explicit handle semicolon whenever possible which 
@@ -808,18 +905,18 @@ t_ast_exp* expression()
     */
     if (cptk == TK_SEMICOLON)
     {
-        return exp;
+		/* in no circumstances should any expression parsing functions return NULL AST NODE. */
+		return make_ast_generic_exp();
     }
 
-    assignment_expression();
+    exp = assignment_expression();
 
     while (cptk == TK_COMMA)
     {
         GET_NEXT_TOKEN;
-        assignment_expression();
+		exp = make_ast_comma_exp(exp, assignment_expression());
     }
 
-    (assign_exp);
     return exp;
 }
 
