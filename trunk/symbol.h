@@ -36,7 +36,7 @@ extern int symbol_scope;
 typedef struct token_coordinate
 {
     char* file;
-    unsigned long x, y;
+    unsigned long line, column;
 } t_token_coordinate;
 
 

@@ -57,7 +57,15 @@ typedef struct Exp
  * the overall structure of the ast nodes are pretty like what described in the Tiger book
  * and/or specified by ASDL.
 */
+
+/**************************** Expressions *****************************************/
 typedef struct hcc_ast_exp t_ast_exp;
+
+typedef struct hcc_ast_coordinate
+{
+	char* file;
+	unsigned long line, column;
+} t_ast_coord;
 
 /* kinds of expressions */
 typedef enum hcc_ast_expression_kind
@@ -185,6 +193,7 @@ typedef struct hcc_ast_list
 typedef struct hcc_ast_exp
 {
 	t_ast_exp_kind kind;
+	t_ast_coord coord;
 
 	union 
 	{
@@ -304,5 +313,26 @@ t_ast_exp* make_ast_generic_exp();
  * [TODO] hook with declaration ast construction
  */
 t_ast_exp* make_ast_typename_exp();
+
+
+/**************************** Statements *****************************************/
+
+/* ast statement kind */
+typedef enum hcc_ast_statement_kind
+{
+    AST_STMT_LABEL_KIND,
+    AST_STMT_COMPOUND_KIND,
+    AST_STMT_EXPRESSION_KIND,
+    AST_STMT_IF_KIND,
+    AST_STMT_SWITCH_KIND,
+    AST_STMT_DO_KIND, 
+    AST_STMT_FOR_KIND,
+    AST_STMT_WHILE_KIND,
+    AST_STMT_GOTO_KIND,
+    AST_STMT_CONTINUE__KIND, 
+    AST_STMT_BREAK_KIND, 
+    AST_STMT_RETURN_KIND
+} t_ast_stmt_kind;
+
 
 #endif

@@ -41,6 +41,14 @@ static char* tokens[] =
 
 #define GET_NEXT_TOKEN cptk = get_token()
 
+/* Binding lexer token coordinate with ast coordinate for future error reporting
+ * leave this out of ctor of ast nodes to simplify ast code
+ * decouple lexer coordinate with ast coordinate to facilitate modularity
+ */
+#define BINDING_COORDINATE(ast, coordinate) (ast)->coord.file = (coordinate).filename; \
+	(ast)->coord.line = (coordinate).line; \
+	(ast)->coord.column = (coordinate).column;
+
 void initialize_parser()
 {
 	GET_NEXT_TOKEN;
@@ -217,31 +225,6 @@ static t_ast_exp_op binary_ast_op(int token_code)
             op = AST_OP_OR;
             break;
         }
-	/*
-	   AST_OP_ASSIGN,
-    AST_OP_MUL_ASSIGN,
-    AST_OP_DIV_ASSIGN,
-    AST_OP_MOD_ASSIGN,
-    AST_OP_ADD_ASSIGN,
-    AST_OP_SUB_ASSIGN,
-    AST_OP_LSHIFT_ASSIGN,
-    AST_OP_RSHIFT_ASSIGN,
-    AST_OP_AND_ASSIGN,
-    AST_OP_OR_ASSIGN,
-    AST_OP_XOR_ASSIGN,
-
-	TK(TK_ASSIGN,        "=")
-TK(TK_BITOR_ASSIGN,  "|=")
-TK(TK_BITXOR_ASSIGN, "^=")
-TK(TK_BITAND_ASSIGN, "&=")
-TK(TK_LSHIFT_ASSIGN, "<<=")
-TK(TK_RSHIFT_ASSIGN, ">>=")
-TK(TK_ADD_ASSIGN,    "+=")
-TK(TK_SUB_ASSIGN,    "-=")
-TK(TK_MUL_ASSIGN,    "*=")
-TK(TK_DIV_ASSIGN,    "/=")
-TK(TK_MOD_ASSIGN,    "%=")
-	*/
 	case TK_ASSIGN :
 		{
 			op = AST_OP_ASSIGN;
@@ -422,7 +405,8 @@ t_ast_exp* primary_expression()
         error(&coord, "expect identifier, constant, string literal or (");
     }
 
-    return exp;
+	BINDING_COORDINATE(exp, coord);
+	return exp;
 }
 
 /*
