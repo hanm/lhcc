@@ -307,6 +307,7 @@ t_ast_exp* primary_expression()
     case TK_ID :
         {
             exp = make_ast_id_exp(lexeme_value.string_value);
+			BINDING_COORDINATE(exp, coord);
 
             GET_NEXT_TOKEN;
             break;
@@ -316,6 +317,7 @@ t_ast_exp* primary_expression()
         {
             exp_val.i = lexeme_value.integer_value;
             exp = make_ast_const_exp(exp_val, AST_EXP_CONST_INTEGER_KIND);
+			BINDING_COORDINATE(exp, coord);
 
             GET_NEXT_TOKEN;
             break;
@@ -324,6 +326,7 @@ t_ast_exp* primary_expression()
         {
             exp_val.f = lexeme_value.float_value;
             exp = make_ast_const_exp(exp_val, AST_EXP_CONST_FLOAT_KIND);
+			BINDING_COORDINATE(exp, coord);
             
             GET_NEXT_TOKEN;
             break;
@@ -332,6 +335,7 @@ t_ast_exp* primary_expression()
         {
             exp_val.d = (double)lexeme_value.double_value;
             exp = make_ast_const_exp(exp_val, AST_EXP_CONST_DOUBLE_KIND);
+			BINDING_COORDINATE(exp, coord);
             
             GET_NEXT_TOKEN;
             break;
@@ -340,6 +344,7 @@ t_ast_exp* primary_expression()
         {
             exp_val.ld = lexeme_value.double_value;
             exp = make_ast_const_exp(exp_val, AST_EXP_CONST_LONG_DOUBLE_KIND);
+			BINDING_COORDINATE(exp, coord);
             
             GET_NEXT_TOKEN;
             break;
@@ -348,6 +353,7 @@ t_ast_exp* primary_expression()
         {
             exp_val.l = lexeme_value.integer_value;
             exp = make_ast_const_exp(exp_val, AST_EXP_CONST_LONG_INTEGER_KIND);
+			BINDING_COORDINATE(exp, coord);
             
             GET_NEXT_TOKEN;
             break;
@@ -356,6 +362,7 @@ t_ast_exp* primary_expression()
         {
             /* [TODO] support long long*/
             exp = make_ast_const_exp(exp_val, AST_EXP_CONST_LONG_LONG_KIND);
+			BINDING_COORDINATE(exp, coord);
             
             GET_NEXT_TOKEN;
             break;
@@ -364,6 +371,7 @@ t_ast_exp* primary_expression()
         {
             exp_val.ui = lexeme_value.integer_value;
             exp = make_ast_const_exp(exp_val, AST_EXP_CONST_UNSIGNED_INTEGER_KIND);
+			BINDING_COORDINATE(exp, coord);
             
             GET_NEXT_TOKEN;
             break;
@@ -372,6 +380,7 @@ t_ast_exp* primary_expression()
         {
             exp_val.ul = lexeme_value.integer_value;
             exp = make_ast_const_exp(exp_val, AST_EXP_CONST_UNSIGNED_LONG_INTEGER_KIND);
+			BINDING_COORDINATE(exp, coord);
             
             GET_NEXT_TOKEN;
             break;
@@ -380,22 +389,23 @@ t_ast_exp* primary_expression()
         {
             /* [TODO] support unsigned long long*/
             exp = make_ast_const_exp(exp_val, AST_EXP_CONST_UNSIGNED_LONG_LONG_KIND);
+			BINDING_COORDINATE(exp, coord);
             
             GET_NEXT_TOKEN;
             break;
         }
     case TK_CONST_STRING_LITERAL:
         {
-            /* [TODO] pass string values to AST here */
             /* [TODO] wide string in lexer */
+			exp_val.p = lexeme_value.string_value;
             exp = make_ast_const_exp(exp_val, AST_EXP_LITERAL_STRING_KIND);
+			BINDING_COORDINATE(exp, coord);
 
             GET_NEXT_TOKEN;
             break;
         }
     case TK_LPAREN :
         {
-            /* [TODO] [AST] */
             GET_NEXT_TOKEN;
             exp = expression();
             match(TK_RPAREN);
@@ -405,7 +415,6 @@ t_ast_exp* primary_expression()
         error(&coord, "expect identifier, constant, string literal or (");
     }
 
-	BINDING_COORDINATE(exp, coord);
 	return exp;
 }
 
@@ -428,6 +437,8 @@ t_ast_exp* postfix_expression()
 {
     t_ast_exp* exp = primary_expression();
 	t_ast_list arguments;
+	t_coordinate saved_coord = coord;
+
 	memset(&arguments, 0, sizeof(t_ast_list));
     
 	assert(exp);
@@ -439,8 +450,11 @@ t_ast_exp* postfix_expression()
         case TK_LBRACKET :
             {
                 GET_NEXT_TOKEN;
+
 				exp = make_ast_subscript_exp(exp, expression());
-                match(TK_RBRACKET);
+				BINDING_COORDINATE(exp, saved_coord);
+
+				match(TK_RBRACKET);
                 break;
             }
         case TK_LPAREN :
@@ -457,6 +471,8 @@ t_ast_exp* postfix_expression()
                 }
 				/* [TODO] argument list parsing */
 				exp = make_ast_call_exp(exp, arguments);
+				BINDING_COORDINATE(exp, saved_coord);
+
                 match(TK_RPAREN);
                 break;
             }
@@ -481,6 +497,7 @@ t_ast_exp* postfix_expression()
 				}
 				
 				exp = make_ast_indir_exp(exp, op, lexeme_value.string_value);
+				BINDING_COORDINATE(exp, saved_coord);
                 
 				GET_NEXT_TOKEN;
                 break;
@@ -490,6 +507,7 @@ t_ast_exp* postfix_expression()
             {
 				t_ast_exp_op op = unary_ast_op(cptk);
 				exp = make_ast_postop_exp(exp, op);
+				BINDING_COORDINATE(exp, saved_coord);
 
                 GET_NEXT_TOKEN;
                 break;
@@ -526,6 +544,7 @@ unary_operator
 t_ast_exp* unary_expression()
 {
     t_ast_exp* exp = NULL;
+	t_coordinate saved_coord = coord;
     
 	switch (cptk)
 	{
@@ -544,6 +563,8 @@ t_ast_exp* unary_expression()
             GET_NEXT_TOKEN;
 
             exp = make_ast_unary_exp(unary_expression(), op);
+			BINDING_COORDINATE(exp, saved_coord);
+
             break;
         }
     case TK_LPAREN :
@@ -566,6 +587,7 @@ t_ast_exp* unary_expression()
                 match(TK_RPAREN);
 
                 exp = make_ast_cast_exp(make_ast_typename_exp(), unary_expression());
+				BINDING_COORDINATE(exp, saved_coord);
             }
             else
             {
@@ -595,6 +617,7 @@ t_ast_exp* sizeof_expression()
 {
     t_ast_exp* exp = NULL;
     t_ast_exp* type = NULL;
+	t_coordinate saved_coord = coord;
 
     GET_NEXT_TOKEN;
     
@@ -606,6 +629,7 @@ t_ast_exp* sizeof_expression()
         {
             type_name();
             type = make_ast_typename_exp();
+			BINDING_COORDINATE(type, saved_coord);
         }
         else
         {
@@ -619,7 +643,10 @@ t_ast_exp* sizeof_expression()
         exp = unary_expression();
     }
 
-    return make_ast_sizeof_exp(type, exp);
+    exp = make_ast_sizeof_exp(type, exp);
+	BINDING_COORDINATE(exp, saved_coord);
+
+	return exp;
 }
 
 /*
