@@ -660,16 +660,18 @@ multiplicative_expression
 t_ast_exp* mul_expression()
 {
     t_ast_exp* exp = unary_expression();
+	t_coordinate saved_coord = coord;
 
     while (cptk == TK_MUL ||
         cptk == TK_DIV ||
         cptk == TK_MOD)
     {
         t_ast_exp_op op = binary_ast_op(cptk);
-
+		saved_coord = coord;
         GET_NEXT_TOKEN;
 
         exp = make_ast_binary_exp(exp, op, unary_expression());
+		BINDING_COORDINATE(exp, saved_coord);
     }
 
     return exp;
@@ -685,13 +687,16 @@ additive_expression
 t_ast_exp* add_expression()
 {
     t_ast_exp* exp = mul_expression();
+	t_coordinate saved_coord = coord;
 
     while (cptk == TK_ADD || cptk == TK_SUB)
     {
         t_ast_exp_op op = binary_ast_op(cptk);
-
+		saved_coord = coord;
         GET_NEXT_TOKEN;
+
         exp = make_ast_binary_exp(exp, op, mul_expression());
+		BINDING_COORDINATE(exp, saved_coord);
     }
 
     return exp;
@@ -707,13 +712,16 @@ shift_expression
 t_ast_exp* shift_expression()
 {
 	t_ast_exp* exp = add_expression();
+	t_coordinate saved_coord = coord;
 
     while (cptk == TK_LSHIFT || cptk == TK_RSHIFT)
     {
 		t_ast_exp_op op = binary_ast_op(cptk);
-
+		saved_coord = coord;
         GET_NEXT_TOKEN;
+
 		exp = make_ast_binary_exp(exp, op, add_expression());
+		BINDING_COORDINATE(exp, saved_coord);
     }
 
 	return exp;
@@ -731,6 +739,7 @@ relational_expression
 t_ast_exp* rel_expression()
 {
 	t_ast_exp* exp = shift_expression();
+	t_coordinate saved_coord = coord;
 
     while (cptk == TK_GREAT ||
         cptk == TK_GREAT_EQ ||
@@ -738,9 +747,11 @@ t_ast_exp* rel_expression()
         cptk == TK_LESS_EQ)
     {
 		t_ast_exp_op op = binary_ast_op(cptk);
-
+		saved_coord = coord;
         GET_NEXT_TOKEN;
+
 		exp = make_ast_binary_exp(exp, op, shift_expression());
+		BINDING_COORDINATE(exp, saved_coord);
     }
 
 	return exp;
@@ -756,13 +767,16 @@ equality_expression
 t_ast_exp* eql_expression()
 {
 	t_ast_exp* exp = rel_expression();
+	t_coordinate saved_coord = coord;
 
     while (cptk == TK_EQUAL || cptk == TK_UNEQUAL)
     {
 		t_ast_exp_op op = binary_ast_op(cptk);
-
+		saved_coord = coord;
         GET_NEXT_TOKEN;
+
 		exp = make_ast_binary_exp(exp, op, rel_expression());
+		BINDING_COORDINATE(exp, saved_coord);
     }
 
 	return exp;
@@ -777,11 +791,15 @@ and_expression
 t_ast_exp* and_expression()
 {
 	t_ast_exp* exp = eql_expression();
+	t_coordinate saved_coord = coord;
 
     while (cptk == TK_BITAND)
     {
+		saved_coord = coord;
         GET_NEXT_TOKEN;
+
 		exp = make_ast_binary_exp(exp, AST_OP_BIT_AND, eql_expression());
+		BINDING_COORDINATE(exp, saved_coord);
     }
 
 	return exp;
@@ -796,11 +814,15 @@ exclusive_or_expression
 t_ast_exp* xor_expression()
 {
 	t_ast_exp* exp = and_expression();
+	t_coordinate saved_coord = coord;
 
     while (cptk == TK_BITXOR)
     {
+		saved_coord = coord;
         GET_NEXT_TOKEN;
+
 		exp = make_ast_binary_exp(exp, AST_OP_BIT_XOR, and_expression());
+		BINDING_COORDINATE(exp, saved_coord);
     }
 
 	return exp;
@@ -815,11 +837,15 @@ inclusive_or_expression
 t_ast_exp* or_expression()
 {
 	t_ast_exp* exp = xor_expression();
+	t_coordinate saved_coord = coord;
 
     while (cptk == TK_BITOR)
     {
+		saved_coord = coord;
         GET_NEXT_TOKEN;
+
 		exp = make_ast_binary_exp(exp, AST_OP_BIT_OR, xor_expression());
+		BINDING_COORDINATE(exp, saved_coord);
     }
 
 	return exp;
@@ -834,11 +860,15 @@ logical_and_expression
 t_ast_exp* logical_and_expression()
 {
     t_ast_exp* exp = or_expression();
+	t_coordinate saved_coord = coord;
 
     while (cptk == TK_AND)
     {
+		saved_coord = coord;
         GET_NEXT_TOKEN;
+
 		exp = make_ast_binary_exp(exp, AST_OP_AND, or_expression());
+		BINDING_COORDINATE(exp, saved_coord);
     }
 
 	return exp;
@@ -853,11 +883,15 @@ logical_or_expression
 t_ast_exp* logical_or_expression()
 {
     t_ast_exp* exp = logical_and_expression();
+	t_coordinate saved_coord = coord;
 
     while (cptk == TK_OR)
     {
+		saved_coord = coord;
         GET_NEXT_TOKEN;
+
 		exp = make_ast_binary_exp(exp, AST_OP_OR, logical_and_expression());
+		BINDING_COORDINATE(exp, saved_coord);
     }
 
 	return exp;
@@ -877,6 +911,7 @@ t_ast_exp* conditional_expression()
     {
 		t_ast_exp* true_exp = NULL;
 		t_ast_exp* false_exp = NULL;
+		t_coordinate saved_coord = coord;
 
         GET_NEXT_TOKEN;
         true_exp = expression();
@@ -886,6 +921,7 @@ t_ast_exp* conditional_expression()
 		assert(true_exp && false_exp);
 
 		exp = make_ast_conditional_exp(exp, true_exp, false_exp);
+		BINDING_COORDINATE(exp, saved_coord);
     }
 
 	return exp;
@@ -913,9 +949,11 @@ t_ast_exp* assignment_expression()
     if (cptk >= TK_ASSIGN && cptk <= TK_MOD_ASSIGN)
     {
 		t_ast_exp_op op = binary_ast_op(cptk);
+		t_coordinate saved_coord = coord;
 
         GET_NEXT_TOKEN;
 		exp = make_ast_assignment_exp(exp, op, assignment_expression());
+		BINDING_COORDINATE(exp, saved_coord);
     }
 
 	return exp;
@@ -929,6 +967,7 @@ t_ast_exp* assignment_expression()
 t_ast_exp* expression()
 {
 	t_ast_exp* exp = NULL;
+	t_coordinate saved_coord = coord;
 
     /* empty expression. Note the implicit contract in cparser is expression parsing 
      * doesn't consume semicolons, I want to explicit handle semicolon whenever possible which 
@@ -937,15 +976,19 @@ t_ast_exp* expression()
     if (cptk == TK_SEMICOLON)
     {
 		/* in no circumstances should any expression parsing functions return NULL AST NODE. */
-		return make_ast_generic_exp();
+		exp = make_ast_generic_exp();
+		BINDING_COORDINATE(exp, coord);
+		return exp;
     }
 
     exp = assignment_expression();
 
     while (cptk == TK_COMMA)
     {
+		saved_coord = coord;
         GET_NEXT_TOKEN;
 		exp = make_ast_comma_exp(exp, assignment_expression());
+		BINDING_COORDINATE(exp, saved_coord);
     }
 
     return exp;
