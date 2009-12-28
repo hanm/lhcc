@@ -28,38 +28,17 @@ OTHER DEALINGS IN THE SOFTWARE.
 #ifndef __HCC_AST_H
 #define __HCC_AST_H
 
-// sample ast
-/*
-typedef struct Exp
-{
-  enum { int_exp, true_exp, false_exp, variable_exp,
-         binary_op, unary_op, function_call,
-         record_construction, projection } tag;
-  union { int                                      integer;
-          string                                   variable;
-          struct { string           oper;
-                   struct Exp*      left;
-                   struct Exp*      right; }       binary;
-          struct { string           oper;
-                   struct Exp*      uexp; }        unary;
-          struct { string           name;
-                   struct Exp_list* arguments; }   call;
-          struct rec { string       attribute;
-                       struct Exp*  value;
-                       struct rec*  next; }        record;
-          struct { struct Exp*  value;
-                   string attribute; }             project;
-      } op;
-} ast;
-*/
-
 /*
  * the overall structure of the ast nodes are pretty like what described in the Tiger book
  * and/or specified by ASDL.
 */
 
-/**************************** Expressions *****************************************/
+/* forward declr */
 typedef struct hcc_ast_exp t_ast_exp;
+typedef struct hcc_ast_stmt t_ast_stmt;
+
+
+/**************************** Expressions *****************************************/
 
 typedef struct hcc_ast_coordinate
 {
@@ -321,6 +300,8 @@ t_ast_exp* make_ast_typename_exp();
 typedef enum hcc_ast_statement_kind
 {
     AST_STMT_LABEL_KIND,
+	AST_STMT_CASE_KIND,
+	AST_STMT_DEFAULT_KIND,
     AST_STMT_COMPOUND_KIND,
     AST_STMT_EXPRESSION_KIND,
     AST_STMT_IF_KIND,
@@ -333,6 +314,86 @@ typedef enum hcc_ast_statement_kind
     AST_STMT_BREAK_KIND, 
     AST_STMT_RETURN_KIND
 } t_ast_stmt_kind;
+
+typedef struct hcc_ast_stmt
+{
+	t_ast_stmt_kind kind;
+	t_ast_coord coord;
+
+	union 
+	{
+		struct 
+		{
+			char* label_name;
+			t_ast_stmt* stmt;
+		} ast_label_stmt;
+
+		struct
+		{
+			int i; /* [TODO] [INCOMPLETE] statement list, declaration list*/
+		} ast_compound_stmt;
+		
+		struct
+		{
+			t_ast_exp* exp;
+		} ast_expression_stmt;
+
+		struct
+		{
+			t_ast_exp* test_exp;
+			t_ast_stmt* then_stmt;
+			t_ast_stmt* else_stmt;
+		} ast_if_stmt;
+
+		struct
+		{
+			t_ast_exp* test_exp;
+			t_ast_stmt* stmt;
+		} ast_switch_stmt;
+
+		struct
+		{
+			t_ast_stmt* body_stmt;
+			t_ast_exp* test_exp;
+		} ast_do_stmt;
+
+		struct
+		{
+			t_ast_exp* test_exp;
+			t_ast_stmt* body_stmt;
+		} ast_while_stmt;
+
+		struct
+		{
+			t_ast_stmt* init_exp_stmt;
+			t_ast_stmt* test_exp_stmt;
+			t_ast_exp* post_test_exp;
+			t_ast_stmt* body_stmt;
+		} ast_for_stmt;
+
+		struct
+		{
+			char* label_name;
+		} ast_goto_stmt;
+
+		struct
+		{
+			t_ast_stmt* target;
+		} ast_continue_stmt;
+
+		struct
+		{
+			t_ast_stmt* body;
+		} ast_break_stmt;
+
+		struct
+		{
+			t_ast_exp* exp;
+		} ast_return_stmt;
+
+	} u;
+
+} t_ast_stmt;
 
 
 #endif
