@@ -32,6 +32,8 @@ OTHER DEALINGS IN THE SOFTWARE.
 #include "hconfig.h"
 #include <crtdbg.h>
 
+#include <time.h>
+
 static void displayhelp()
 {
     	static char *msgs[] = {
@@ -236,14 +238,17 @@ int main(int argc, char* argv[])
 	};
 
    int i = 0;
+   time_t t1,t2; /* for prude performance measurement */
+
 HCC_MEM_CHECK_START
-    (i);
 
-    log_initialize("G:\\athena.txt");
+   log_initialize("G:\\athena.txt");
 
-//#define ATOMIC_TEST
+   time(&t1);
+
+   //#define ATOMIC_TEST
 #ifdef ATOMIC_TEST
-    (names);
+   (names);
     test_parser("G:\\src\\mit.c", path);
 #else
     for (; i < NUMBEROFELEMENTS(names); i ++)
@@ -255,7 +260,11 @@ HCC_MEM_CHECK_START
 #endif
     log_terminate();
 
-hcc_deallocate_all();
+	hcc_deallocate_all();
+
+	time(&t2);
+	
+	printf("running time is %f: \n", difftime(t2, t1));
 
 HCC_MEM_CHECK_END
 

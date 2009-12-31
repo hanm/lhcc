@@ -29,56 +29,6 @@ OTHER DEALINGS IN THE SOFTWARE.
 #include "arena.h"
 #include "ast.h"
 
-// guide line on creating ast http://lambda.uta.edu/cse5317/notes/node25.html
-// also Abel's book has similar ideas on building ast on top of c structs..
-/*
-typedef struct Exp {
-  enum { int_exp, true_exp, false_exp, variable_exp,
-         binary_op, unary_op, function_call,
-         record_construction, projection } tag;
-  union { int                                      integer;
-          string                                   variable;
-          struct { string           oper;
-                   struct Exp*      left;
-                   struct Exp*      right; }       binary;
-          struct { string           oper;
-                   struct Exp*      uexp; }        unary;
-          struct { string           name;
-                   struct Exp_list* arguments; }   call;
-          struct rec { string       attribute;
-                       struct Exp*  value;
-                       struct rec*  next; }        record;
-          struct { struct Exp*  value;
-                   string attribute; }             project;
-      } op;
-} ast;
-where Exp_list is a list of ASTs:
-typedef struct Exp_list { 
-  ast*             elem;
-  struct Exp_list* next;
-} ast_list;
-
-It's a good idea to define a constructor for every kind of expression to simplify the task of constructing ASTs:
-ast* make_binary_op ( string oper, ast* left, ast* right ) {
-  ast* e = (ast*) malloc(sizeof(ast));
-  e->tag = binary_op;
-  e->op.binary.oper = make_string(oper);
-  e->op.binary.left = left;
-  e->op.binary.right = right;
-  return e;
-};
-
-For example,
-make_binary_op("+",make_binary_op("-",make_variable("x"),make_integer(2)),
-               make_integer(3))
-constructs the AST for the input (x-2)+3.
-
-Unfortunately, when constructing a compiler, we need to define many tree-like data structures to capture ASTs for many different constructs, 
-such as expressions, statements, declarations, programs etc, as well as type structures, intermediate representation (IR) trees, etc. 
-This would require hundreds of recursive structs in C or classes in Java. 
-An alternative method is to use just one generic tree structure to capture all possible tree structures. 
-*/
-
 #define ALLOCATE_GENERIC_AST_EXP  t_ast_exp* exp; \
 	CALLOC(exp, PERM)
 
@@ -432,6 +382,32 @@ t_ast_stmt* make_ast_return_stmt(t_ast_exp* return_exp)
 
 	stmt->kind = AST_STMT_RETURN_KIND;
 	stmt->u.ast_return_stmt.exp = return_exp;
+
+	return stmt;
+}
+
+t_ast_stmt* make_ast_compound_stmt(t_ast_stmt_list stmts)
+{
+	ALLOCATE_GENERIC_AST_STMT;
+
+	if (stmts.current == NULL) 
+	{
+		stmt->kind = AST_STMT_EMPTY_KIND;
+	}
+	else
+	{
+		stmt->kind = AST_STMT_COMPOUND_KIND;
+		stmt->u.ast_compound_stmt.stmts = stmts;
+	}
+
+	return stmt;
+}
+
+t_ast_stmt* make_ast_empty_stmt()
+{
+	ALLOCATE_GENERIC_AST_STMT;
+
+	stmt->kind = AST_STMT_EMPTY_KIND;
 
 	return stmt;
 }

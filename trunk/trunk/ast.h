@@ -36,6 +36,9 @@ OTHER DEALINGS IN THE SOFTWARE.
 /* forward declr */
 typedef struct hcc_ast_exp t_ast_exp;
 typedef struct hcc_ast_stmt t_ast_stmt;
+typedef struct hcc_ast_func_arg_list t_ast_func_arg_list;
+typedef struct hcc_ast_stmt_list t_ast_stmt_list;
+typedef struct hcc_ast_declr_list t_ast_declr_list;
 
 
 /**************************** Expressions *****************************************/
@@ -296,7 +299,15 @@ t_ast_exp* make_ast_typename_exp();
 
 /**************************** Statements *****************************************/
 
-/* ast statement kind */
+typedef struct hcc_ast_stmt_list 
+{
+	t_ast_stmt* current;
+	
+	struct hcc_ast_stmt_list* next;
+
+} t_ast_stmt_list;
+
+
 typedef enum hcc_ast_statement_kind
 {
     AST_STMT_LABEL_KIND,
@@ -312,7 +323,10 @@ typedef enum hcc_ast_statement_kind
     AST_STMT_GOTO_KIND,
     AST_STMT_CONTINUE__KIND, 
     AST_STMT_BREAK_KIND, 
-    AST_STMT_RETURN_KIND
+    AST_STMT_RETURN_KIND,
+	AST_STMT_EMPTY_KIND /* empty statement in compound statement 
+						 * no corresponding NT symbol in grammar 
+						 */
 } t_ast_stmt_kind;
 
 typedef struct hcc_ast_stmt
@@ -330,7 +344,8 @@ typedef struct hcc_ast_stmt
 
 		struct
 		{
-			int i; /* [TODO] [INCOMPLETE] statement list, declaration list*/
+			t_ast_stmt_list stmts;
+			/* [TODO] [PATH] declaration list */
 		} ast_compound_stmt;
 		
 		struct
@@ -407,4 +422,7 @@ t_ast_stmt* make_ast_goto_stmt(char* label_name);
 t_ast_stmt* make_ast_continue_stmt(t_ast_stmt* target);
 t_ast_stmt* make_ast_break_stmt(t_ast_stmt* target);
 t_ast_stmt* make_ast_return_stmt(t_ast_exp* return_exp);
+t_ast_stmt* make_ast_compound_stmt(t_ast_stmt_list stmts);
+/* [TODO] your fate is up to the master..*/
+t_ast_stmt* make_ast_empty_stmt();
 #endif
