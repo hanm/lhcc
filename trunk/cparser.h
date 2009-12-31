@@ -490,21 +490,21 @@ t_ast_exp* expression();
 /*
  * STATEMENTS
  */
-void statement();
-void compound_statement();
-void expression_statement();
-void if_statement(); 
-void switch_statement();
-void case_statement();
-void default_statement();
-void while_statement();
-void do_while_statement();
-void for_statement();
-void break_statement();
-void continue_statement();
-void goto_statement();
-void return_statement();
-void labeled_statement();
+t_ast_stmt* statement();
+t_ast_stmt* labeled_statement();
+t_ast_stmt* compound_statement();
+t_ast_stmt* expression_statement();
+t_ast_stmt* if_statement(); 
+t_ast_stmt* switch_statement();
+t_ast_stmt* case_statement();
+t_ast_stmt* default_statement();
+t_ast_stmt* while_statement();
+t_ast_stmt* do_while_statement();
+t_ast_stmt* for_statement();
+t_ast_stmt* break_statement();
+t_ast_stmt* continue_statement();
+t_ast_stmt* goto_statement();
+t_ast_stmt* return_statement();
 
 /*
  * DECLARATIONS

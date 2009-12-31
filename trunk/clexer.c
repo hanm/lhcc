@@ -38,7 +38,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 #include "preprocessor/cpp.h"
 
 // enable trace in lexical analysis
-#define HCC_TRACE_ENABLE
+//#define HCC_TRACE_ENABLE
 #include "trace.h"
 
 /*
@@ -547,7 +547,9 @@ static int identify_float_value(char* number, char* begin)
         warning("float value out of range!");
     }
 
+#ifdef HCC_TRACE_ENABLE
     fprintf(stderr, "float value %f\n", value);
+#endif
 
     lexeme_value.double_value = value;
 

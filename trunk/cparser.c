@@ -1004,52 +1004,56 @@ statement
         | jump_statement
         ;
 */
-void statement()
+t_ast_stmt* statement()
 {
+	t_ast_stmt* stmt = NULL;
+
     switch (cptk)
     {
     case TK_ID :
-        expression_statement();
+        stmt = expression_statement();
         break;
     case TK_SWITCH :
-        switch_statement();
+        stmt = switch_statement();
         break;
     case TK_CASE :
-        case_statement();
+        stmt = case_statement();
         break;
     case TK_DEFAULT :
-        default_statement();
+        stmt = default_statement();
         break;
     case TK_IF :
-        if_statement();
+        stmt = if_statement();
         break;
     case TK_DO :
-        do_while_statement();
+        stmt = do_while_statement();
         break;
     case TK_WHILE :
-        while_statement();
+        stmt = while_statement();
         break;
     case TK_FOR :
-        for_statement();
+        stmt = for_statement();
         break;
     case TK_BREAK :
-        break_statement();
+        stmt = break_statement();
         break;
     case TK_CONTINUE :
-        continue_statement();
+        stmt = continue_statement();
         break;
     case TK_RETURN :
-        return_statement();
+        stmt = return_statement();
         break;
     case TK_GOTO :
-        goto_statement();
+        stmt = goto_statement();
         break;
     case TK_LBRACE :
-        compound_statement();
+        stmt = compound_statement();
         break;
     default:
-        expression_statement();
+        stmt = expression_statement();
     }
+
+	return stmt;
 }
 
 /*
@@ -1058,8 +1062,10 @@ expression_statement
         | expression ';'
         ;
 */
-void expression_statement()
+t_ast_stmt* expression_statement()
 {
+	t_ast_stmt* stmt = make_ast_empty_stmt();
+
     if (cptk == TK_ID && peek_token() == TK_COLON)
     {
         labeled_statement();
@@ -1090,6 +1096,8 @@ void expression_statement()
         expression();
         match(TK_SEMICOLON);
     }
+
+	return stmt;
 }
 
 /*
@@ -1098,26 +1106,48 @@ labeled_statement
         | CASE constant_expression ':' statement
         | DEFAULT ':' statement
         ;
+
+NOTE - the case and default statement are stripped out of this deriveration.
+Both case are dealt explicitly.
 */
-void labeled_statement()
+t_ast_stmt* labeled_statement()
 {
-    match(TK_ID); match(TK_COLON);
-    statement();
+	t_ast_stmt* stmt = NULL;
+	t_coordinate saved_coord = coord;
+
+    match(TK_ID); 
+	match(TK_COLON);
+    
+	statement();
+	
+	/* [FIX ME] hook with statment instead of empty place holder!*/
+	stmt = make_ast_label_stmt(lexeme_value.string_value, make_ast_empty_stmt());
+	BINDING_COORDINATE(stmt, saved_coord);
+	
+	return stmt;
 }
 
-void case_statement()
+t_ast_stmt* case_statement()
 {
+	t_ast_stmt* stmt = make_ast_empty_stmt();
+
     match(TK_CASE); 
     constant_expression();
     match(TK_COLON);
     statement();
+
+	return stmt;
 }
 
-void default_statement()
+t_ast_stmt* default_statement()
 {
+	t_ast_stmt* stmt = make_ast_empty_stmt();
+
     match(TK_DEFAULT);
     match(TK_COLON);
     statement();
+
+	return stmt;
 }
 
 /*
@@ -1127,8 +1157,10 @@ selection_statement
         | SWITCH '(' expression ')' statement
         ;
 */
-void switch_statement()
+t_ast_stmt* switch_statement()
 {
+	t_ast_stmt* stmt = make_ast_empty_stmt();
+
     match(TK_SWITCH);
 
     match(TK_LPAREN);
@@ -1136,10 +1168,14 @@ void switch_statement()
     match(TK_RPAREN);
 
     statement();
+
+	return stmt;
 }
 
-void if_statement()
+t_ast_stmt* if_statement()
 {
+	t_ast_stmt* stmt = make_ast_empty_stmt();
+
     match(TK_IF);
     match(TK_LPAREN);
     
@@ -1152,6 +1188,8 @@ void if_statement()
         GET_NEXT_TOKEN;
         statement();
     }
+
+	return stmt;
 }
 
 /*
@@ -1162,8 +1200,10 @@ iteration_statement
         | FOR '(' expression_statement expression_statement expression ')' statement
         ;
 */
-void do_while_statement()
+t_ast_stmt* do_while_statement()
 {
+	t_ast_stmt* stmt = make_ast_empty_stmt();
+
     match(TK_DO);
     
     statement();
@@ -1173,20 +1213,28 @@ void do_while_statement()
     expression();
     match(TK_RPAREN);
     match(TK_SEMICOLON);
+
+	return stmt;
 }
 
-void while_statement()
+t_ast_stmt* while_statement()
 {
+	t_ast_stmt* stmt = make_ast_empty_stmt();
+
     match(TK_WHILE);
     match(TK_LPAREN);
     expression();
     match(TK_RPAREN);
 
     statement();
+
+	return stmt;
 }
 
-void for_statement()
+t_ast_stmt* for_statement()
 {
+	t_ast_stmt* stmt = make_ast_empty_stmt();
+
     match(TK_FOR);
     match(TK_LPAREN);
 
@@ -1210,6 +1258,8 @@ void for_statement()
     match(TK_RPAREN);
 
     statement();
+
+	return stmt;
 }
 
 /*
@@ -1222,33 +1272,49 @@ jump_statement
         ;
 */
 
-void goto_statement()
+t_ast_stmt* goto_statement()
 {
+	t_ast_stmt* stmt = make_ast_empty_stmt();
+
     match(TK_GOTO);
     match(TK_ID);
     match(TK_SEMICOLON);
+
+	return stmt;
 }
 
-void continue_statement()
+t_ast_stmt* continue_statement()
 {
+	t_ast_stmt* stmt = make_ast_empty_stmt();
+
     match(TK_CONTINUE);
     match(TK_SEMICOLON);
+
+	return stmt;
 }
 
-void break_statement()
+t_ast_stmt* break_statement()
 {
+	t_ast_stmt* stmt = make_ast_empty_stmt();
+
     match(TK_BREAK);
     match(TK_SEMICOLON);
+
+	return stmt;
 }
 
-void return_statement()
+t_ast_stmt* return_statement()
 {
+	t_ast_stmt* stmt = make_ast_empty_stmt();
+
     match(TK_RETURN);
     if (cptk != TK_SEMICOLON)
     {
         expression();
     }
     match(TK_SEMICOLON);
+
+	return stmt;
 }
 
 /*
@@ -1259,8 +1325,10 @@ compound_statement
         | '{' declaration_list statement_list '}'
         ;
 */
-void compound_statement()
+t_ast_stmt* compound_statement()
 {
+	t_ast_stmt* stmt = make_ast_empty_stmt();
+
 	match(TK_LBRACE);
 
     enter_scope();
@@ -1288,6 +1356,8 @@ void compound_statement()
     match(TK_RBRACE);
 
     exit_scope();
+
+	return stmt;
 }
 
 /*
