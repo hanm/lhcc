@@ -368,6 +368,17 @@ typedef struct hcc_ast_stmt
 
 		struct
 		{
+			t_ast_exp* const_exp;
+			t_ast_stmt* stmt;
+		} ast_case_stmt;
+
+		struct
+		{
+			t_ast_stmt* stmt;
+		} ast_default_stmt;
+
+		struct
+		{
 			t_ast_stmt* body_stmt;
 			t_ast_exp* test_exp;
 		} ast_do_stmt;
@@ -414,7 +425,9 @@ typedef struct hcc_ast_stmt
 t_ast_stmt* make_ast_label_stmt(char* label_name, t_ast_stmt* stmt);
 t_ast_stmt* make_ast_expression_stmt(t_ast_exp* exp);
 t_ast_stmt* make_ast_if_stmt(t_ast_exp* test_exp, t_ast_stmt* then_stmt, t_ast_stmt* else_stmt);
+t_ast_stmt* make_ast_case_stmt(t_ast_exp* const_exp, t_ast_stmt* body_stmt);
 t_ast_stmt* make_ast_switch_stmt(t_ast_exp* test_exp, t_ast_stmt* switch_stmt);
+t_ast_stmt* make_ast_default_stmt(t_ast_stmt* stmt);
 t_ast_stmt* make_ast_do_stmt(t_ast_stmt* body_stmt, t_ast_exp* test_exp);
 t_ast_stmt* make_ast_while_stmt(t_ast_exp* test_exp, t_ast_stmt* body_stmt);
 t_ast_stmt* make_ast_for_stmt(t_ast_stmt* init_exp_stmt, t_ast_stmt* test_exp_stmt, t_ast_exp* post_test_exp, t_ast_stmt* body_stmt);

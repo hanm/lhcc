@@ -1129,23 +1129,34 @@ t_ast_stmt* labeled_statement()
 
 t_ast_stmt* case_statement()
 {
-	t_ast_stmt* stmt = make_ast_empty_stmt();
+	t_ast_stmt* stmt = NULL;
+	t_ast_exp* exp = NULL;
+	t_ast_stmt* body_stmt = NULL;
+	t_coordinate saved_coord = coord;
 
     match(TK_CASE); 
-    constant_expression();
+	exp = constant_expression();
     match(TK_COLON);
-    statement();
+	body_stmt = statement();
+
+	stmt = make_ast_case_stmt(exp, body_stmt);
+	BINDING_COORDINATE(stmt, saved_coord);
 
 	return stmt;
 }
 
 t_ast_stmt* default_statement()
 {
-	t_ast_stmt* stmt = make_ast_empty_stmt();
+	t_ast_stmt* stmt = NULL;
+	t_ast_stmt* body_stmt = NULL;
+	t_coordinate saved_coord = coord;
 
     match(TK_DEFAULT);
     match(TK_COLON);
-    statement();
+
+	body_stmt = statement();
+	stmt = make_ast_default_stmt(body_stmt);
+	BINDING_COORDINATE(stmt, saved_coord);
 
 	return stmt;
 }
