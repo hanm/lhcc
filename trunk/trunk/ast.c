@@ -403,6 +403,31 @@ t_ast_stmt* make_ast_compound_stmt(t_ast_stmt_list stmts)
 	return stmt;
 }
 
+t_ast_stmt* make_ast_case_stmt(t_ast_exp* const_exp, t_ast_stmt* body_stmt)
+{
+	ALLOCATE_GENERIC_AST_STMT;
+
+	assert(const_exp && body_stmt);
+
+	stmt->kind = AST_STMT_CASE_KIND;
+	stmt->u.ast_case_stmt.const_exp = const_exp;
+	stmt->u.ast_case_stmt.stmt = body_stmt;
+
+	return stmt;
+}
+
+t_ast_stmt* make_ast_default_stmt(t_ast_stmt* body_stmt)
+{
+	ALLOCATE_GENERIC_AST_STMT;
+
+	assert(body_stmt);
+
+	stmt->kind = AST_STMT_DEFAULT_KIND;
+	stmt->u.ast_default_stmt.stmt = body_stmt;
+
+	return stmt;
+}
+
 t_ast_stmt* make_ast_empty_stmt()
 {
 	ALLOCATE_GENERIC_AST_STMT;
@@ -411,3 +436,5 @@ t_ast_stmt* make_ast_empty_stmt()
 
 	return stmt;
 }
+
+
