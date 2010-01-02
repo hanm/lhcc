@@ -969,18 +969,6 @@ t_ast_exp* expression()
 	t_ast_exp* exp = NULL;
 	t_coordinate saved_coord = coord;
 
-    /* empty expression. Note the implicit contract in cparser is expression parsing 
-     * doesn't consume semicolons, I want to explicit handle semicolon whenever possible which 
-     * is clean and easy for debugging purpose.
-    */
-    if (cptk == TK_SEMICOLON)
-    {
-		/* in no circumstances should any expression parsing functions return NULL AST NODE. */
-		exp = make_ast_generic_exp();
-		BINDING_COORDINATE(exp, coord);
-		return exp;
-    }
-
     exp = assignment_expression();
 
     while (cptk == TK_COMMA)
@@ -1091,6 +1079,11 @@ t_ast_stmt* expression_statement()
         }
         /* else skip multiple single asm stmt.. bang! it can't do that now! [TODO] */
     }
+	else if (cptk == TK_SEMICOLON)
+	{
+		/* empty expression statement */
+		GET_NEXT_TOKEN;
+	}
     else
     {
         expression();
@@ -1117,7 +1110,6 @@ t_ast_stmt* labeled_statement()
 
     match(TK_ID); 
 	match(TK_COLON);
-    
 	statement();
 	
 	/* [FIX ME] hook with statment instead of empty place holder!*/
@@ -1129,9 +1121,8 @@ t_ast_stmt* labeled_statement()
 
 t_ast_stmt* case_statement()
 {
-	t_ast_stmt* stmt = NULL;
+	t_ast_stmt *stmt = NULL, *body_stmt = NULL;
 	t_ast_exp* exp = NULL;
-	t_ast_stmt* body_stmt = NULL;
 	t_coordinate saved_coord = coord;
 
     match(TK_CASE); 
@@ -1147,14 +1138,13 @@ t_ast_stmt* case_statement()
 
 t_ast_stmt* default_statement()
 {
-	t_ast_stmt* stmt = NULL;
-	t_ast_stmt* body_stmt = NULL;
+	t_ast_stmt *stmt = NULL, *body_stmt = NULL;
 	t_coordinate saved_coord = coord;
 
     match(TK_DEFAULT);
     match(TK_COLON);
-
 	body_stmt = statement();
+	
 	stmt = make_ast_default_stmt(body_stmt);
 	BINDING_COORDINATE(stmt, saved_coord);
 
@@ -1170,35 +1160,41 @@ selection_statement
 */
 t_ast_stmt* switch_statement()
 {
-	t_ast_stmt* stmt = make_ast_empty_stmt();
+	t_ast_stmt *stmt = NULL, *switch_stmt = NULL;
+	t_ast_exp* test_exp = NULL;
+	t_coordinate saved_coord = coord;
 
     match(TK_SWITCH);
-
     match(TK_LPAREN);
-    expression();
+	test_exp = expression();
     match(TK_RPAREN);
-
-    statement();
+	switch_stmt = statement();
+	
+	stmt = make_ast_switch_stmt(test_exp, switch_stmt);
+	BINDING_COORDINATE(stmt, saved_coord);
 
 	return stmt;
 }
 
 t_ast_stmt* if_statement()
 {
-	t_ast_stmt* stmt = make_ast_empty_stmt();
-
+	t_ast_stmt *stmt = NULL, *then_stmt = NULL, *else_stmt = NULL;
+	t_ast_exp* test_exp = NULL;
+	t_coordinate saved_coord = coord;
+	
     match(TK_IF);
     match(TK_LPAREN);
-    
-    expression();
-    
+	test_exp = expression();
     match(TK_RPAREN);
-    statement();
+	then_stmt = statement();
     if (cptk == TK_ELSE)
     {
         GET_NEXT_TOKEN;
-        statement();
+		else_stmt = statement();
     }
+
+	stmt = make_ast_if_stmt(test_exp, then_stmt, else_stmt);
+	BINDING_COORDINATE(stmt, saved_coord);
 
 	return stmt;
 }
@@ -1213,62 +1209,61 @@ iteration_statement
 */
 t_ast_stmt* do_while_statement()
 {
-	t_ast_stmt* stmt = make_ast_empty_stmt();
+	t_ast_stmt *stmt = NULL, *body_stmt = NULL;
+	t_ast_exp* test_exp = NULL;
+	t_coordinate saved_coord = coord;
 
     match(TK_DO);
-    
-    statement();
-    
+	body_stmt = statement();
     match(TK_WHILE);
     match(TK_LPAREN);
-    expression();
+	test_exp = expression();
     match(TK_RPAREN);
     match(TK_SEMICOLON);
+
+	stmt = make_ast_do_stmt(body_stmt, test_exp);
+	BINDING_COORDINATE(stmt, saved_coord);
 
 	return stmt;
 }
 
 t_ast_stmt* while_statement()
 {
-	t_ast_stmt* stmt = make_ast_empty_stmt();
+	t_ast_stmt *stmt = NULL, *body_stmt = NULL;
+	t_ast_exp* test_exp = NULL;
+	t_coordinate saved_coord = coord;
 
     match(TK_WHILE);
     match(TK_LPAREN);
-    expression();
+	test_exp = expression();
     match(TK_RPAREN);
+	body_stmt = statement();
 
-    statement();
+	stmt = make_ast_while_stmt(test_exp, body_stmt);
+	BINDING_COORDINATE(stmt, saved_coord);
 
 	return stmt;
 }
 
 t_ast_stmt* for_statement()
 {
-	t_ast_stmt* stmt = make_ast_empty_stmt();
+	t_ast_stmt *stmt = NULL, *init_exp_stmt = NULL, *test_stmt = NULL, *body_stmt = NULL;
+	t_ast_exp* post_test_exp = NULL;
+	t_coordinate saved_coord = coord;
 
     match(TK_FOR);
     match(TK_LPAREN);
-
-    if (cptk != TK_SEMICOLON)
-    {
-        expression();
-    }
-    match(TK_SEMICOLON);
-
-    if (cptk != TK_SEMICOLON)
-    {
-        expression();
-    }
-    match(TK_SEMICOLON);
-
+	init_exp_stmt = expression_statement();
+	test_stmt = expression_statement();
     if (cptk != TK_RPAREN)
     {
-        expression();
+		post_test_exp = expression();
     }
-
     match(TK_RPAREN);
+	body_stmt = statement();
 
-    statement();
+	stmt = make_ast_for_stmt(init_exp_stmt, test_stmt, post_test_exp, body_stmt);
+	BINDING_COORDINATE(stmt, saved_coord);
 
 	return stmt;
 }
