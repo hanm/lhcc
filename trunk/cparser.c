@@ -1280,18 +1280,28 @@ jump_statement
 
 t_ast_stmt* goto_statement()
 {
-	t_ast_stmt* stmt = make_ast_empty_stmt();
+	t_ast_stmt* stmt = NULL;
 
     match(TK_GOTO);
-    match(TK_ID);
-    match(TK_SEMICOLON);
+	if (cptk == TK_ID)
+	{
+		stmt = make_ast_goto_stmt(lexeme_value.string_value);
+		BINDING_COORDINATE(stmt, coord);
+		GET_NEXT_TOKEN;
+	}
+	else
+	{
+		match(TK_ID);
+	}
+	match(TK_SEMICOLON);
 
 	return stmt;
 }
 
 t_ast_stmt* continue_statement()
 {
-	t_ast_stmt* stmt = make_ast_empty_stmt();
+	t_ast_stmt* stmt = make_ast_continue_stmt();
+	BINDING_COORDINATE(stmt, coord);
 
     match(TK_CONTINUE);
     match(TK_SEMICOLON);
@@ -1301,7 +1311,8 @@ t_ast_stmt* continue_statement()
 
 t_ast_stmt* break_statement()
 {
-	t_ast_stmt* stmt = make_ast_empty_stmt();
+	t_ast_stmt* stmt = make_ast_break_stmt();
+	BINDING_COORDINATE(stmt, coord);
 
     match(TK_BREAK);
     match(TK_SEMICOLON);
@@ -1311,14 +1322,19 @@ t_ast_stmt* break_statement()
 
 t_ast_stmt* return_statement()
 {
-	t_ast_stmt* stmt = make_ast_empty_stmt();
+	t_ast_stmt* stmt = NULL;
+	t_ast_exp* exp = NULL;
+	t_coordinate saved_coord = coord;
 
     match(TK_RETURN);
     if (cptk != TK_SEMICOLON)
     {
-        expression();
+		exp = expression();
     }
     match(TK_SEMICOLON);
+	
+	stmt = make_ast_return_stmt(exp);
+	BINDING_COORDINATE(stmt, saved_coord);
 
 	return stmt;
 }

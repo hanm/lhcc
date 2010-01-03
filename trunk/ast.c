@@ -352,26 +352,20 @@ t_ast_stmt* make_ast_goto_stmt(char* label_name)
 	return stmt;
 }
 
-t_ast_stmt* make_ast_continue_stmt(t_ast_stmt* target)
+t_ast_stmt* make_ast_continue_stmt()
 {
 	ALLOCATE_GENERIC_AST_STMT;
 
-	assert(target);
-	
 	stmt->kind = AST_STMT_CONTINUE__KIND;
-	stmt->u.ast_continue_stmt.target = target;
 
 	return stmt;
 }
 
-t_ast_stmt* make_ast_break_stmt(t_ast_stmt* target)
+t_ast_stmt* make_ast_break_stmt()
 {
 	ALLOCATE_GENERIC_AST_STMT;
 
-	assert(target);
-
 	stmt->kind = AST_STMT_BREAK_KIND;
-	stmt->u.ast_break_stmt.target = target;
 
 	return stmt;
 }

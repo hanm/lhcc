@@ -404,12 +404,12 @@ typedef struct hcc_ast_stmt
 
 		struct
 		{
-			t_ast_stmt* target;
+			int i; /* [TODO] fill */
 		} ast_continue_stmt;
 
 		struct
 		{
-			t_ast_stmt* target;
+			int i; /* [TODO] fill */
 		} ast_break_stmt;
 
 		struct
@@ -432,8 +432,8 @@ t_ast_stmt* make_ast_do_stmt(t_ast_stmt* body_stmt, t_ast_exp* test_exp);
 t_ast_stmt* make_ast_while_stmt(t_ast_exp* test_exp, t_ast_stmt* body_stmt);
 t_ast_stmt* make_ast_for_stmt(t_ast_stmt* init_exp_stmt, t_ast_stmt* test_exp_stmt, t_ast_exp* post_test_exp, t_ast_stmt* body_stmt);
 t_ast_stmt* make_ast_goto_stmt(char* label_name);
-t_ast_stmt* make_ast_continue_stmt(t_ast_stmt* target);
-t_ast_stmt* make_ast_break_stmt(t_ast_stmt* target);
+t_ast_stmt* make_ast_continue_stmt();
+t_ast_stmt* make_ast_break_stmt();
 t_ast_stmt* make_ast_return_stmt(t_ast_exp* return_exp);
 t_ast_stmt* make_ast_compound_stmt(t_ast_stmt_list stmts);
 /* [TODO] your fate is up to the master..*/
