@@ -1350,7 +1350,7 @@ compound_statement
 t_ast_stmt* compound_statement()
 {
 	t_ast_stmt* stmt = make_ast_empty_stmt();
-
+    
 	match(TK_LBRACE);
 
     enter_scope();
@@ -1362,7 +1362,7 @@ t_ast_stmt* compound_statement()
 			if (cptk == TK_ID && peek_token() == TK_COLON)
 			{
 				/* label statement */
-				statement();
+                statement();
 			}
 			else
 			{

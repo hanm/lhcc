@@ -134,3 +134,10 @@ void log_terminate()
 {
     if (!fp) fclose(fp);
 }
+
+void log_number(int i)
+{
+    if (!fp)return;
+
+    fprintf(fp, "%d \r\n", i);
+}
