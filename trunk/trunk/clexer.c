@@ -38,7 +38,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 #include "preprocessor/cpp.h"
 
 // enable trace in lexical analysis
-//#define HCC_TRACE_ENABLE
+#define HCC_TRACE_ENABLE
 #include "trace.h"
 
 /*
