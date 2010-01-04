@@ -40,11 +40,7 @@ typedef struct hcc_ast_func_arg_list t_ast_func_arg_list;
 typedef struct hcc_ast_stmt_list t_ast_stmt_list;
 typedef struct hcc_ast_declr_list t_ast_declr_list;
 
-/* AST List to hold homogeneous ast elements. It's a simple singly linked list
- * For example, statement list is to hold statements. 
- * Tempted to use variable array trick but unfortunately the list size is not known the time
- * the list is constructed. this is online, not offline as what py parser did (it first build cst then transform to ast)
- */
+/* helper container data structures for ast elements */
 typedef struct hcc_ast_list
 {
     void* item;
@@ -52,6 +48,22 @@ typedef struct hcc_ast_list
 } t_ast_list;
 
 t_ast_list* make_ast_list_entry();
+
+typedef struct hcc_ast_array
+{
+	int size;
+	void *items[1];
+} t_ast_array;
+
+t_ast_array* make_ast_array(int size, int arena);
+
+#define HCC_AST_ARRAY_GET(a, i) (a)->items[(i)]
+#define HCC_AST_ARRAY_LEN(a) ((a) == NULL ? 0 : (a)->size)
+#define HCC_AST_ARRAY_SET(a, i, v) { \
+        assert((a) && i < (a)->size); \
+        (a)->items[i] = (v); \
+}
+
 
 /**************************** Expressions *****************************************/
 

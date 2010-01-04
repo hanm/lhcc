@@ -49,9 +49,38 @@ static char* tokens[] =
 	(ast)->coord.line = (coordinate).line; \
 	(ast)->coord.column = (coordinate).column;
 
+
+#define HCC_AST_ELEMENTS_SEQ_LEN 1024
+
+static void* ast_elements_seq[HCC_AST_ELEMENTS_SEQ_LEN];
+
 void initialize_parser()
 {
 	GET_NEXT_TOKEN;
+
+	memset(ast_elements_seq, 0, sizeof(void*) * HCC_AST_ELEMENTS_SEQ_LEN);
+}
+
+static t_ast_array* array_from_seq(int start, int size, int arena)
+{
+	t_ast_array* a = NULL;
+	int i = 0;
+
+	assert(start >= 0 && size>= 0 && start + size <= HCC_AST_ELEMENTS_SEQ_LEN);
+
+	if (size > 1) return NULL;
+	a = make_ast_array(size, arena);
+
+	for (; i < size; i ++)
+	{
+		HCC_AST_ARRAY_SET(a, i, ast_elements_seq[start + i]);
+		ast_elements_seq[start + i] = NULL;
+		/* unfortunately, or fortunately, VC checks array boundary so this 
+		 * trick can't be used here..
+		 */
+	}
+
+	return a;
 }
 
 static void match(int token)
@@ -1350,9 +1379,11 @@ compound_statement
 t_ast_stmt* compound_statement()
 {
 	t_ast_stmt* stmt = make_ast_empty_stmt();
-    
-	match(TK_LBRACE);
+	t_ast_array* stmt_list = NULL;
+    int i = 0, j = 0;
+	(j);
 
+	match(TK_LBRACE);
     enter_scope();
 
 	while (cptk != TK_RBRACE && cptk != TK_END)
@@ -1362,7 +1393,8 @@ t_ast_stmt* compound_statement()
 			if (cptk == TK_ID && peek_token() == TK_COLON)
 			{
 				/* label statement */
-                stmt = statement();
+				ast_elements_seq[i++] = statement();
+				i ++;
 			}
 			else
 			{
@@ -1371,14 +1403,15 @@ t_ast_stmt* compound_statement()
         }
 		else
 		{
-			statement();
+			ast_elements_seq[i++] = statement();
 		}
 	}
 
     match(TK_RBRACE);
-
     exit_scope();
 
+	(stmt_list);
+	
 	return stmt;
 }
 
@@ -2354,5 +2387,3 @@ int is_token_typename_token(int token_code, char* token_symbol)
       
     return 0;
 }
-
-
