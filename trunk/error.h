@@ -41,5 +41,5 @@ void type_error(char* msg);
 /* prelimary logging system */
 void log_initialize(char* filename);
 void log_terminate();
-
+void log_number(int i);
 #endif

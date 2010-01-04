@@ -40,6 +40,16 @@ typedef struct hcc_ast_func_arg_list t_ast_func_arg_list;
 typedef struct hcc_ast_stmt_list t_ast_stmt_list;
 typedef struct hcc_ast_declr_list t_ast_declr_list;
 
+/* AST List to hold homogeneous ast elements. It's a simple singly linked list
+ * For example, statement list is to hold statements. 
+ * Tempted to use variable array trick but unfortunately the list size is not known the time
+ * the list is constructed. this is online, not offline as what py parser did (it first build cst then transform to ast)
+ */
+typedef struct hcc_ast_list
+{
+    void* item;
+    struct hcc_ast_list* next;
+} t_ast_list;
 
 /**************************** Expressions *****************************************/
 
@@ -160,11 +170,6 @@ typedef union hcc_ast_exp_value
 	void* p;
 } t_ast_exp_val;
 
-typedef struct hcc_ast_list
-{
-	int size;
-	void* item[1];
-} t_ast_list;
 
 /*
  * variant record represents C expression ast node
@@ -333,6 +338,7 @@ typedef struct hcc_ast_stmt
 {
 	t_ast_stmt_kind kind;
 	t_ast_coord coord;
+    t_ast_stmt* next;
 
 	union 
 	{
