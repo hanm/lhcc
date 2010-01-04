@@ -439,3 +439,18 @@ t_ast_list* make_ast_list_entry()
     return entry;
 }
 
+t_ast_array* make_ast_array(int size, int arena)
+{
+	t_ast_array *a = NULL;
+	unsigned int n = 0;
+
+	assert(size >= 0 && arena >= 0);
+	
+	n = (size ? (sizeof(void *) * (size - 1)) : 0);
+	n += sizeof(t_ast_array);
+
+	a = (t_ast_array *)CALLOC(a, arena);
+	a->size = size;
+	
+	return a;
+}
