@@ -338,7 +338,6 @@ typedef struct hcc_ast_stmt
 {
 	t_ast_stmt_kind kind;
 	t_ast_coord coord;
-    t_ast_stmt* next;
 
 	union 
 	{
