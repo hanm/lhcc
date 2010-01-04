@@ -51,6 +51,8 @@ typedef struct hcc_ast_list
     struct hcc_ast_list* next;
 } t_ast_list;
 
+t_ast_list* make_ast_list_entry();
+
 /**************************** Expressions *****************************************/
 
 typedef struct hcc_ast_coordinate

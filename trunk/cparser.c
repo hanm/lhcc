@@ -1362,7 +1362,7 @@ t_ast_stmt* compound_statement()
 			if (cptk == TK_ID && peek_token() == TK_COLON)
 			{
 				/* label statement */
-                statement();
+                stmt = statement();
 			}
 			else
 			{

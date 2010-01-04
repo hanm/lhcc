@@ -431,4 +431,11 @@ t_ast_stmt* make_ast_empty_stmt()
 	return stmt;
 }
 
+t_ast_list* make_ast_list_entry()
+{
+    t_ast_list *entry = NULL;
+    CALLOC(entry, PERM);
+
+    return entry;
+}
 
