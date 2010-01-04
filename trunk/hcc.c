@@ -1,6 +1,6 @@
 /***************************************************************
 
-Copyright (c) 2008-2009 Michael Liang Han
+Copyright (c) 2008-2010 Michael Liang Han
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation
@@ -246,7 +246,7 @@ HCC_MEM_CHECK_START
 
    time(&t1);
 
-#define ATOMIC_TEST
+//#define ATOMIC_TEST
 #ifdef ATOMIC_TEST
    (names);
    (i);

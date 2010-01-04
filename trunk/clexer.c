@@ -1,6 +1,6 @@
 /***************************************************************
 
-Copyright (c) 2008-2009 Michael Liang Han
+Copyright (c) 2008-2010 Michael Liang Han
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation
@@ -38,7 +38,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 #include "preprocessor/cpp.h"
 
 // enable trace in lexical analysis
-#define HCC_TRACE_ENABLE
+//#define HCC_TRACE_ENABLE
 #include "trace.h"
 
 /*
