@@ -83,11 +83,11 @@ t_ast_exp* make_ast_subscript_exp(t_ast_exp* main, t_ast_exp* index)
 	return exp;
 }
 
-t_ast_exp* make_ast_call_exp(t_ast_exp* func, t_ast_list args)
+t_ast_exp* make_ast_call_exp(t_ast_exp* func, t_ast_list* args)
 {
 	ALLOCATE_GENERIC_AST_EXP;
 
-	assert(func);
+	assert(func && args);
 
 	exp->kind = AST_EXP_FUNCTION_CALL_KIND;
 	exp->u.ast_call_exp.func = func;
@@ -237,14 +237,6 @@ t_ast_exp* make_ast_typename_exp()
     exp->kind = AST_EXP_GENERIC_EXP_KIND;
 
     return exp;
-}
-
-t_ast_exp* make_ast_generic_exp()
-{
-	ALLOCATE_GENERIC_AST_EXP;
-	exp->kind = AST_EXP_GENERIC_EXP_KIND;
-
-	return exp;
 }
 
 t_ast_stmt* make_ast_label_stmt(char* label_name, t_ast_stmt* label_stmt)
