@@ -49,6 +49,13 @@ typedef struct hcc_ast_list
 
 t_ast_list* make_ast_list_entry();
 
+#define HCC_AST_LIST_APPEND(l, n)   (l)->item = n; \
+                (l)->next = make_ast_list_entry(); \
+                (l) = (l)->next;
+
+/* WARNING - there might be a compiler out there which checks array bondary
+ * which renders this trick useless
+ */
 typedef struct hcc_ast_array
 {
 	int size;
@@ -363,8 +370,8 @@ typedef struct hcc_ast_stmt
 
 		struct
 		{
-			t_ast_stmt_list stmts;
-			/* [TODO] [PATH] declaration list */
+            t_ast_list* stmts;
+            t_ast_list* declrs;
 		} ast_compound_stmt;
 		
 		struct
@@ -454,7 +461,7 @@ t_ast_stmt* make_ast_goto_stmt(char* label_name);
 t_ast_stmt* make_ast_continue_stmt();
 t_ast_stmt* make_ast_break_stmt();
 t_ast_stmt* make_ast_return_stmt(t_ast_exp* return_exp);
-t_ast_stmt* make_ast_compound_stmt(t_ast_stmt_list stmts);
+t_ast_stmt* make_ast_compound_stmt(t_ast_list* stmts, t_ast_list* declrs);
 /* [TODO] your fate is up to the master..*/
 t_ast_stmt* make_ast_empty_stmt();
 #endif
