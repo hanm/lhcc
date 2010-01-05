@@ -75,9 +75,6 @@ static t_ast_array* array_from_seq(int start, int size, int arena)
 	{
 		HCC_AST_ARRAY_SET(a, i, ast_elements_seq[start + i]);
 		ast_elements_seq[start + i] = NULL;
-		/* unfortunately, or fortunately, VC checks array boundary so this 
-		 * trick can't be used here..
-		 */
 	}
 
 	return a;
@@ -1378,10 +1375,11 @@ compound_statement
 */
 t_ast_stmt* compound_statement()
 {
-	t_ast_stmt* stmt = make_ast_empty_stmt();
-	t_ast_array* stmt_list = NULL;
-    int i = 0, j = 0;
-	(j);
+	t_ast_stmt* stmt = NULL;
+    t_ast_list *stmts = make_ast_list_entry(), *declrs = make_ast_list_entry();
+    t_ast_list *c_stmt = stmts, *c_declr = declrs;
+    t_coordinate saved_coord = coord;
+    (stmts, declrs, c_stmt, c_declr);
 
 	match(TK_LBRACE);
     enter_scope();
@@ -1392,9 +1390,7 @@ t_ast_stmt* compound_statement()
 		{
 			if (cptk == TK_ID && peek_token() == TK_COLON)
 			{
-				/* label statement */
-				ast_elements_seq[i++] = statement();
-				i ++;
+                HCC_AST_LIST_APPEND(c_stmt, statement());
 			}
 			else
 			{
@@ -1403,15 +1399,16 @@ t_ast_stmt* compound_statement()
         }
 		else
 		{
-			ast_elements_seq[i++] = statement();
+            HCC_AST_LIST_APPEND(c_stmt, statement());
 		}
 	}
 
     match(TK_RBRACE);
     exit_scope();
 
-	(stmt_list);
-	
+    stmt = make_ast_compound_stmt(stmts, declrs);
+    BINDING_COORDINATE(stmt, saved_coord);
+
 	return stmt;
 }
 

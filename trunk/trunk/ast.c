@@ -380,19 +380,15 @@ t_ast_stmt* make_ast_return_stmt(t_ast_exp* return_exp)
 	return stmt;
 }
 
-t_ast_stmt* make_ast_compound_stmt(t_ast_stmt_list stmts)
+t_ast_stmt* make_ast_compound_stmt(t_ast_list* stmts, t_ast_list* declrs)
 {
 	ALLOCATE_GENERIC_AST_STMT;
 
-	if (stmts.current == NULL) 
-	{
-		stmt->kind = AST_STMT_EMPTY_KIND;
-	}
-	else
-	{
-		stmt->kind = AST_STMT_COMPOUND_KIND;
-		stmt->u.ast_compound_stmt.stmts = stmts;
-	}
+    assert(stmts && declrs);
+
+	stmt->kind = AST_STMT_COMPOUND_KIND;
+    stmt->u.ast_compound_stmt.stmts = stmts;
+    stmt->u.ast_compound_stmt.declrs = declrs;
 
 	return stmt;
 }

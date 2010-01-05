@@ -46,12 +46,12 @@ static struct atom
 	char *string;
 } *buckets[4096];
 
-const char* atom_string(const char* string)
+char* atom_string(const char* string)
 {
 	return atom_string_number(string, (int)strlen(string));
 }
 
-const char* atom_string_number(const char* string, int length)
+char* atom_string_number(const char* string, int length)
 {
 	/* djb2 hash */
 	unsigned long hash = 5381;
@@ -101,7 +101,7 @@ const char* atom_string_number(const char* string, int length)
 	return p->string;
 }
 
-const char* atom_int(int n)
+char* atom_int(int n)
 {
 	char string[43];
 	char *s = string + sizeof(string);

@@ -30,6 +30,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 #include "clexer.h"
 #include "cparser.h"
 #include "hconfig.h"
+#include "arena.h"
 #include <crtdbg.h>
 
 #include <time.h>
@@ -97,7 +98,7 @@ static void compile(const char* filename)
 
     (filename);
 
-    while (token = gettoken())
+    while (token = get_token())
     {
         fprintf(stdout, "%s ", token);
         if (count++ == 8)fprintf(stdout, "\n");
