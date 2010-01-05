@@ -115,9 +115,9 @@
 				EnableIntrinsicFunctions="true"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
-				WarningLevel="3"
+				WarningLevel="4"
 				DebugInformationFormat="3"
-				DisableSpecificWarnings="4996;4141;4068"
+				DisableSpecificWarnings="4068;4996;4141;4127;4701;4706;4090;4267;4013;4311;4146"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"

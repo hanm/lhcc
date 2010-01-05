@@ -462,10 +462,8 @@ argument_expression_list : assignment_expression
 t_ast_exp* postfix_expression()
 {
     t_ast_exp* exp = primary_expression();
-	t_ast_list arguments;
+    t_ast_list *arguments = make_ast_list_entry(), *c_arg = arguments;
 	t_coordinate saved_coord = coord;
-
-	memset(&arguments, 0, sizeof(t_ast_list));
     
 	assert(exp);
 
@@ -488,14 +486,14 @@ t_ast_exp* postfix_expression()
                 GET_NEXT_TOKEN;
                 if (cptk != TK_RPAREN)
                 {
-                    assignment_expression();
+                    HCC_AST_LIST_APPEND(c_arg, assignment_expression());
                     while (cptk == TK_COMMA)
                     {
                         GET_NEXT_TOKEN;
-                        assignment_expression();
+                        HCC_AST_LIST_APPEND(c_arg, assignment_expression());
                     }
                 }
-				/* [TODO] argument list parsing */
+
 				exp = make_ast_call_exp(exp, arguments);
 				BINDING_COORDINATE(exp, saved_coord);
 
