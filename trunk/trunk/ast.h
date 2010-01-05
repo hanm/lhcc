@@ -80,10 +80,8 @@ typedef struct hcc_ast_coordinate
 	unsigned long line, column;
 } t_ast_coord;
 
-/* kinds of expressions */
 typedef enum hcc_ast_expression_kind
 {
-    /* 'complex' expression kind */
     AST_EXP_BINARY_KIND,
     AST_EXP_UNARY_KIND,
     AST_EXP_IDENTIFIER_KIND,
@@ -294,10 +292,6 @@ typedef struct hcc_ast_exp
 
 } t_ast_exp;
 
-
-/* ast constructors 
- * use these functions to construct specific type of expression ast node
- */
 t_ast_exp* make_ast_id_exp(char* name);
 t_ast_exp* make_ast_const_exp(t_ast_exp_val val, t_ast_exp_kind kind);
 t_ast_exp* make_ast_subscript_exp(t_ast_exp* main, t_ast_exp* index);
@@ -442,7 +436,6 @@ typedef struct hcc_ast_stmt
 
 } t_ast_stmt;
 
-/* constructors for ast statements */
 t_ast_stmt* make_ast_label_stmt(char* label_name, t_ast_stmt* stmt);
 t_ast_stmt* make_ast_expression_stmt(t_ast_exp* exp);
 t_ast_stmt* make_ast_if_stmt(t_ast_exp* test_exp, t_ast_stmt* then_stmt, t_ast_stmt* else_stmt);
@@ -457,6 +450,33 @@ t_ast_stmt* make_ast_continue_stmt();
 t_ast_stmt* make_ast_break_stmt();
 t_ast_stmt* make_ast_return_stmt(t_ast_exp* return_exp);
 t_ast_stmt* make_ast_compound_stmt(t_ast_list* stmts, t_ast_list* declrs);
-/* [TODO] your fate is up to the master..*/
+/* [TODO] may not needed this...*/
 t_ast_stmt* make_ast_empty_stmt();
+
+
+/******************* Declarations *****************/
+/*
+typedef enum hcc_ast_declarations_kind
+{
+	AST_DECLR
+} t_ast_declr_kind;
+*/
+
+typedef struct hcc_ast_enumerator
+{
+	t_ast_coord coord;
+	char* id;
+	t_ast_exp* exp;
+} t_ast_enumerator;
+
+typedef struct hcc_ast_enum_specifier
+{
+	char* id;
+	t_ast_list* enumerator_list;
+} t_ast_enum_specifier;
+
+t_ast_enumerator* make_ast_enumerator(char*id, t_ast_exp* exp);
+t_ast_enum_specifier* make_ast_enum_specifier(char* id, t_ast_list* enumerator_list);
+
+
 #endif

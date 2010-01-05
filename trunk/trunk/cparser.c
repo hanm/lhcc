@@ -994,6 +994,7 @@ t_ast_exp* expression()
 	t_coordinate saved_coord = coord;
 
     exp = assignment_expression();
+	BINDING_COORDINATE(exp, saved_coord);
 
     while (cptk == TK_COMMA)
     {
