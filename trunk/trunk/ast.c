@@ -467,3 +467,38 @@ t_ast_enum_specifier* make_ast_enum_specifier(char* id, t_ast_list* enumerator_l
 
 	return e;
 }
+
+t_ast_typedef* make_ast_typedef(char*id, void* symbol)
+{
+    t_ast_typedef* t = NULL;
+    CALLOC(t, PERM);
+
+    assert(id); /* [TODO] chekc symbol sanity? */
+
+    t->name = id;
+    t->symbol = symbol;
+
+    return t;
+}
+
+t_ast_struct_or_union_specifier* make_ast_struct_union_specifier(int is_struct, char* name, t_ast_list* struct_declr_list)
+{
+    t_ast_struct_or_union_specifier* s = NULL;
+    CALLOC(s, PERM);
+
+    assert(name || struct_declr_list);
+
+    s->is_struct = is_struct;
+    s->name = name;
+    s->struct_declr_list = struct_declr_list;
+
+    return s;
+}
+
+t_ast_type_specifier* make_ast_type_specifier_template()
+{
+    t_ast_type_specifier* t = NULL;
+    CALLOC(t, PERM);
+
+    return t;
+}
