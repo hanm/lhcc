@@ -28,19 +28,11 @@ OTHER DEALINGS IN THE SOFTWARE.
 #ifndef __HCC_AST_H
 #define __HCC_AST_H
 
-/*
- * the overall structure of the ast nodes are pretty like what described in the Tiger book
- * and/or specified by ASDL.
-*/
-
-/* forward declr */
 typedef struct hcc_ast_exp t_ast_exp;
 typedef struct hcc_ast_stmt t_ast_stmt;
-typedef struct hcc_ast_func_arg_list t_ast_func_arg_list;
-typedef struct hcc_ast_stmt_list t_ast_stmt_list;
-typedef struct hcc_ast_declr_list t_ast_declr_list;
 
-/* helper container data structures for ast elements */
+typedef struct hcc_ast_declarator t_ast_declarator;
+
 typedef struct hcc_ast_list
 {
     void* item;
@@ -511,9 +503,52 @@ typedef struct hcc_ast_type_specifier
     } u;
 } t_ast_type_specifier;
 
+typedef enum
+{
+	AST_TYPE_CONST,
+	AST_TYPE_VOLATILE
+} t_ast_type_qualifier_kind;
+
+typedef struct hcc_ast_type_qualifier
+{
+	t_ast_coord coord;
+	t_ast_type_qualifier_kind kind;
+} t_ast_type_qualifier;
+
+typedef enum
+{
+	AST_STORAGE_TYPEDEF,
+	AST_STORAGE_EXTERN,
+	AST_STORAGE_STATIC,
+	AST_STORAGE_AUTO,
+	AST_STORAGE_REGISTER
+} t_ast_storage_specifier_kind;
+
+typedef struct hcc_ast_storage_specifier
+{
+	t_ast_coord coord;
+	t_ast_storage_specifier_kind kind;
+} t_ast_storage_specifier;
+
+typedef struct hcc_ast_declr_specifier
+{
+	t_ast_coord coord;
+	t_ast_list* list;
+} t_ast_declaration_specifier;
+
+typedef struct hcc_ast_pointer
+{
+	t_ast_list* type_qualifier_list;
+	struct hcc_ast_pointer* pointer;
+} t_ast_pointer;
+
 t_ast_enumerator* make_ast_enumerator(char*id, t_ast_exp* exp);
 t_ast_enum_specifier* make_ast_enum_specifier(char* id, t_ast_list* enumerator_list);
 t_ast_typedef* make_ast_typedef(char*id, void* symbol);
 t_ast_struct_or_union_specifier* make_ast_struct_union_specifier(int is_struct, char* name, t_ast_list* struct_declr_list);
 t_ast_type_specifier* make_ast_type_specifier_template();
+t_ast_type_qualifier* make_ast_type_qualifer(t_ast_type_qualifier_kind kind);
+t_ast_storage_specifier* make_ast_storage_specifier(t_ast_storage_specifier_kind kind);
+t_ast_declaration_specifier* make_ast_declaration_specifier(t_ast_list* list);
+t_ast_pointer* make_ast_pointer(t_ast_list* list, t_ast_pointer* pointer);
 #endif
