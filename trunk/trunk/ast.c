@@ -502,3 +502,42 @@ t_ast_type_specifier* make_ast_type_specifier_template()
 
     return t;
 }
+
+t_ast_type_qualifier* make_ast_type_qualifer(t_ast_type_qualifier_kind kind)
+{
+	t_ast_type_qualifier* t = NULL;
+	CALLOC(t, PERM);
+	
+	t->kind = kind;
+	return t;
+}
+
+t_ast_storage_specifier* make_ast_storage_specifier(t_ast_storage_specifier_kind kind)
+{
+	t_ast_storage_specifier* s = NULL;
+	CALLOC(s, PERM);
+
+	s->kind = kind;
+	return s;
+}
+
+t_ast_declaration_specifier* make_ast_declaration_specifier(t_ast_list* list)
+{
+	t_ast_declaration_specifier* s = NULL;
+	CALLOC(s, PERM);
+
+	assert(list);
+	s->list = list;
+	return s;
+}
+
+t_ast_pointer* make_ast_pointer(t_ast_list* list, t_ast_pointer* pointer)
+{
+	t_ast_pointer* p = NULL;
+	CALLOC(p, PERM);
+
+	p->type_qualifier_list = list;
+	p->pointer = pointer;
+	
+	return p;
+}
