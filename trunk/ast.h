@@ -455,12 +455,6 @@ t_ast_stmt* make_ast_empty_stmt();
 
 
 /******************* Declarations *****************/
-/*
-typedef enum hcc_ast_declarations_kind
-{
-	AST_DECLR
-} t_ast_declr_kind;
-*/
 
 typedef struct hcc_ast_enumerator
 {
@@ -471,12 +465,55 @@ typedef struct hcc_ast_enumerator
 
 typedef struct hcc_ast_enum_specifier
 {
+    t_ast_coord coord;
 	char* id;
 	t_ast_list* enumerator_list;
 } t_ast_enum_specifier;
 
+typedef struct hcc_ast_typedef
+{
+    t_ast_coord coord;
+    char* name;
+    void* symbol; /* ptr to symbol table entry */
+} t_ast_typedef;
+
+typedef struct hcc_ast_struct_or_union_specifier
+{
+    t_ast_coord coord;
+    int is_struct; /* set to 1 for struct, 0 for union */
+    char* name;
+    t_ast_list* struct_declr_list;
+} t_ast_struct_or_union_specifier;
+
+typedef enum 
+{
+    AST_NTYPE_VOID,
+    AST_NTYPE_CHAR,
+    AST_NTYPE_SHORT,
+    AST_NTYPE_INT,
+    AST_NTYPE_LONG,
+    AST_NTYPE_FLOAT,
+    AST_NTYPE_DOUBLE,
+    AST_NTYPE_SIGNED,
+    AST_NTYPE_UNSIGNED,
+} t_ast_native_type_kind;
+
+typedef struct hcc_ast_type_specifier
+{
+    t_ast_coord coord;
+
+    union 
+    {
+        t_ast_native_type_kind native_type;
+        t_ast_struct_or_union_specifier* struct_union_specifier;
+        t_ast_enum_specifier* enum_specifier;
+        t_ast_typedef* type_name;
+    } u;
+} t_ast_type_specifier;
+
 t_ast_enumerator* make_ast_enumerator(char*id, t_ast_exp* exp);
 t_ast_enum_specifier* make_ast_enum_specifier(char* id, t_ast_list* enumerator_list);
-
-
+t_ast_typedef* make_ast_typedef(char*id, void* symbol);
+t_ast_struct_or_union_specifier* make_ast_struct_union_specifier(int is_struct, char* name, t_ast_list* struct_declr_list);
+t_ast_type_specifier* make_ast_type_specifier_template();
 #endif
