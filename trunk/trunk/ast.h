@@ -538,9 +538,23 @@ typedef struct hcc_ast_declr_specifier
 
 typedef struct hcc_ast_pointer
 {
+	t_ast_coord coord;
 	t_ast_list* type_qualifier_list;
 	struct hcc_ast_pointer* pointer;
 } t_ast_pointer;
+
+typedef struct hcc_ast_param_type_list
+{
+	t_ast_coord coord;
+	t_ast_list* parameter_list;
+	int has_ellipsis;
+} t_ast_param_type_list;
+
+typedef struct hcc_ast_suffix_declarator
+{
+	t_ast_coord coord;
+
+} t_ast_suffix_declarator;
 
 t_ast_enumerator* make_ast_enumerator(char*id, t_ast_exp* exp);
 t_ast_enum_specifier* make_ast_enum_specifier(char* id, t_ast_list* enumerator_list);
