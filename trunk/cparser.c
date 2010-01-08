@@ -2102,10 +2102,24 @@ void enum_specifier()
     if (cptk == TK_LBRACE)
     {
         GET_NEXT_TOKEN;
+
+        if (cptk == TK_RBRACE)
+        {
+            GET_NEXT_TOKEN;
+            return;
+        }
+
         enumerator();
         while (cptk == TK_COMMA)
         {
             GET_NEXT_TOKEN;
+
+            if (cptk == TK_RBRACE)
+            {
+                GET_NEXT_TOKEN;
+                return;
+            }
+
             enumerator();
         }
 
@@ -2125,29 +2139,30 @@ enumerator
 	| IDENTIFIER '=' constant_expression
 	;
 */
-void enumerator()
+t_ast_enumerator* enumerator()
 {
+    t_ast_enumerator* e = NULL;
+    t_ast_exp* exp = NULL;
+    char* id = lexeme_value.string_value;
+    t_coordinate saved_coord = coord;
+
     if (cptk != TK_ID)
     {
-		/*
-		 * deal with "unclosed" enum member declaration like
-		 * enum { a, b, c, }
-		 */
-		if (cptk == TK_RBRACE)
-		{
-			return;
-		}
-
         syntax_error("enumerator must be identifier!");
-        return;
+        return NULL;
     }
 
     GET_NEXT_TOKEN;
     if (cptk == TK_ASSIGN)
     {
         GET_NEXT_TOKEN;
-        constant_expression();
+        exp = constant_expression();
     }
+
+    e = make_ast_enumerator(id, exp);
+    BINDING_COORDINATE(e, saved_coord);
+
+    return e;
 }
 
 /*
