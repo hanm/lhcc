@@ -503,6 +503,57 @@ t_ast_type_specifier* make_ast_type_specifier_template()
     return t;
 }
 
+t_ast_type_specifier* make_ast_type_specifier_native_type(t_ast_native_type_kind native_type)
+{
+    t_ast_type_specifier* t = NULL;
+    CALLOC(t, PERM);
+
+    t->kind = AST_TYPE_SPECIFIER_NATIVE;
+    t->u.native_type = native_type;
+
+    return t;
+}
+
+t_ast_type_specifier* make_ast_type_specifier_struct_union(t_ast_struct_or_union_specifier* specifier)
+{
+    t_ast_type_specifier* t = NULL;
+    CALLOC(t, PERM);
+
+    assert(specifier);
+
+    t->kind = AST_TYPE_SPECIFIER_STRUCT_OR_UNION;
+    t->u.struct_union_specifier = specifier;
+
+    return t;
+}
+
+t_ast_type_specifier* make_ast_type_specifier_enum(t_ast_enum_specifier* specifier)
+{
+    t_ast_type_specifier* t = NULL;
+    CALLOC(t, PERM);
+
+    assert(specifier);
+
+    t->u.enum_specifier = specifier;
+    t->kind = AST_TYPE_SPECIFIER_ENUM;
+
+    return t;
+}
+
+t_ast_type_specifier* make_ast_type_specifier_typedef(t_ast_typedef* type_def)
+{
+    t_ast_type_specifier* t = NULL;
+    CALLOC(t, PERM);
+
+    assert(type_def);
+
+    t->kind = AST_TYPE_SPECIFIER_TYPEDEF;
+    t->u.typedef_name = type_def;
+
+    return t;
+}
+
+
 t_ast_type_qualifier* make_ast_type_qualifer(t_ast_type_qualifier_kind kind)
 {
 	t_ast_type_qualifier* t = NULL;
@@ -540,4 +591,131 @@ t_ast_pointer* make_ast_pointer(t_ast_list* list, t_ast_pointer* pointer)
 	p->pointer = pointer;
 	
 	return p;
+}
+
+t_ast_suffix_declarator* make_ast_subscript_declarator(t_ast_exp* exp)
+{
+    t_ast_suffix_declarator* s = NULL;
+    CALLOC(s, PERM);
+
+    s->kind = AST_SUFFIX_DECLR_SUBSCRIPT;
+    s->u.subscript.const_exp = exp;
+
+    return s;
+}
+
+t_ast_suffix_declarator* make_ast_parameter_list_declarator(t_ast_param_type_list* param_type_list, t_ast_list* id_list)
+{
+    t_ast_suffix_declarator* s = NULL;
+    CALLOC(s, PERM);
+
+    s->kind = AST_SUFFIX_DECLR_PARAMETER;
+    s->u.parameter.param_type_list = param_type_list;
+    s->u.parameter.identifier_list = id_list;
+
+    return s;
+}
+
+t_ast_direct_declarator* make_ast_direct_declarator(char* id, t_ast_declarator* declarator)
+{
+    t_ast_direct_declarator* d = NULL;
+    CALLOC(d, PERM);
+
+    assert(id || declarator);
+
+    d->declarator = declarator;
+    d->id = id;
+
+    return d;
+}
+
+t_ast_declarator* make_ast_declarator(t_ast_pointer* pointer, t_ast_direct_declarator* direct_declarator)
+{
+    t_ast_declarator* d = NULL;
+    CALLOC(d, PERM);
+
+    assert(direct_declarator);
+
+    d->pointer = pointer;
+    d->direct_declarator = direct_declarator;
+
+    return d;
+}
+
+t_ast_direct_abstract_declarator* make_ast_direct_abstract_declarator(t_ast_list* suffix_declarator_list)
+{
+    t_ast_direct_abstract_declarator* d = NULL;
+    CALLOC(d, PERM);
+
+    assert(suffix_declarator_list);
+
+    d->suffix_declarators = suffix_declarator_list;
+    return d;
+}
+
+t_ast_abstract_declarator* make_ast_abstract_declarator(t_ast_pointer* pointer, t_ast_direct_abstract_declarator* direct_abstract_declarator)
+{
+    t_ast_abstract_declarator* d = NULL;
+    CALLOC(d, PERM);
+
+    assert(pointer || direct_abstract_declarator);
+
+    d->direct_abstract_declarator = direct_abstract_declarator;
+    d->pointer = pointer;
+
+    return d;
+}
+
+t_ast_type_name* make_ast_type_name(t_ast_list* list, t_ast_abstract_declarator* abstract_declr)
+{
+    t_ast_type_name* t = NULL;
+    CALLOC(t, PERM);
+
+    assert(list);
+
+    t->specifier_qualifier_list = list;
+    t->abstract_declarator = abstract_declr;
+
+    return t;
+}
+
+t_ast_initializer* make_ast_initializer(t_ast_exp* assign_exp, t_ast_list* initializer_list, int comma_ending)
+{
+    t_ast_initializer* i = NULL;
+    CALLOC(i, PERM);
+
+    assert(assign_exp || initializer_list);
+
+    i->assign_exp = assign_exp;
+    i->initializer_list = initializer_list;
+    i->comma_ending = comma_ending;
+
+    return i;
+}
+
+t_ast_parameter_declaration* make_ast_parameter_declaration(t_ast_declaration_specifier* specifier, t_ast_declarator* declarator, t_ast_abstract_declarator* abstract_declarator)
+{
+    t_ast_parameter_declaration* p = NULL;
+    CALLOC(p, PERM);
+
+    assert(specifier && (declarator || abstract_declarator));
+
+    p->declr_specifiers = specifier;
+    p->declarator = declarator;
+    p->abstract_declarator = abstract_declarator;
+
+    return p;
+}
+
+t_ast_struct_declarator* make_ast_struct_declarator(t_ast_declarator* declarator, t_ast_exp* const_exp)
+{
+    t_ast_struct_declarator* d = NULL;
+    CALLOC(d, PERM);
+
+    assert(declarator || const_exp);
+
+    d->const_exp = const_exp;
+    d->declarator = declarator;
+
+    return d;
 }
