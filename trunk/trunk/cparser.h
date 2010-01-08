@@ -527,7 +527,7 @@ void struct_declaration_list();
 void struct_declarator();
 void specifiers_qualifier_list();
 void enum_specifier();
-void enumerator();
+t_ast_enumerator* enumerator();
 
 void translation_unit();
 void external_declaration();
