@@ -490,16 +490,25 @@ typedef enum
     AST_NTYPE_UNSIGNED,
 } t_ast_native_type_kind;
 
+typedef enum
+{
+    AST_TYPE_SPECIFIER_NATIVE,
+    AST_TYPE_SPECIFIER_STRUCT_OR_UNION,
+    AST_TYPE_SPECIFIER_ENUM,
+    AST_TYPE_SPECIFIER_TYPEDEF
+} t_ast_type_specifier_kind;
+
 typedef struct hcc_ast_type_specifier
 {
     t_ast_coord coord;
+    t_ast_type_specifier_kind kind;
 
     union 
     {
         t_ast_native_type_kind native_type;
         t_ast_struct_or_union_specifier* struct_union_specifier;
         t_ast_enum_specifier* enum_specifier;
-        t_ast_typedef* type_name;
+        t_ast_typedef* typedef_name;
     } u;
 } t_ast_type_specifier;
 
@@ -550,19 +559,125 @@ typedef struct hcc_ast_param_type_list
 	int has_ellipsis;
 } t_ast_param_type_list;
 
+typedef enum
+{
+    AST_SUFFIX_DECLR_SUBSCRIPT,
+    AST_SUFFIX_DECLR_PARAMETER
+} t_ast_suffix_declarator_kind;
+
 typedef struct hcc_ast_suffix_declarator
 {
 	t_ast_coord coord;
+    t_ast_suffix_declarator_kind kind;
+
+    union 
+    {
+        struct 
+        {
+            t_ast_exp* const_exp;
+        } subscript;
+
+        struct
+        {
+            t_ast_param_type_list* param_type_list;
+            t_ast_list* identifier_list;
+        } parameter;
+    } u;
 
 } t_ast_suffix_declarator;
+
+
+typedef struct hcc_ast_direct_declarator
+{
+    t_ast_coord coord;
+
+    char* id;
+    t_ast_declarator* declarator;
+} t_ast_direct_declarator;
+
+typedef struct hcc_ast_declarator
+{
+    t_ast_coord coord;
+
+    t_ast_direct_declarator* direct_declarator;
+    t_ast_pointer* pointer;
+} t_ast_declarator;
+
+typedef struct hcc_ast_direct_abstract_declarator
+{
+    t_ast_coord coord;
+    
+    t_ast_list* suffix_declarators;
+} t_ast_direct_abstract_declarator;
+
+typedef struct hcc_ast_abstract_declarator
+{
+    t_ast_coord coord;
+
+    t_ast_pointer* pointer;
+    t_ast_direct_abstract_declarator* direct_abstract_declarator;
+} t_ast_abstract_declarator;
+
+typedef struct hcc_ast_struct_declarator
+{
+    t_ast_coord coord;
+
+    t_ast_declarator* declarator;
+    t_ast_exp* const_exp;
+} t_ast_struct_declarator;
+
+typedef struct hcc_ast_type_name
+{
+    t_ast_coord coord;
+
+    t_ast_list* specifier_qualifier_list;
+    t_ast_abstract_declarator* abstract_declarator;
+} t_ast_type_name;
+
+typedef struct hcc_ast_initializer
+{
+    t_ast_coord coord;
+
+    t_ast_exp* assign_exp;
+    t_ast_list* initializer_list;
+    int comma_ending;
+} t_ast_initializer;
+
+typedef struct hcc_ast_parameter_declaration
+{
+    t_ast_coord coord;
+
+    t_ast_declaration_specifier* declr_specifiers;
+    t_ast_declarator* declarator;
+    t_ast_abstract_declarator* abstract_declarator;
+} t_ast_parameter_declaration;
+
 
 t_ast_enumerator* make_ast_enumerator(char*id, t_ast_exp* exp);
 t_ast_enum_specifier* make_ast_enum_specifier(char* id, t_ast_list* enumerator_list);
 t_ast_typedef* make_ast_typedef(char*id, void* symbol);
 t_ast_struct_or_union_specifier* make_ast_struct_union_specifier(int is_struct, char* name, t_ast_list* struct_declr_list);
-t_ast_type_specifier* make_ast_type_specifier_template();
+t_ast_type_specifier* make_ast_type_specifier_template(); 
+t_ast_type_specifier* make_ast_type_specifier_native_type(t_ast_native_type_kind native_type);
+t_ast_type_specifier* make_ast_type_specifier_struct_union(t_ast_struct_or_union_specifier* specifier);
+t_ast_type_specifier* make_ast_type_specifier_enum(t_ast_enum_specifier* specifier);
+t_ast_type_specifier* make_ast_type_specifier_typedef(t_ast_typedef* type_def);
 t_ast_type_qualifier* make_ast_type_qualifer(t_ast_type_qualifier_kind kind);
 t_ast_storage_specifier* make_ast_storage_specifier(t_ast_storage_specifier_kind kind);
 t_ast_declaration_specifier* make_ast_declaration_specifier(t_ast_list* list);
+
 t_ast_pointer* make_ast_pointer(t_ast_list* list, t_ast_pointer* pointer);
+
+t_ast_suffix_declarator* make_ast_subscript_declarator(t_ast_exp* exp); 
+t_ast_suffix_declarator* make_ast_parameter_list_declarator(t_ast_param_type_list* param_type_list, t_ast_list* id_list);
+t_ast_direct_declarator* make_ast_direct_declarator(char* id, t_ast_declarator* declarator);
+t_ast_declarator* make_ast_declarator(t_ast_pointer* pointer, t_ast_direct_declarator* direct_declarator);
+t_ast_direct_abstract_declarator* make_ast_direct_abstract_declarator(t_ast_list* suffix_declarator_list);
+t_ast_abstract_declarator* make_ast_abstract_declarator(t_ast_pointer* pointer, t_ast_direct_abstract_declarator* direct_abstract_declarator);
+t_ast_struct_declarator* make_ast_struct_declarator(t_ast_declarator* declarator, t_ast_exp* const_exp);
+
+t_ast_type_name* make_ast_type_name(t_ast_list* list, t_ast_abstract_declarator* abstract_declr);
+t_ast_initializer* make_ast_initializer(t_ast_exp* assign_exp, t_ast_list* initializer_list, int comma_ending);
+t_ast_parameter_declaration* make_ast_parameter_declaration(t_ast_declaration_specifier* specifier, t_ast_declarator* declarator, t_ast_abstract_declarator* abstract_declarator);
+
 #endif
