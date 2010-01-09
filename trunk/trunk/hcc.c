@@ -251,7 +251,7 @@ HCC_MEM_CHECK_START
 #ifdef ATOMIC_TEST
    (names);
    (i);
-    test_parser("G:\\src\\list.c", path);
+    test_parser("G:\\src\\mit.c", path);
 #else
     for (; i < NUMBEROFELEMENTS(names); i ++)
     {

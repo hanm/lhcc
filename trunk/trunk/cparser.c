@@ -2083,18 +2083,23 @@ enumerator_list
 	| enumerator_list ',' enumerator
 	;
 */
-void enum_specifier()
+t_ast_enum_specifier* enum_specifier()
 {
-    //
-    // this flag is to indicate that at least we have parsed either { , or ID
-    // which are the only legal suffix following enum keyword..
-    //
+    /*
+     * this flag is to indicate that at least we have parsed either { , or ID
+     * which are the only legal suffix following enum keyword..
+    */
     int flag = 0;
+	t_ast_list *enumerator_list = make_ast_list_entry();
+	t_ast_enum_specifier* e = make_ast_enum_specifier(NULL, enumerator_list);
+	BINDING_COORDINATE(e, coord);
 
     match(TK_ENUM);
 
     if (cptk == TK_ID)
     {
+		e->id = lexeme_value.string_value;
+		
         GET_NEXT_TOKEN;
         flag = 1;
     }
@@ -2106,10 +2111,10 @@ void enum_specifier()
         if (cptk == TK_RBRACE)
         {
             GET_NEXT_TOKEN;
-            return;
+            return e;
         }
 
-        enumerator();
+		HCC_AST_LIST_APPEND(enumerator_list, enumerator());
         while (cptk == TK_COMMA)
         {
             GET_NEXT_TOKEN;
@@ -2117,10 +2122,10 @@ void enum_specifier()
             if (cptk == TK_RBRACE)
             {
                 GET_NEXT_TOKEN;
-                return;
+                return e;
             }
 
-            enumerator();
+			HCC_AST_LIST_APPEND(enumerator_list, enumerator());
         }
 
         match(TK_RBRACE);
@@ -2131,6 +2136,8 @@ void enum_specifier()
     {
         syntax_error("Error when parsing enum specifier : { or identifier expected");
     }
+
+	return e;
 }
 
 /*
