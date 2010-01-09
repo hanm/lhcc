@@ -526,7 +526,7 @@ void struct_or_union_specifier();
 void struct_declaration_list();
 void struct_declarator();
 void specifiers_qualifier_list();
-void enum_specifier();
+t_ast_enum_specifier* enum_specifier();
 t_ast_enumerator* enumerator();
 
 void translation_unit();
