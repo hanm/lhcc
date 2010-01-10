@@ -522,10 +522,10 @@ void direct_declarator(int storage_class);
 void abstract_declarator();
 void direct_abstract_declarator();
 void all_declarator(int storage_class); 
-void struct_or_union_specifier();
-void struct_declaration_list();
+t_ast_struct_or_union_specifier* struct_or_union_specifier();
+t_ast_list* struct_declaration_list();
 void struct_declarator();
-void specifiers_qualifier_list();
+t_ast_list* specifiers_qualifier_list();
 t_ast_enum_specifier* enum_specifier();
 t_ast_enumerator* enumerator();
 
