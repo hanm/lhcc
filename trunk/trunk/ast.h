@@ -488,6 +488,7 @@ typedef enum
     AST_NTYPE_DOUBLE,
     AST_NTYPE_SIGNED,
     AST_NTYPE_UNSIGNED,
+	AST_NTYPE_INT64
 } t_ast_native_type_kind;
 
 typedef enum
@@ -508,7 +509,7 @@ typedef struct hcc_ast_type_specifier
         t_ast_native_type_kind native_type;
         t_ast_struct_or_union_specifier* struct_union_specifier;
         t_ast_enum_specifier* enum_specifier;
-        t_ast_typedef* typedef_name;
+        char* type_def;
     } u;
 } t_ast_type_specifier;
 
@@ -543,6 +544,7 @@ typedef struct hcc_ast_declr_specifier
 {
 	t_ast_coord coord;
 	t_ast_list* list;
+	t_ast_storage_specifier_kind storage_kind;
 } t_ast_declaration_specifier;
 
 typedef struct hcc_ast_pointer
@@ -661,7 +663,7 @@ t_ast_type_specifier* make_ast_type_specifier_template();
 t_ast_type_specifier* make_ast_type_specifier_native_type(t_ast_native_type_kind native_type);
 t_ast_type_specifier* make_ast_type_specifier_struct_union(t_ast_struct_or_union_specifier* specifier);
 t_ast_type_specifier* make_ast_type_specifier_enum(t_ast_enum_specifier* specifier);
-t_ast_type_specifier* make_ast_type_specifier_typedef(t_ast_typedef* type_def);
+t_ast_type_specifier* make_ast_type_specifier_typedef(char* id);
 t_ast_type_qualifier* make_ast_type_qualifer(t_ast_type_qualifier_kind kind);
 t_ast_storage_specifier* make_ast_storage_specifier(t_ast_storage_specifier_kind kind);
 t_ast_declaration_specifier* make_ast_declaration_specifier(t_ast_list* list);

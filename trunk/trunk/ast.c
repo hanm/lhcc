@@ -540,15 +540,15 @@ t_ast_type_specifier* make_ast_type_specifier_enum(t_ast_enum_specifier* specifi
     return t;
 }
 
-t_ast_type_specifier* make_ast_type_specifier_typedef(t_ast_typedef* type_def)
+t_ast_type_specifier* make_ast_type_specifier_typedef(char* id)
 {
     t_ast_type_specifier* t = NULL;
     CALLOC(t, PERM);
 
-    assert(type_def);
+    assert(id);
 
     t->kind = AST_TYPE_SPECIFIER_TYPEDEF;
-    t->u.typedef_name = type_def;
+    t->u.type_def = id;
 
     return t;
 }

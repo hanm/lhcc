@@ -314,6 +314,76 @@ static t_ast_exp_op binary_ast_op(int token_code)
 }
 
 
+static t_ast_native_type_kind token_to_ast_native_type(int token_code)
+{
+	t_ast_native_type_kind kind;
+
+	switch (token_code)
+	{
+		case TK_FLOAT:
+			kind = AST_NTYPE_FLOAT;
+			break;
+        case TK_DOUBLE:
+			kind = AST_NTYPE_DOUBLE;
+			break;
+        case TK_CHAR:
+			kind = AST_NTYPE_CHAR;
+			break;
+        case TK_SHORT:
+			kind = AST_NTYPE_SHORT;
+			break;
+        case TK_INT:
+			kind = AST_NTYPE_INT;
+			break;
+        case TK_SIGNED:
+			kind = AST_NTYPE_SIGNED;
+			break;
+        case TK_UNSIGNED:
+			kind = AST_NTYPE_UNSIGNED;
+			break;
+        case TK_VOID:
+			kind = AST_NTYPE_VOID;
+			break;
+        case TK_LONG:
+			kind = AST_NTYPE_LONG;
+			break;
+		case TK_INT64:
+			kind = AST_NTYPE_INT64;
+			break;
+		default:
+			assert(0);
+	}
+
+	return kind;
+}
+
+static t_ast_storage_specifier_kind token_to_ast_storage_kind(int token_code)
+{
+	t_ast_storage_specifier_kind kind;
+
+	switch (token_code)
+	{
+		case TK_AUTO:
+			kind = AST_STORAGE_AUTO;
+			break;
+        case TK_REGISTER:
+			kind = AST_STORAGE_REGISTER;
+			break;
+        case TK_EXTERN:
+			kind = AST_STORAGE_EXTERN;
+			break;
+        case TK_STATIC:
+			kind = AST_STORAGE_STATIC;
+			break;
+        case TK_TYPEDEF:
+			kind = AST_STORAGE_TYPEDEF;
+			break;
+		default:
+			assert(0);
+	}
+
+	return kind;
+}
 /*
 primary_expression
         : IDENTIFIER
@@ -1443,11 +1513,29 @@ void declaration()
 	match(TK_SEMICOLON);
 }
 
+/*
+declaration_specifiers
+	: storage_class_specifier
+	| storage_class_specifier declaration_specifiers
+	| type_specifier
+	| type_specifier declaration_specifiers
+	| type_qualifier
+	| type_qualifier declaration_specifiers
+	;
+*/
 int declaration_specifiers()
 {
+	/* [TODO] need to make this return declaration_specifier */
     int storage_specifier = TK_AUTO;
-
+	t_ast_storage_specifier_kind storage_kind = AST_STORAGE_AUTO;
+	t_ast_type_specifier* s = NULL;
+	t_ast_list* list = make_ast_list_entry();
+	t_ast_declaration_specifier* declr_specifiers = make_ast_declaration_specifier(list);
 	int alien_type_engaged = 0;
+	int storage_specifier_engaged = 0;
+
+	BINDING_COORDINATE(declr_specifiers, coord);
+	declr_specifiers->storage_kind = storage_kind;
 
     for(;;)
     {
@@ -1458,13 +1546,41 @@ int declaration_specifiers()
         case TK_EXTERN:
         case TK_STATIC:
         case TK_TYPEDEF:
-            storage_specifier = cptk;
-            GET_NEXT_TOKEN;
-            break;
+			{
+				t_ast_storage_specifier* s = NULL;
+				if (storage_specifier_engaged)
+				{
+					/* another place to do semantic checking durin parsing. storage kind is
+					 * a critical value for parser to make parsing decision so got to make it correct
+					 * in the first place.
+					 */
+					syntax_error("more than one storage class specified");
+					return storage_specifier;
+				}
+
+				storage_specifier_engaged = 1;
+				storage_specifier = cptk;
+				storage_kind = token_to_ast_storage_kind(cptk);
+				s = make_ast_storage_specifier(storage_kind);
+				BINDING_COORDINATE(s, coord);
+				HCC_AST_LIST_APPEND(list, s);
+
+				declr_specifiers->storage_kind = storage_kind;
+				
+				GET_NEXT_TOKEN;
+				break;
+			}
         case TK_CONST:
         case TK_VOLATILE:
-            GET_NEXT_TOKEN;
-            break;
+			{
+				t_ast_type_qualifier_kind kind = (cptk == TK_CONST)? AST_TYPE_CONST : AST_TYPE_VOLATILE;
+				t_ast_type_qualifier* q = make_ast_type_qualifer(kind);
+				BINDING_COORDINATE(q, coord);
+				HCC_AST_LIST_APPEND(list, q);
+
+				GET_NEXT_TOKEN;
+				break;
+			}
         case TK_FLOAT:
         case TK_DOUBLE:
         case TK_CHAR:
@@ -1475,25 +1591,44 @@ int declaration_specifiers()
         case TK_VOID:
         case TK_LONG:
 		case TK_INT64:
-            GET_NEXT_TOKEN;
-            break;
+			{
+				s = make_ast_type_specifier_native_type(token_to_ast_native_type(cptk));
+				BINDING_COORDINATE(s, coord);
+				HCC_AST_LIST_APPEND(list, s);
+
+				GET_NEXT_TOKEN;
+				break;
+			}
         case TK_ID:
 			if (!alien_type_engaged && is_typedef_id(lexeme_value.string_value))
             {
+				s = make_ast_type_specifier_typedef(lexeme_value.string_value);
+				BINDING_COORDINATE(s, coord);
+				HCC_AST_LIST_APPEND(list, s);
+
 				alien_type_engaged = 1;
                 GET_NEXT_TOKEN;
 				break;
             }
+
             return storage_specifier;
         case TK_STRUCT:
-        case TK_UNION:
-            struct_or_union_specifier();
-			alien_type_engaged = 1;
-            break;
+		case TK_UNION:
+			{
+				s = make_ast_type_specifier_struct_union(struct_or_union_specifier());
+				HCC_AST_LIST_APPEND(list, s);
+
+				alien_type_engaged = 1;
+				break;
+			}
         case TK_ENUM:
-            enum_specifier();
-			alien_type_engaged = 1;
-            break;
+			{
+				s = make_ast_type_specifier_enum(enum_specifier());
+				HCC_AST_LIST_APPEND(list, s);
+
+				alien_type_engaged = 1;
+				break;
+			}
         default:
             return storage_specifier;
         }
@@ -1931,23 +2066,35 @@ struct_or_union_specifier
 	| struct_or_union IDENTIFIER
 	;
 */
-void struct_or_union_specifier()
+t_ast_struct_or_union_specifier* struct_or_union_specifier()
 {
+	t_ast_struct_or_union_specifier* s = NULL;
+	t_ast_list* struct_declr_list = NULL;
+	char* id = NULL;
+	t_coordinate saved_coord = coord;
+	int is_struct = (cptk == TK_STRUCT)? 1 : 0;
+
     assert(cptk == TK_STRUCT || cptk == TK_UNION);
 
     GET_NEXT_TOKEN;
     if (cptk  == TK_ID)
     {
         /* [TODO] [SYMBOL MANAGE] - install tag name into the types table? */
+		id = lexeme_value.string_value;
         GET_NEXT_TOKEN;
     }
 
     if (cptk == TK_LBRACE)
     {
         GET_NEXT_TOKEN;
-        struct_declaration_list();
+		struct_declr_list = struct_declaration_list();
         match(TK_RBRACE);
     }
+
+	s = make_ast_struct_union_specifier(is_struct, id, struct_declr_list);
+	BINDING_COORDINATE(s, saved_coord);
+
+	return s;
 }
 
 /*
@@ -1963,8 +2110,11 @@ struct_declarator_list
 	| struct_declarator_list ',' struct_declarator
 	;
 */
-void struct_declaration_list()
+t_ast_list* struct_declaration_list()
 {
+	t_ast_list* list = make_ast_list_entry();
+	/*[TODO] missing logic here*/
+
     do
     {
 		specifiers_qualifier_list();
@@ -1979,6 +2129,8 @@ void struct_declaration_list()
         match(TK_SEMICOLON);
     }
     while (cptk != TK_RBRACE);
+
+	return list;
 }
 
 /*
@@ -2016,18 +2168,27 @@ specifier_qualifier_list
 	| type_qualifier
 	;
 */
-void specifiers_qualifier_list()
+t_ast_list* specifiers_qualifier_list()
 {
+	t_ast_list* list = make_ast_list_entry();
     int alien_type_engaged = 0;
+	t_ast_type_specifier* s = NULL;
 
     for(;;)
     {
         switch(cptk)
         {
         case TK_CONST:
-        case TK_VOLATILE:
-            GET_NEXT_TOKEN;
-            break;
+		case TK_VOLATILE:
+			{
+				t_ast_type_qualifier_kind kind = (cptk == TK_CONST)? AST_TYPE_CONST : AST_TYPE_VOLATILE;
+				t_ast_type_qualifier* q = make_ast_type_qualifer(kind);
+				BINDING_COORDINATE(q, coord);
+				HCC_AST_LIST_APPEND(list, q);
+
+				GET_NEXT_TOKEN;
+				break;
+			}
         case TK_FLOAT:
         case TK_DOUBLE:
         case TK_CHAR:
@@ -2038,25 +2199,42 @@ void specifiers_qualifier_list()
         case TK_VOID:
         case TK_LONG:
 		case TK_INT64:
-            GET_NEXT_TOKEN;
-            break;
+			{
+				s = make_ast_type_specifier_native_type(token_to_ast_native_type(cptk));
+				BINDING_COORDINATE(s, coord);
+				HCC_AST_LIST_APPEND(list, s);
+				
+				GET_NEXT_TOKEN;
+				break;
+			}
         case TK_ID:
 			if (!alien_type_engaged && is_typedef_id(lexeme_value.string_value))
             {
+				s = make_ast_type_specifier_typedef(lexeme_value.string_value);
+				BINDING_COORDINATE(s, coord);
+				HCC_AST_LIST_APPEND(list, s);
+
                 GET_NEXT_TOKEN;
                 alien_type_engaged = 1; 
                 break;
             }
-            return;
+
+            return list;
         case TK_STRUCT:
         case TK_UNION:
-            struct_or_union_specifier();
-			alien_type_engaged = 1;
-            break;
+			{
+				s = make_ast_type_specifier_struct_union(struct_or_union_specifier());
+				HCC_AST_LIST_APPEND(list, s);
+				alien_type_engaged = 1;
+				break;
+			}
         case TK_ENUM:
-            enum_specifier();
-			alien_type_engaged = 1;
-            break;
+			{
+				s = make_ast_type_specifier_enum(enum_specifier());
+				HCC_AST_LIST_APPEND(list, s);
+				alien_type_engaged = 1;
+				break;
+			}
         case TK_AUTO:
         case TK_REGISTER:
         case TK_EXTERN:
@@ -2064,10 +2242,10 @@ void specifiers_qualifier_list()
         case TK_TYPEDEF:
             {
                 syntax_error("illegal storage class appears");
-                return;
+                return list;
             }
         default:
-            return;
+            return list;
         }
     }
 }
