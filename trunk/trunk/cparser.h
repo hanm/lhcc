@@ -510,7 +510,7 @@ t_ast_stmt* return_statement();
  * DECLARATIONS
  */
 void declaration();
-int declaration_specifiers();
+t_ast_declaration_specifier* declaration_specifiers();
 void init_declarator(int storage_class);
 t_ast_initializer* initializer();
 void parameter_type_list();

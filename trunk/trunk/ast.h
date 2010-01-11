@@ -545,6 +545,7 @@ typedef struct hcc_ast_declr_specifier
 	t_ast_coord coord;
 	t_ast_list* list;
 	t_ast_storage_specifier_kind storage_kind;
+	int storage_class;
 } t_ast_declaration_specifier;
 
 typedef struct hcc_ast_pointer

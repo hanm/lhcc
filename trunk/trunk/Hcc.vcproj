@@ -230,7 +230,7 @@
 					</File>
 				</Filter>
 				<Filter
-					Name="error handling"
+					Name="log"
 					>
 					<File
 						RelativePath=".\error.c"

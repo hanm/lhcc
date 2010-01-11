@@ -1506,7 +1506,8 @@ declaration
 */
 void declaration()
 {
-	int storage_class = declaration_specifiers();
+	t_ast_declaration_specifier* declr_specifiers = declaration_specifiers();
+	int storage_class = declr_specifiers->storage_class;
 	if (cptk == TK_SEMICOLON)
 	{
 		GET_NEXT_TOKEN;
@@ -1540,9 +1541,8 @@ declaration_specifiers
 	| type_qualifier declaration_specifiers
 	;
 */
-int declaration_specifiers()
+t_ast_declaration_specifier* declaration_specifiers()
 {
-	/* [TODO] need to make this return declaration_specifier */
     int storage_specifier = TK_AUTO;
 	t_ast_storage_specifier_kind storage_kind = AST_STORAGE_AUTO;
 	t_ast_type_specifier* s = NULL;
@@ -1553,6 +1553,7 @@ int declaration_specifiers()
 
 	BINDING_COORDINATE(declr_specifiers, coord);
 	declr_specifiers->storage_kind = storage_kind;
+	declr_specifiers->storage_class = storage_specifier;
 
     for(;;)
     {
@@ -1572,7 +1573,7 @@ int declaration_specifiers()
 					 * in the first place.
 					 */
 					syntax_error("more than one storage class specified");
-					return storage_specifier;
+					return declr_specifiers;
 				}
 
 				storage_specifier_engaged = 1;
@@ -1583,6 +1584,7 @@ int declaration_specifiers()
 				HCC_AST_LIST_APPEND(list, s);
 
 				declr_specifiers->storage_kind = storage_kind;
+				declr_specifiers->storage_class = storage_specifier;
 				
 				GET_NEXT_TOKEN;
 				break;
@@ -1628,7 +1630,7 @@ int declaration_specifiers()
 				break;
             }
 
-            return storage_specifier;
+            return declr_specifiers;
         case TK_STRUCT:
 		case TK_UNION:
 			{
@@ -1647,7 +1649,7 @@ int declaration_specifiers()
 				break;
 			}
         default:
-            return storage_specifier;
+            return declr_specifiers;
         }
     }
 }
@@ -1757,7 +1759,8 @@ parameter_declaration
 */
 void parameter_declaration()
 {
-	int storage_class = declaration_specifiers();
+	t_ast_declaration_specifier* declr_specifiers = declaration_specifiers();
+	int storage_class = declr_specifiers->storage_class;
 
     if (cptk == TK_MUL)
     {
@@ -2485,7 +2488,7 @@ void external_declaration()
         return;
     }
 
-    storage_class = declaration_specifiers();
+    storage_class = declaration_specifiers()->storage_class;
     
     if (cptk == TK_SEMICOLON)
     {
