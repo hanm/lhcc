@@ -384,6 +384,23 @@ static t_ast_storage_specifier_kind token_to_ast_storage_kind(int token_code)
 
 	return kind;
 }
+static t_ast_type_qualifier_kind token_to_ast_type_qualifier_kind(int token_code)
+{
+    if (token_code == TK_CONST)
+    {
+        return AST_TYPE_CONST;
+    }
+    else if (token_code == TK_VOLATILE)
+    {
+        return AST_TYPE_VOLATILE;
+    }
+    else
+    {
+        /* restrict etc C99, for now no..*/
+        assert(0);
+        return AST_TYPE_CONST;
+    }
+}
 /*
 primary_expression
         : IDENTIFIER
@@ -1816,16 +1833,47 @@ pointer
 	| '*' type_qualifier_list pointer
 	;
 */
-void pointer()
+t_ast_pointer* pointer()
 {
+    /* personally I think this code is ugly. the cost of not using recursion. */
+    t_ast_list* type_qualifier_list =  make_ast_list_entry();
+    t_ast_pointer* pointer = make_ast_pointer(type_qualifier_list, NULL);
+    t_ast_pointer* c_pointer = pointer;
+    BINDING_COORDINATE(pointer, coord);
+
+    assert(cptk == TK_MUL);
+
+    GET_NEXT_TOKEN;
+    while (cptk == TK_CONST || cptk == TK_VOLATILE)
+    {
+        t_ast_type_qualifier_kind kind = token_to_ast_type_qualifier_kind(cptk);
+        t_ast_type_qualifier* qualifier = make_ast_type_qualifer(kind);
+        BINDING_COORDINATE(qualifier, coord);
+        HCC_AST_LIST_APPEND(type_qualifier_list, qualifier);
+
+        GET_NEXT_TOKEN;
+    }
+
 	while (cptk == TK_MUL)
 	{
+        type_qualifier_list = make_ast_list_entry();
+        c_pointer->pointer = make_ast_pointer(type_qualifier_list, NULL);
+
 		GET_NEXT_TOKEN;
 		while (cptk == TK_CONST || cptk == TK_VOLATILE)
 		{
+            t_ast_type_qualifier_kind kind = token_to_ast_type_qualifier_kind(cptk);
+            t_ast_type_qualifier* qualifier = make_ast_type_qualifer(kind);
+            BINDING_COORDINATE(qualifier, coord);
+            HCC_AST_LIST_APPEND(type_qualifier_list, qualifier);
+
 			GET_NEXT_TOKEN;
 		}
+
+        c_pointer = c_pointer->pointer;
 	}
+
+    return pointer;
 }
 
 /*

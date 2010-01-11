@@ -515,7 +515,7 @@ void init_declarator(int storage_class);
 void initializer();
 void parameter_type_list();
 void parameter_declaration();
-void pointer();
+t_ast_pointer* pointer();
 void suffix_declarator();
 void declarator(int storage_class);
 void direct_declarator(int storage_class);
