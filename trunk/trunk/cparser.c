@@ -1681,26 +1681,44 @@ initializer_list
 	| initializer_list ',' initializer
 	;
 */
-void initializer()
+t_ast_initializer* initializer()
 {
+    t_ast_list* initializer_list = make_ast_list_entry();
+    t_ast_exp* exp = NULL;
+    t_coordinate saved_coord = coord;
+    t_ast_initializer* r = NULL;
+    int comma_ending = 0;
+
+    (saved_coord, exp, initializer_list);
+
 	if (cptk == TK_LBRACE)
 	{
 		GET_NEXT_TOKEN;
 		
-		initializer();
+        HCC_AST_LIST_APPEND(initializer_list, initializer());
 		while (cptk == TK_COMMA)
 		{
 			GET_NEXT_TOKEN;
-			if (cptk == TK_RBRACE) break;
-			initializer();
+			if (cptk == TK_RBRACE) 
+            {
+                comma_ending = 1;
+                break;
+            }
+
+            HCC_AST_LIST_APPEND(initializer_list, initializer());
 		}
 
 		match(TK_RBRACE);
 	}
 	else
 	{
-		assignment_expression();
+		exp = assignment_expression();
 	}
+
+    r = make_ast_initializer(exp, initializer_list, comma_ending);
+    BINDING_COORDINATE(r, saved_coord);
+
+    return r;
 }
 
 /*
