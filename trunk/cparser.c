@@ -1504,31 +1504,43 @@ declaration
         | declaration_specifiers init_declarator_list ';'
         ;
 */
-void declaration()
+t_ast_declaration* declaration()
 {
 	t_ast_declaration_specifier* declr_specifiers = declaration_specifiers();
 	int storage_class = declr_specifiers->storage_class;
+    t_ast_list *init_declr_list = make_ast_list_entry(), *c_list = init_declr_list;
+    t_coordinate saved_coord = coord;
+    t_ast_declaration* declr = NULL;
+   
 	if (cptk == TK_SEMICOLON)
 	{
+        declr = make_ast_declaration(declr_specifiers, init_declr_list);
+        BINDING_COORDINATE(declr, saved_coord);
+
 		GET_NEXT_TOKEN;
-		return;
+        return declr;
 	}
 
-	init_declarator(storage_class);
+    HCC_AST_LIST_APPEND(c_list, init_declarator(storage_class));
 
 	while (cptk == TK_COMMA)
 	{
 		GET_NEXT_TOKEN;
-		init_declarator(storage_class);
+        HCC_AST_LIST_APPEND(c_list, init_declarator(storage_class));
 	}
+
+    declr = make_ast_declaration(declr_specifiers, init_declr_list);
+    BINDING_COORDINATE(declr, saved_coord);
 
     /* beginning of a compound statement */ 
     if (cptk == TK_LBRACE)
     {
-        return;
+        return declr;
     }
 
 	match(TK_SEMICOLON);
+
+    return declr;
 }
 
 /*
@@ -1660,15 +1672,24 @@ init_declarator
 	| declarator '=' initializer
 	;
 */
-void init_declarator(int storage_class)
+t_ast_init_declarator* init_declarator(int storage_class)
 {
-    declarator(storage_class);
+    t_ast_init_declarator* init_declr = NULL;
+    t_coordinate saved_coord = coord;
+    t_ast_initializer* init = NULL;
+
+    t_ast_declarator* declr = declarator(storage_class);
 
 	if (cptk == TK_ASSIGN)
 	{
 		GET_NEXT_TOKEN;
-		initializer();
+        init = initializer();
 	}
+
+    init_declr = make_ast_init_declarator(declr, init);
+    BINDING_COORDINATE(init_declr, saved_coord);
+
+    return init_declr;
 }
 
 /*
@@ -1960,18 +1981,30 @@ declarator
 	| direct_declarator
 	;
 */
-void declarator(int storage_class)
+t_ast_declarator* declarator(int storage_class)
 {
+    t_ast_declarator* d = NULL;
+    t_ast_pointer* ptr = NULL;
+    t_ast_direct_declarator* dir_declr = NULL;
+    t_ast_list* suffix_list = make_ast_list_entry();
+    t_coordinate saved_coord = coord;
+
 	if (cptk == TK_MUL)
 	{
-		pointer();
+        ptr = pointer();
 	}
-    direct_declarator(storage_class);
+    dir_declr = direct_declarator(storage_class);
 
     while (cptk == TK_LPAREN || cptk == TK_LBRACKET)
     {
+        /* [TODO] binding suffix declarator here */
         suffix_declarator();
     }
+
+    d = make_ast_declarator(ptr, dir_declr, suffix_list);
+    BINDING_COORDINATE(d, saved_coord);
+
+    return d;
 }
 
 /*
@@ -1980,12 +2013,17 @@ direct_declarator
 	| '(' declarator ')'
 	;
 */
-void direct_declarator(int storage_class)
+t_ast_direct_declarator* direct_declarator(int storage_class)
 {
+    t_ast_direct_declarator* dir_declr = NULL;
+    t_ast_declarator* declr = NULL;
+    t_coordinate saved_coord = coord;
+    char* id = NULL;
+
     if (cptk == TK_LPAREN)
     {
         GET_NEXT_TOKEN;
-        declarator(storage_class);
+        declr = declarator(storage_class);
         match(TK_RPAREN);
     }
     else
@@ -2019,8 +2057,15 @@ void direct_declarator(int storage_class)
             (a);
         }
 
+        id = lexeme_value.string_value;
+
 		GET_NEXT_TOKEN;
     }
+
+    dir_declr = make_ast_direct_declarator(id, declr);
+    BINDING_COORDINATE(dir_declr, saved_coord);
+
+    return dir_declr;
 }
 
 /*

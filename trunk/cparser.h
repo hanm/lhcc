@@ -509,16 +509,16 @@ t_ast_stmt* return_statement();
 /*
  * DECLARATIONS
  */
-void declaration();
+t_ast_declaration* declaration();
 t_ast_declaration_specifier* declaration_specifiers();
-void init_declarator(int storage_class);
+t_ast_init_declarator* init_declarator(int storage_class);
 t_ast_initializer* initializer();
 void parameter_type_list();
 void parameter_declaration();
 t_ast_pointer* pointer();
 void suffix_declarator();
-void declarator(int storage_class);
-void direct_declarator(int storage_class);
+t_ast_declarator* declarator(int storage_class);
+t_ast_direct_declarator* direct_declarator(int storage_class);
 void abstract_declarator();
 void direct_abstract_declarator();
 void all_declarator(int storage_class); 
