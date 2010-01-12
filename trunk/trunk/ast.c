@@ -629,7 +629,7 @@ t_ast_direct_declarator* make_ast_direct_declarator(char* id, t_ast_declarator* 
     return d;
 }
 
-t_ast_declarator* make_ast_declarator(t_ast_pointer* pointer, t_ast_direct_declarator* direct_declarator)
+t_ast_declarator* make_ast_declarator(t_ast_pointer* pointer, t_ast_direct_declarator* direct_declarator, t_ast_list* list)
 {
     t_ast_declarator* d = NULL;
     CALLOC(d, PERM);
@@ -638,6 +638,7 @@ t_ast_declarator* make_ast_declarator(t_ast_pointer* pointer, t_ast_direct_decla
 
     d->pointer = pointer;
     d->direct_declarator = direct_declarator;
+    d->suffix_delcr_list = list;
 
     return d;
 }
@@ -718,4 +719,30 @@ t_ast_struct_declarator* make_ast_struct_declarator(t_ast_declarator* declarator
     d->declarator = declarator;
 
     return d;
+}
+
+t_ast_init_declarator* make_ast_init_declarator(t_ast_declarator* declarator, t_ast_initializer* initializer)
+{
+    t_ast_init_declarator* d = NULL;
+    CALLOC(d, PERM);
+
+    assert(declarator);
+
+    d->declarator = declarator;
+    d->initializer = initializer;
+
+    return d;
+}
+
+t_ast_declaration* make_ast_declaration(t_ast_declaration_specifier* declr_specifier, t_ast_list* init_declr_list)
+{
+    t_ast_declaration* declr = NULL;
+    CALLOC(declr, PERM);
+
+    assert(declr_specifier);
+
+    declr->declr_specifiers = declr_specifier;
+    declr->init_declr_list = init_declr_list;
+
+    return declr;
 }
