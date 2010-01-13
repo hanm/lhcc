@@ -643,18 +643,19 @@ t_ast_declarator* make_ast_declarator(t_ast_pointer* pointer, t_ast_direct_decla
     return d;
 }
 
-t_ast_direct_abstract_declarator* make_ast_direct_abstract_declarator(t_ast_list* suffix_declarator_list)
+t_ast_direct_abstract_declarator* make_ast_direct_abstract_declarator(t_ast_suffix_declarator* suffix_declr, t_ast_abstract_declarator* abstract_declr)
 {
     t_ast_direct_abstract_declarator* d = NULL;
     CALLOC(d, PERM);
 
-    assert(suffix_declarator_list);
+    /* [TODO] need assert check here! */
 
-    d->suffix_declarators = suffix_declarator_list;
+    d->suffix_declr = suffix_declr;
+    d->abstract_declr = abstract_declr;
     return d;
 }
 
-t_ast_abstract_declarator* make_ast_abstract_declarator(t_ast_pointer* pointer, t_ast_direct_abstract_declarator* direct_abstract_declarator)
+t_ast_abstract_declarator* make_ast_abstract_declarator(t_ast_pointer* pointer, t_ast_direct_abstract_declarator* direct_abstract_declarator, t_ast_list* suffix_list)
 {
     t_ast_abstract_declarator* d = NULL;
     CALLOC(d, PERM);
@@ -663,6 +664,7 @@ t_ast_abstract_declarator* make_ast_abstract_declarator(t_ast_pointer* pointer, 
 
     d->direct_abstract_declarator = direct_abstract_declarator;
     d->pointer = pointer;
+    d->suffix_list = suffix_list;
 
     return d;
 }
@@ -713,7 +715,7 @@ t_ast_struct_declarator* make_ast_struct_declarator(t_ast_declarator* declarator
     t_ast_struct_declarator* d = NULL;
     CALLOC(d, PERM);
 
-    assert(declarator || const_exp);
+    /* for anonymous struct or union both declarator or const_exp could be NULL */
 
     d->const_exp = const_exp;
     d->declarator = declarator;

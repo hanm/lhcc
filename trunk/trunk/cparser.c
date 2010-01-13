@@ -2073,11 +2073,19 @@ abstract_declarator
 	| pointer direct_abstract_declarator
 	;
 */
-void abstract_declarator()
+t_ast_abstract_declarator* abstract_declarator()
 {
+    t_ast_abstract_declarator* abstract_declr = NULL;
+    t_ast_pointer* ptr = NULL;
+    t_ast_direct_abstract_declarator* dir_abstract_declr = NULL;
+    t_ast_list *suffix_list = make_ast_list_entry(), *c_list = suffix_list;
+    t_coordinate saved_coord = coord;
+
+    (c_list);
+
 	if (cptk == TK_MUL)
 	{
-		pointer();
+		ptr = pointer();
 
 		/*
 		 * look ahead is neither '(' nor '[', we are done.
@@ -2085,16 +2093,25 @@ void abstract_declarator()
          */
 		if (cptk != TK_LPAREN && cptk != TK_LBRACKET)
 		{
-			return;
+            abstract_declr = make_ast_abstract_declarator(ptr, dir_abstract_declr, suffix_list);
+            BINDING_COORDINATE(abstract_declr, saved_coord);
+
+			return abstract_declr;
 		}
 	}
 
-	direct_abstract_declarator();
+    dir_abstract_declr = direct_abstract_declarator();
 
+    /* [TODO][AST] list bind*/
 	while (cptk == TK_LPAREN || cptk == TK_LBRACKET)
 	{
 		suffix_declarator();
 	}
+
+    abstract_declr = make_ast_abstract_declarator(ptr, dir_abstract_declr, suffix_list);
+    BINDING_COORDINATE(abstract_declr, saved_coord);
+
+    return abstract_declr;
 }
 
 /*
@@ -2102,8 +2119,13 @@ direct_abstract_declarator
 	: '(' abstract_declarator ')'
 	: suffix_declarator
 */
-void direct_abstract_declarator()
+t_ast_direct_abstract_declarator* direct_abstract_declarator()
 {
+    t_ast_direct_abstract_declarator* dir_abstract_declr = NULL;
+    t_ast_suffix_declarator* suffix_declr = NULL;
+    t_ast_abstract_declarator* abstract_declr = NULL;
+    t_coordinate saved_coord = coord;
+
 	if (cptk == TK_LPAREN)
 	{
 		GET_NEXT_TOKEN;
@@ -2113,11 +2135,12 @@ void direct_abstract_declarator()
 		 */
 		if (cptk == TK_RPAREN || is_current_token_declaration_specifier_token())
 		{
+            /* [TODO][AST] bind suffix declr here */
 			suffix_declarator();
 		}
 		else
 		{
-			abstract_declarator();
+            abstract_declr = abstract_declarator();
 			match(TK_RPAREN);
 		}
 	}
@@ -2125,6 +2148,11 @@ void direct_abstract_declarator()
 	{
 		syntax_error("illegal token found in abstract declarator!");
 	}
+
+    dir_abstract_declr = make_ast_direct_abstract_declarator(suffix_declr, abstract_declr);
+    BINDING_COORDINATE(dir_abstract_declr, saved_coord);
+
+    return dir_abstract_declr;
 }
 
 /* this function parse declarator regardless of its type - that is, it could parse
@@ -2252,24 +2280,37 @@ struct_declarator
 	| declarator ':' constant_expression
 	;
 */
-void struct_declarator()
+t_ast_struct_declarator* struct_declarator()
 {
+    t_ast_struct_declarator* d = NULL;
+    t_coordinate saved_coord = coord;
+    t_ast_declarator* declr = NULL;
+    t_ast_exp* exp = NULL;
+
     /* short circuit anonymous struct / union */
     if (cptk == TK_SEMICOLON)
     {
-        return;
+        d = make_ast_struct_declarator(declr, exp);
+        BINDING_COORDINATE(d, coord);
+
+        return d;
     }
    
     if (cptk != TK_COLON)
     {
-        declarator(TK_AUTO);
+        declr = declarator(TK_AUTO);
     }
 
     if (cptk == TK_COLON)
     {
         GET_NEXT_TOKEN;
-        constant_expression();
+        exp = constant_expression();
     }
+
+    d = make_ast_struct_declarator(declr, exp);
+    BINDING_COORDINATE(d, saved_coord);
+
+    return d;
 }
 
 /*
