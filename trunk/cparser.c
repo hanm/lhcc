@@ -1706,19 +1706,17 @@ initializer_list
 */
 t_ast_initializer* initializer()
 {
-    t_ast_list* initializer_list = make_ast_list_entry();
+    t_ast_list *initializer_list = make_ast_list_entry(), *c_list = initializer_list;
     t_ast_exp* exp = NULL;
     t_coordinate saved_coord = coord;
     t_ast_initializer* r = NULL;
     int comma_ending = 0;
 
-    (saved_coord, exp, initializer_list);
-
 	if (cptk == TK_LBRACE)
 	{
 		GET_NEXT_TOKEN;
 		
-        HCC_AST_LIST_APPEND(initializer_list, initializer());
+        HCC_AST_LIST_APPEND(c_list, initializer());
 		while (cptk == TK_COMMA)
 		{
 			GET_NEXT_TOKEN;
@@ -1728,7 +1726,7 @@ t_ast_initializer* initializer()
                 break;
             }
 
-            HCC_AST_LIST_APPEND(initializer_list, initializer());
+            HCC_AST_LIST_APPEND(c_list, initializer());
 		}
 
 		match(TK_RBRACE);
@@ -2284,7 +2282,7 @@ specifier_qualifier_list
 */
 t_ast_list* specifiers_qualifier_list()
 {
-	t_ast_list* list = make_ast_list_entry();
+	t_ast_list *list = make_ast_list_entry(), *c_list = list;
     int alien_type_engaged = 0;
 	t_ast_type_specifier* s = NULL;
 
@@ -2298,7 +2296,7 @@ t_ast_list* specifiers_qualifier_list()
 				t_ast_type_qualifier_kind kind = (cptk == TK_CONST)? AST_TYPE_CONST : AST_TYPE_VOLATILE;
 				t_ast_type_qualifier* q = make_ast_type_qualifer(kind);
 				BINDING_COORDINATE(q, coord);
-				HCC_AST_LIST_APPEND(list, q);
+				HCC_AST_LIST_APPEND(c_list, q);
 
 				GET_NEXT_TOKEN;
 				break;
@@ -2316,7 +2314,7 @@ t_ast_list* specifiers_qualifier_list()
 			{
 				s = make_ast_type_specifier_native_type(token_to_ast_native_type(cptk));
 				BINDING_COORDINATE(s, coord);
-				HCC_AST_LIST_APPEND(list, s);
+				HCC_AST_LIST_APPEND(c_list, s);
 				
 				GET_NEXT_TOKEN;
 				break;
@@ -2326,7 +2324,7 @@ t_ast_list* specifiers_qualifier_list()
             {
 				s = make_ast_type_specifier_typedef(lexeme_value.string_value);
 				BINDING_COORDINATE(s, coord);
-				HCC_AST_LIST_APPEND(list, s);
+				HCC_AST_LIST_APPEND(c_list, s);
 
                 GET_NEXT_TOKEN;
                 alien_type_engaged = 1; 
@@ -2338,14 +2336,14 @@ t_ast_list* specifiers_qualifier_list()
         case TK_UNION:
 			{
 				s = make_ast_type_specifier_struct_union(struct_or_union_specifier());
-				HCC_AST_LIST_APPEND(list, s);
+				HCC_AST_LIST_APPEND(c_list, s);
 				alien_type_engaged = 1;
 				break;
 			}
         case TK_ENUM:
 			{
 				s = make_ast_type_specifier_enum(enum_specifier());
-				HCC_AST_LIST_APPEND(list, s);
+				HCC_AST_LIST_APPEND(c_list, s);
 				alien_type_engaged = 1;
 				break;
 			}
