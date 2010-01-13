@@ -1924,16 +1924,27 @@ suffix_declarator
 	|  '(' identifier_list ')'
 	|  '(' ')'
 */
-void suffix_declarator()
+t_ast_suffix_declarator* suffix_declarator()
 {
+    /* [TODO] do something here */
+    t_ast_suffix_declarator* suffix_declr = NULL;
+    t_ast_exp* exp = NULL;
+    t_ast_list *parameters = make_ast_list_entry(), *ids = make_ast_list_entry();
+    t_coordinate saved_coord = coord;
+
+    (saved_coord, parameters, exp, suffix_declr, ids);
+
     if (cptk == TK_LBRACKET)
     {
         GET_NEXT_TOKEN;
         if (cptk != TK_RBRACKET)
         {
-            constant_expression();
+            exp = constant_expression();
         }
         match(TK_RBRACKET);
+
+        suffix_declr = make_ast_subscript_declarator(exp);
+        BINDING_COORDINATE(suffix_declr, saved_coord);
     }
     else if (cptk == TK_LPAREN)
     {
@@ -1971,6 +1982,8 @@ void suffix_declarator()
             }
         }
     }
+
+    return suffix_declr;
 }
 
 /*
