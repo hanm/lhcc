@@ -33,6 +33,7 @@ typedef struct hcc_ast_stmt t_ast_stmt;
 
 typedef struct hcc_ast_declarator t_ast_declarator;
 typedef struct hcc_ast_abstract_declarator t_ast_abstract_declarator;
+typedef struct hcc_ast_all_declarator t_ast_all_declarator;
 
 typedef struct hcc_ast_list
 {
@@ -675,6 +676,15 @@ typedef struct hcc_ast_declaration
     t_ast_list* init_declr_list;
 } t_ast_declaration;
 
+typedef struct hcc_ast_all_declarator
+{
+	t_ast_coord coord;
+	
+	t_ast_pointer* pointer;
+	char* id;
+	t_ast_all_declarator* all_declr;
+	t_ast_list* suffix_declr_list;
+} t_ast_all_declarator;
 
 t_ast_enumerator* make_ast_enumerator(char*id, t_ast_exp* exp);
 t_ast_enum_specifier* make_ast_enum_specifier(char* id, t_ast_list* enumerator_list);
@@ -704,6 +714,6 @@ t_ast_initializer* make_ast_initializer(t_ast_exp* assign_exp, t_ast_list* initi
 t_ast_parameter_declaration* make_ast_parameter_declaration(t_ast_declaration_specifier* specifier, t_ast_declarator* declarator, t_ast_abstract_declarator* abstract_declarator);
 t_ast_init_declarator* make_ast_init_declarator(t_ast_declarator* declarator, t_ast_initializer* initializer);
 t_ast_declaration* make_ast_declaration(t_ast_declaration_specifier* declr_specifier, t_ast_list* init_declr_list);
-
+t_ast_all_declarator* make_ast_all_declarator(t_ast_pointer* ptr, char* id, t_ast_all_declarator* all_declr, t_ast_list* suffix_declr_list);
 
 #endif

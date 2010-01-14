@@ -748,3 +748,18 @@ t_ast_declaration* make_ast_declaration(t_ast_declaration_specifier* declr_speci
 
     return declr;
 }
+
+t_ast_all_declarator* make_ast_all_declarator(t_ast_pointer* ptr, char* id, t_ast_all_declarator* all_declr, t_ast_list* suffix_declr_list)
+{
+	t_ast_all_declarator* declr = NULL;
+	CALLOC(declr, PERM);
+
+	assert(id || all_declr);
+
+	declr->all_declr = all_declr;
+	declr->pointer = ptr;
+	declr->id = id;
+	declr->suffix_declr_list = suffix_declr_list;
+	
+	return declr;
+}
