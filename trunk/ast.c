@@ -696,16 +696,19 @@ t_ast_initializer* make_ast_initializer(t_ast_exp* assign_exp, t_ast_list* initi
     return i;
 }
 
-t_ast_parameter_declaration* make_ast_parameter_declaration(t_ast_declaration_specifier* specifier, t_ast_declarator* declarator, t_ast_abstract_declarator* abstract_declarator)
+t_ast_parameter_declaration* make_ast_parameter_declaration(t_ast_declaration_specifier* specifier, t_ast_direct_declarator* dir_declr,  t_ast_direct_abstract_declarator* dir_abstract_declr, t_ast_pointer* ptr, t_ast_list* suffix_declr_list)
 {
     t_ast_parameter_declaration* p = NULL;
     CALLOC(p, PERM);
 
-    assert(specifier && (declarator || abstract_declarator));
+    /*[TODO] this assert may need rework*/
+    assert(specifier && (dir_declr || dir_abstract_declr || ptr || suffix_declr_list));
 
     p->declr_specifiers = specifier;
-    p->declarator = declarator;
-    p->abstract_declarator = abstract_declarator;
+    p->dir_declr = dir_declr;
+    p->dir_abstract_declr = dir_abstract_declr;
+    p->ptr = ptr;
+    p->suffix_declr_list = suffix_declr_list;
 
     return p;
 }
@@ -754,7 +757,7 @@ t_ast_all_declarator* make_ast_all_declarator(t_ast_pointer* ptr, char* id, t_as
 	t_ast_all_declarator* declr = NULL;
 	CALLOC(declr, PERM);
 
-	assert(id || all_declr);
+	assert(id || all_declr || ptr);
 
 	declr->all_declr = all_declr;
 	declr->pointer = ptr;

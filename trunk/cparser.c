@@ -1776,16 +1776,25 @@ parameter_declaration
 	| declaration_specifiers
 	;
 */
-void parameter_declaration()
+t_ast_parameter_declaration* parameter_declaration()
 {
+    t_ast_parameter_declaration* param_delcr = NULL;
 	t_ast_declaration_specifier* declr_specifiers = declaration_specifiers();
 	int storage_class = declr_specifiers->storage_class;
+    t_ast_pointer* ptr = NULL;
+    t_coordinate saved_coord = coord;
+    t_ast_list* suffix_declr_list = make_ast_list_entry();
+    t_ast_direct_declarator* direct_declr = NULL;
+    t_ast_direct_abstract_declarator* direct_abstract_declr = NULL;
 
+    /* [TODO] remove */
+    (param_delcr, saved_coord, suffix_declr_list, direct_declr, direct_abstract_declr);
+    
     if (cptk == TK_MUL)
     {
-        pointer();
+        ptr = pointer();
 	}  
-
+    
     if (!is_current_token_declarator_token() && cptk != TK_LBRACKET)
     {
         if (cptk == TK_ID && is_typedef_id(lexeme_value.string_value))
@@ -1802,7 +1811,11 @@ void parameter_declaration()
             * an direct abstract direclarator. 
             * This is a case where the parameter declaration is just typename*
             */
-            return;
+            
+            param_delcr = make_ast_parameter_declaration(declr_specifiers, direct_declr, direct_abstract_declr, ptr, suffix_declr_list);
+            BINDING_COORDINATE(param_delcr, saved_coord);
+            
+            return param_delcr;
         }
     }
     
@@ -1825,11 +1838,11 @@ void parameter_declaration()
 
 	if (cptk == TK_ID)
 	{
-		direct_declarator(storage_class);
+        direct_declr = direct_declarator(storage_class);
 	}
 	else if (cptk == TK_LBRACKET)
 	{
-		direct_abstract_declarator();
+        direct_abstract_declr = direct_abstract_declarator();
 	}
 	else
 	{
@@ -1839,7 +1852,10 @@ void parameter_declaration()
 		if (cptk == TK_RPAREN)
 		{
 			/* empty suffix declarator */
-			return;
+            param_delcr = make_ast_parameter_declaration(declr_specifiers, direct_declr, direct_abstract_declr, ptr, suffix_declr_list);
+            BINDING_COORDINATE(param_delcr, saved_coord); 
+    
+            return param_delcr;
 		}
 		else if (is_current_token_declaration_specifier_token())
 		{
@@ -1854,15 +1870,21 @@ void parameter_declaration()
 		}
 		else
 		{
+            /* [TODO] match here */
             all_declarator(storage_class);
 			match(TK_RPAREN);
 		}
 	}
 
+    param_delcr = make_ast_parameter_declaration(declr_specifiers, direct_declr, direct_abstract_declr, ptr, suffix_declr_list);
+    BINDING_COORDINATE(param_delcr, saved_coord);
+
 	while (cptk == TK_LPAREN || cptk == TK_LBRACKET)
 	{
-		suffix_declarator();
+        HCC_AST_LIST_APPEND(suffix_declr_list, suffix_declarator());
 	}
+
+    return param_delcr;
 }
 
 /*
@@ -2172,17 +2194,26 @@ t_ast_direct_abstract_declarator* direct_abstract_declarator()
  * both declarator and abstract declarator. it should only be used when absolutely neccessary
  * because a function should only do one thing well. 
  */
-void all_declarator(int storage_class)
+t_ast_all_declarator* all_declarator(int storage_class)
 {
+    t_ast_all_declarator *all_declr = NULL, *sub_all_declr = NULL;
+    t_ast_pointer* ptr = NULL;
+    t_ast_list* suffix_declr_list = make_ast_list_entry();
+    char* id = NULL;
+    t_coordinate saved_coord = coord;
+
     if (cptk == TK_MUL)
     {
-        pointer();
+        ptr = pointer();
 
         if (cptk != TK_LPAREN && 
             cptk != TK_LBRACKET &&
             cptk != TK_ID) 
         {
-            return;
+            all_declr = make_ast_all_declarator(ptr, id, sub_all_declr, suffix_declr_list);
+            BINDING_COORDINATE(all_declr, saved_coord);
+
+            return all_declr;
         }
     }
 
@@ -2195,21 +2226,28 @@ void all_declarator(int storage_class)
 			symbol->storage = TK_TYPEDEF;
 		}
 
+        id = lexeme_value.string_value;
+
         GET_NEXT_TOKEN;
     }
     else if (cptk == TK_LPAREN)
     {
-        all_declarator(storage_class);
+        sub_all_declr = all_declarator(storage_class);
     }
     else
     {
         if (cptk != TK_LBRACKET) syntax_error("declarator error");
     }
     
+    all_declr = make_ast_all_declarator(ptr, id, sub_all_declr, suffix_declr_list);
+    BINDING_COORDINATE(all_declr, saved_coord);
+
     while (cptk == TK_LPAREN || cptk == TK_LBRACKET)
     {
-        suffix_declarator();
+        HCC_AST_LIST_APPEND(suffix_declr_list, suffix_declarator());
     }
+
+    return all_declr;
 }
 
 /*
