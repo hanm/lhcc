@@ -727,6 +727,19 @@ t_ast_struct_declarator* make_ast_struct_declarator(t_ast_declarator* declarator
     return d;
 }
 
+t_ast_struct_declaration* make_ast_struct_declaration(t_ast_list* specifier_qualifier_list, t_ast_list* struct_declr_list)
+{
+	t_ast_struct_declaration* d = NULL;
+	CALLOC(d, PERM);
+
+	assert(specifier_qualifier_list && struct_declr_list);
+
+	d->specifier_qualifier_list = specifier_qualifier_list;
+	d->struct_declarator_list = struct_declr_list;
+
+	return d;
+}
+
 t_ast_init_declarator* make_ast_init_declarator(t_ast_declarator* declarator, t_ast_initializer* initializer)
 {
     t_ast_init_declarator* d = NULL;
