@@ -634,6 +634,14 @@ typedef struct hcc_ast_struct_declarator
     t_ast_exp* const_exp;
 } t_ast_struct_declarator;
 
+typedef struct hcc_ast_struct_declaration
+{
+	t_ast_coord coord;
+
+	t_ast_list* specifier_qualifier_list;
+	t_ast_list* struct_declarator_list;
+} t_ast_struct_declaration;
+
 typedef struct hcc_ast_type_name
 {
     t_ast_coord coord;
@@ -711,6 +719,7 @@ t_ast_declarator* make_ast_declarator(t_ast_pointer* pointer, t_ast_direct_decla
 t_ast_direct_abstract_declarator* make_ast_direct_abstract_declarator(t_ast_suffix_declarator* suffix_declr, t_ast_abstract_declarator* abstract_declr);
 t_ast_abstract_declarator* make_ast_abstract_declarator(t_ast_pointer* pointer, t_ast_direct_abstract_declarator* direct_abstract_declarator, t_ast_list* suffix_list);
 t_ast_struct_declarator* make_ast_struct_declarator(t_ast_declarator* declarator, t_ast_exp* const_exp);
+t_ast_struct_declaration* make_ast_struct_declaration(t_ast_list* specifier_qualifier_list, t_ast_list* struct_declr_list);
 
 t_ast_type_name* make_ast_type_name(t_ast_list* list, t_ast_abstract_declarator* abstract_declr);
 t_ast_initializer* make_ast_initializer(t_ast_exp* assign_exp, t_ast_list* initializer_list, int comma_ending);

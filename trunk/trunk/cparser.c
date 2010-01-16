@@ -2038,16 +2038,16 @@ t_ast_declarator* declarator(int storage_class)
 	{
         ptr = pointer();
 	}
-    dir_declr = direct_declarator(storage_class);
+
+	dir_declr = direct_declarator(storage_class);
+
+	d = make_ast_declarator(ptr, dir_declr, suffix_list);
+    BINDING_COORDINATE(d, saved_coord);
 
     while (cptk == TK_LPAREN || cptk == TK_LBRACKET)
     {
-        /* [TODO] binding suffix declarator here */
-        suffix_declarator();
+		HCC_AST_LIST_APPEND(suffix_list, suffix_declarator());
     }
-
-    d = make_ast_declarator(ptr, dir_declr, suffix_list);
-    BINDING_COORDINATE(d, saved_coord);
 
     return d;
 }
@@ -2125,10 +2125,8 @@ t_ast_abstract_declarator* abstract_declarator()
     t_ast_abstract_declarator* abstract_declr = NULL;
     t_ast_pointer* ptr = NULL;
     t_ast_direct_abstract_declarator* dir_abstract_declr = NULL;
-    t_ast_list *suffix_list = make_ast_list_entry(), *c_list = suffix_list;
+    t_ast_list *suffix_list = make_ast_list_entry();
     t_coordinate saved_coord = coord;
-
-    (c_list);
 
 	if (cptk == TK_MUL)
 	{
@@ -2149,14 +2147,13 @@ t_ast_abstract_declarator* abstract_declarator()
 
     dir_abstract_declr = direct_abstract_declarator();
 
-    /* [TODO][AST] list bind*/
+	abstract_declr = make_ast_abstract_declarator(ptr, dir_abstract_declr, suffix_list);
+    BINDING_COORDINATE(abstract_declr, saved_coord);
+
 	while (cptk == TK_LPAREN || cptk == TK_LBRACKET)
 	{
-		suffix_declarator();
+		HCC_AST_LIST_APPEND(suffix_list, suffix_declarator());
 	}
-
-    abstract_declr = make_ast_abstract_declarator(ptr, dir_abstract_declr, suffix_list);
-    BINDING_COORDINATE(abstract_declr, saved_coord);
 
     return abstract_declr;
 }
@@ -2178,12 +2175,12 @@ t_ast_direct_abstract_declarator* direct_abstract_declarator()
 		GET_NEXT_TOKEN;
 
 		/*
-	     * look ahead is either ')' or parameter_type_list, so we must processing the suffix declarator.
+	     * abstract_declarator doesn't start with either ) or declr specifier
+		 * so this must be a suffix declarator (either (), or (parameter type))
 		 */
 		if (cptk == TK_RPAREN || is_current_token_declaration_specifier_token())
 		{
-            /* [TODO][AST] bind suffix declr here */
-			suffix_declarator();
+			suffix_declr = suffix_declarator();
 		}
 		else
 		{
@@ -2315,21 +2312,28 @@ struct_declarator_list
 */
 t_ast_list* struct_declaration_list()
 {
-	t_ast_list* list = make_ast_list_entry();
-	/*[TODO] missing logic here*/
+	t_ast_list *list = make_ast_list_entry(), *c_list = list, *specifier_qualifier_list = NULL;
+	t_ast_struct_declaration* struct_declaration = NULL;
 
     do
     {
-		specifiers_qualifier_list();
-        struct_declarator();
+		t_ast_list* struct_declarator_list = make_ast_list_entry();
+		specifier_qualifier_list = specifiers_qualifier_list();
+		
+		struct_declaration = make_ast_struct_declaration(specifier_qualifier_list, struct_declarator_list);
+		BINDING_COORDINATE(struct_declaration, coord);
+
+		HCC_AST_LIST_APPEND(struct_declarator_list, struct_declarator());
         
         while (cptk == TK_COMMA)
         {
             GET_NEXT_TOKEN;
-            struct_declarator();
+			HCC_AST_LIST_APPEND(struct_declarator_list, struct_declarator());
         }
 
         match(TK_SEMICOLON);
+
+		HCC_AST_LIST_APPEND(c_list, struct_declaration);
     }
     while (cptk != TK_RBRACE);
 
