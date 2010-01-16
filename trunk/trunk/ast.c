@@ -696,17 +696,18 @@ t_ast_initializer* make_ast_initializer(t_ast_exp* assign_exp, t_ast_list* initi
     return i;
 }
 
-t_ast_parameter_declaration* make_ast_parameter_declaration(t_ast_declaration_specifier* specifier, t_ast_direct_declarator* dir_declr,  t_ast_direct_abstract_declarator* dir_abstract_declr, t_ast_pointer* ptr, t_ast_list* suffix_declr_list)
+t_ast_parameter_declaration* make_ast_parameter_declaration(t_ast_declaration_specifier* specifier, t_ast_direct_declarator* dir_declr, t_ast_direct_abstract_declarator* dir_abstract_declr, t_ast_all_declarator* all_declr, t_ast_pointer* ptr, t_ast_list* suffix_declr_list)
 {
     t_ast_parameter_declaration* p = NULL;
     CALLOC(p, PERM);
 
     /*[TODO] this assert may need rework*/
-    assert(specifier && (dir_declr || dir_abstract_declr || ptr || suffix_declr_list));
+	assert(specifier && (dir_declr || dir_abstract_declr || ptr || suffix_declr_list || all_declr));
 
     p->declr_specifiers = specifier;
     p->dir_declr = dir_declr;
     p->dir_abstract_declr = dir_abstract_declr;
+	p->all_declr = all_declr;
     p->ptr = ptr;
     p->suffix_declr_list = suffix_declr_list;
 
