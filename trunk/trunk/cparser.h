@@ -513,7 +513,7 @@ t_ast_declaration* declaration();
 t_ast_declaration_specifier* declaration_specifiers();
 t_ast_init_declarator* init_declarator(int storage_class);
 t_ast_initializer* initializer();
-void parameter_type_list();
+t_ast_param_type_list* parameter_type_list();
 t_ast_parameter_declaration* parameter_declaration();
 t_ast_pointer* pointer();
 t_ast_suffix_declarator* suffix_declarator();
