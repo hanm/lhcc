@@ -767,3 +767,16 @@ t_ast_all_declarator* make_ast_all_declarator(t_ast_pointer* ptr, char* id, t_as
 	
 	return declr;
 }
+
+t_ast_param_type_list* make_ast_parameter_type_list(t_ast_list* list, int ellipsis)
+{
+	t_ast_param_type_list* t = NULL;
+	CALLOC(t, PERM);
+
+	assert(list);
+
+	t->has_ellipsis = ellipsis;
+	t->parameter_list = list;
+
+	return t;
+}

@@ -719,4 +719,5 @@ t_ast_init_declarator* make_ast_init_declarator(t_ast_declarator* declarator, t_
 t_ast_declaration* make_ast_declaration(t_ast_declaration_specifier* declr_specifier, t_ast_list* init_declr_list);
 t_ast_all_declarator* make_ast_all_declarator(t_ast_pointer* ptr, char* id, t_ast_all_declarator* all_declr, t_ast_list* suffix_declr_list);
 
+t_ast_param_type_list* make_ast_parameter_type_list(t_ast_list* list, int ellipsis);
 #endif

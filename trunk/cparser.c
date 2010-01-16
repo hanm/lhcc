@@ -1752,9 +1752,13 @@ parameter_list
 	| parameter_list ',' parameter_declaration
 	;
 */
-void parameter_type_list()
+t_ast_param_type_list* parameter_type_list()
 {
-	parameter_declaration();
+	t_ast_list *list = make_ast_list_entry();
+	t_ast_param_type_list* param_type_list = make_ast_parameter_type_list(list, 0);
+	BINDING_COORDINATE(param_type_list, coord);
+
+	HCC_AST_LIST_APPEND(list, parameter_declaration());
 
 	while (cptk == TK_COMMA)
 	{
@@ -1762,11 +1766,16 @@ void parameter_type_list()
 		if (cptk == TK_ELLIPSE)
 		{
 			GET_NEXT_TOKEN;
+
+			param_type_list->has_ellipsis = 1;
+
 			break;
 		}
 
-		parameter_declaration();
+		HCC_AST_LIST_APPEND(list, parameter_declaration());
 	}
+
+	return param_type_list;
 }
 
 /*
@@ -1944,13 +1953,10 @@ suffix_declarator
 */
 t_ast_suffix_declarator* suffix_declarator()
 {
-    /* [TODO] do something here */
     t_ast_suffix_declarator* suffix_declr = NULL;
     t_ast_exp* exp = NULL;
-    t_ast_list *parameters = make_ast_list_entry(), *ids = make_ast_list_entry();
+    t_ast_list *ids = make_ast_list_entry();
     t_coordinate saved_coord = coord;
-
-    (saved_coord, parameters, exp, suffix_declr, ids);
 
     if (cptk == TK_LBRACKET)
     {
@@ -1968,6 +1974,9 @@ t_ast_suffix_declarator* suffix_declarator()
     {
         int new_scope = 0;
 
+		suffix_declr = make_ast_parameter_list_declarator(NULL, ids);
+		BINDING_COORDINATE(suffix_declr, saved_coord);
+
         GET_NEXT_TOKEN;
         
         /* parameter type list always starts with declaration specifiers */
@@ -1975,16 +1984,21 @@ t_ast_suffix_declarator* suffix_declarator()
         {
             enter_scope();
             new_scope = 1;
-            parameter_type_list();
+			suffix_declr->u.parameter.param_type_list = parameter_type_list();
         }
         else
         {
             if (cptk == TK_ID)
             {
+				HCC_AST_LIST_APPEND(ids, lexeme_value.string_value);
+
                 GET_NEXT_TOKEN;
                 while (cptk == TK_COMMA)
                 {
                     GET_NEXT_TOKEN;
+
+					HCC_AST_LIST_APPEND(ids, lexeme_value.string_value);
+
                     match(TK_ID);
                 }
             }
@@ -2000,6 +2014,8 @@ t_ast_suffix_declarator* suffix_declarator()
             }
         }
     }
+
+	assert(suffix_declr);
 
     return suffix_declr;
 }
