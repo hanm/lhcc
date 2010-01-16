@@ -1782,13 +1782,11 @@ t_ast_parameter_declaration* parameter_declaration()
 	t_ast_declaration_specifier* declr_specifiers = declaration_specifiers();
 	int storage_class = declr_specifiers->storage_class;
     t_ast_pointer* ptr = NULL;
-    t_coordinate saved_coord = coord;
     t_ast_list* suffix_declr_list = make_ast_list_entry();
     t_ast_direct_declarator* direct_declr = NULL;
     t_ast_direct_abstract_declarator* direct_abstract_declr = NULL;
-
-    /* [TODO] remove */
-    (param_delcr, saved_coord, suffix_declr_list, direct_declr, direct_abstract_declr);
+	t_ast_all_declarator* all_declr = NULL;
+	t_coordinate saved_coord = coord;
     
     if (cptk == TK_MUL)
     {
@@ -1811,8 +1809,7 @@ t_ast_parameter_declaration* parameter_declaration()
             * an direct abstract direclarator. 
             * This is a case where the parameter declaration is just typename*
             */
-            
-            param_delcr = make_ast_parameter_declaration(declr_specifiers, direct_declr, direct_abstract_declr, ptr, suffix_declr_list);
+            param_delcr = make_ast_parameter_declaration(declr_specifiers, direct_declr, direct_abstract_declr, all_declr, ptr, suffix_declr_list);
             BINDING_COORDINATE(param_delcr, saved_coord);
             
             return param_delcr;
@@ -1852,7 +1849,7 @@ t_ast_parameter_declaration* parameter_declaration()
 		if (cptk == TK_RPAREN)
 		{
 			/* empty suffix declarator */
-            param_delcr = make_ast_parameter_declaration(declr_specifiers, direct_declr, direct_abstract_declr, ptr, suffix_declr_list);
+			param_delcr = make_ast_parameter_declaration(declr_specifiers, direct_declr, direct_abstract_declr, all_declr, ptr, suffix_declr_list);
             BINDING_COORDINATE(param_delcr, saved_coord); 
     
             return param_delcr;
@@ -1870,13 +1867,12 @@ t_ast_parameter_declaration* parameter_declaration()
 		}
 		else
 		{
-            /* [TODO] match here */
-            all_declarator(storage_class);
+			all_declr = all_declarator(storage_class);
 			match(TK_RPAREN);
 		}
 	}
 
-    param_delcr = make_ast_parameter_declaration(declr_specifiers, direct_declr, direct_abstract_declr, ptr, suffix_declr_list);
+	param_delcr = make_ast_parameter_declaration(declr_specifiers, direct_declr, direct_abstract_declr, all_declr, ptr, suffix_declr_list);
     BINDING_COORDINATE(param_delcr, saved_coord);
 
 	while (cptk == TK_LPAREN || cptk == TK_LBRACKET)
