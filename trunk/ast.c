@@ -793,3 +793,21 @@ t_ast_param_type_list* make_ast_parameter_type_list(t_ast_list* list, int ellips
 
 	return t;
 }
+
+t_ast_function_definition* make_ast_function_definition(t_ast_declaration_specifier* declr_specifier,
+	t_ast_declarator* declarator,
+	t_ast_list* declr_list,
+	t_ast_stmt* compound_stmt)
+{
+	t_ast_function_definition* d = NULL;
+	CALLOC(d, PERM);
+
+	assert(compound_stmt && declarator);
+
+	d->declr_specifier = declr_specifier;
+	d->declr_list = declr_list;
+	d->declarator = declarator;
+	d->compound_stmt = compound_stmt;
+
+	return d;
+}

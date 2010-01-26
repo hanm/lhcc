@@ -697,6 +697,29 @@ typedef struct hcc_ast_all_declarator
 	t_ast_list* suffix_declr_list;
 } t_ast_all_declarator;
 
+typedef struct hcc_ast_function_definition
+{
+	t_ast_coord coord;
+
+	t_ast_declaration_specifier* declr_specifier;
+	t_ast_declarator* declarator;
+	t_ast_list* declr_list;
+	t_ast_stmt* compound_stmt;
+} t_ast_function_definition;
+
+typedef struct hcc_ast_external_declaration
+{
+	t_ast_coord coord;
+
+	int fun_def;
+	union
+	{
+		t_ast_function_definition* func_def;
+		t_ast_declaration* declr;
+	}u;
+} t_ast_external_declaration;
+
+
 t_ast_enumerator* make_ast_enumerator(char*id, t_ast_exp* exp);
 t_ast_enum_specifier* make_ast_enum_specifier(char* id, t_ast_list* enumerator_list);
 t_ast_typedef* make_ast_typedef(char*id, void* symbol);
@@ -729,4 +752,10 @@ t_ast_declaration* make_ast_declaration(t_ast_declaration_specifier* declr_speci
 t_ast_all_declarator* make_ast_all_declarator(t_ast_pointer* ptr, char* id, t_ast_all_declarator* all_declr, t_ast_list* suffix_declr_list);
 
 t_ast_param_type_list* make_ast_parameter_type_list(t_ast_list* list, int ellipsis);
+
+t_ast_function_definition* make_ast_function_definition(t_ast_declaration_specifier* declr_specifier,
+	t_ast_declarator* declarator,
+	t_ast_list* declr_list,
+	t_ast_stmt* compound_stmt);
+
 #endif
