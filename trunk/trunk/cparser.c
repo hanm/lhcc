@@ -2709,14 +2709,22 @@ type_name
         | specifier_qualifier_list abstract_declarator
         ;
 */
-void type_name()
+t_ast_type_name* type_name()
 {
-    specifiers_qualifier_list();
+	t_ast_type_name* t = NULL;
+	t_coordinate saved_coord = coord;
+	t_ast_abstract_declarator* abstract_declr = NULL;
+	t_ast_list* list = specifiers_qualifier_list();
 
     if (cptk == TK_MUL || cptk == TK_LPAREN || cptk == TK_LBRACKET)
     {
-        abstract_declarator();
+		abstract_declr = abstract_declarator();
     }
+
+	t = make_ast_type_name(list, abstract_declr);
+	BINDING_COORDINATE(t, saved_coord);
+
+	return t;
 }
 
 
