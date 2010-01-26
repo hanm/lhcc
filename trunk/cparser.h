@@ -528,14 +528,12 @@ t_ast_struct_declarator* struct_declarator();
 t_ast_list* specifiers_qualifier_list();
 t_ast_enum_specifier* enum_specifier();
 t_ast_enumerator* enumerator();
+t_ast_type_name* type_name();
 
 void translation_unit();
 void external_declaration();
 
-/*
- *  Utilities
- */
-void type_name();
+
 int is_typedef_id(char* token_name);
 /*
  * check if current token is in declaration specifier token set
