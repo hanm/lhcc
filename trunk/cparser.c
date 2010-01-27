@@ -2619,37 +2619,53 @@ init_declarator
 void external_declaration()
 {
     int storage_class = TK_AUTO;
+	t_ast_declarator* declrtor = NULL;
+	t_ast_list *declr_list = make_ast_list_entry(), *c_declr_list = declr_list;
+	t_ast_list *init_declr_list = make_ast_list_entry();
+	t_ast_declaration_specifier* declr_specifier = NULL;
+	t_ast_stmt* compound_stmt = NULL;
+	t_coordinate saved_coord = coord;
+
+	t_ast_function_definition* func_def = NULL;
+	t_ast_declaration* declr = NULL;
 
     if (is_current_token_declarator_token())
     {
         /* [FIX ME] - IS THAT NEEDED? function omit types have extern int assumed... */
-        declarator(TK_AUTO);
+		declrtor = declarator(TK_AUTO);
 
         if (cptk != TK_LBRACE)
         {
             /* declaration list */
             while (is_current_token_declaration_specifier_token())
             {
-                declaration();
+				HCC_AST_LIST_APPEND(c_declr_list, declaration());
             }
         }
         
         /* function body */
-        compound_statement();
+		compound_stmt = compound_statement();
+		
+		func_def = make_ast_function_definition(declr_specifier, declrtor, declr_list, compound_stmt);
+		BINDING_COORDINATE(func_def, saved_coord);
+
         return;
     }
 
-    storage_class = declaration_specifiers()->storage_class;
+	declr_specifier = declaration_specifiers();
+	storage_class = declr_specifier->storage_class;
     
     if (cptk == TK_SEMICOLON)
     {
 		/* for non struct/union declaration this should issue a warning */
 		/* TODO - for example, int; long; is by itself not meaningful declarations */
         GET_NEXT_TOKEN;
+
+		(declr);
         return;
     }
 
-    declarator(storage_class);
+	declrtor = declarator(storage_class);
     
 	if (cptk == TK_SEMICOLON)
 	{
@@ -2660,7 +2676,7 @@ void external_declaration()
     else if (cptk == TK_LBRACE)
     {
         /* declaration_specifiers declarator compound_statement */
-        compound_statement();
+		compound_stmt = compound_statement();
         return;
     }
     else if (is_current_token_declaration_specifier_token())
@@ -2668,10 +2684,10 @@ void external_declaration()
         /* declaration_specifiers declarator declaration_list compound_statement*/
         while (is_current_token_declaration_specifier_token())
         {
-            declaration();
+			HCC_AST_LIST_APPEND(declr_list, declaration());
         }
 
-        compound_statement();
+		compound_stmt = compound_statement();
         return;
     }
   
@@ -2679,6 +2695,8 @@ void external_declaration()
      * survive crossfire
 	 * declaration_specifiers init_declarator_list
      */
+	declr = make_ast_declaration(declr_specifier, init_declr_list);
+	BINDING_COORDINATE(declr, saved_coord);
 
     /* init_declarator_list */
     if (cptk == TK_COMMA || cptk == TK_ASSIGN)
