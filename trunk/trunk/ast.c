@@ -811,3 +811,26 @@ t_ast_function_definition* make_ast_function_definition(t_ast_declaration_specif
 
 	return d;
 }
+
+t_ast_external_declaration* make_ast_external_declaration(t_ast_function_definition* func_def, 
+                                                          t_ast_declaration* declar)
+{
+    t_ast_external_declaration* ext_declr = NULL;
+    CALLOC(ext_declr, PERM);
+
+    assert(func_def || declar);
+    assert(!(func_def && declar));
+
+    if (!func_def)
+    {
+        ext_declr->u.func_def = func_def;
+        ext_declr->fun_def = 1;
+    }
+    else
+    {
+        ext_declr->u.declr = declar;
+        ext_declr->fun_def = 0;
+    }
+
+    return ext_declr;
+}

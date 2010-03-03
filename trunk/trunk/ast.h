@@ -758,4 +758,6 @@ t_ast_function_definition* make_ast_function_definition(t_ast_declaration_specif
 	t_ast_list* declr_list,
 	t_ast_stmt* compound_stmt);
 
+t_ast_external_declaration* make_ast_external_declaration(t_ast_function_definition* func_def, t_ast_declaration* declar);
+
 #endif
