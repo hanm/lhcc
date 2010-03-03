@@ -2616,18 +2616,20 @@ init_declarator
 	| declarator '=' initializer
 	;
 */
-void external_declaration()
+t_ast_external_declaration* external_declaration()
 {
     int storage_class = TK_AUTO;
 	t_ast_declarator* declrtor = NULL;
+    t_ast_init_declarator* init_declrtor = NULL;
 	t_ast_list *declr_list = make_ast_list_entry(), *c_declr_list = declr_list;
-	t_ast_list *init_declr_list = make_ast_list_entry();
+    t_ast_list *init_declr_list = make_ast_list_entry(), *c_init_declr_list = init_declr_list;
 	t_ast_declaration_specifier* declr_specifier = NULL;
 	t_ast_stmt* compound_stmt = NULL;
+    t_ast_external_declaration* ext_declr = NULL;
 	t_coordinate saved_coord = coord;
 
 	t_ast_function_definition* func_def = NULL;
-	t_ast_declaration* declr = NULL;
+	t_ast_declaration* declare = NULL;
 
     if (is_current_token_declarator_token())
     {
@@ -2647,9 +2649,11 @@ void external_declaration()
 		compound_stmt = compound_statement();
 		
 		func_def = make_ast_function_definition(declr_specifier, declrtor, declr_list, compound_stmt);
-		BINDING_COORDINATE(func_def, saved_coord);
+        ext_declr = make_ast_external_declaration(func_def, declare);
+        BINDING_COORDINATE(func_def, saved_coord);
+        BINDING_COORDINATE(ext_declr, saved_coord);
 
-        return;
+        return ext_declr;
     }
 
 	declr_specifier = declaration_specifiers();
@@ -2661,42 +2665,70 @@ void external_declaration()
 		/* TODO - for example, int; long; is by itself not meaningful declarations */
         GET_NEXT_TOKEN;
 
-		(declr);
-        return;
+		(declare);
+
+        /* GETH - this return NULL! */
+        return ext_declr;
     }
 
 	declrtor = declarator(storage_class);
+    HCC_AST_LIST_APPEND(c_declr_list, declrtor);
     
 	if (cptk == TK_SEMICOLON)
 	{
         /* declaration_specifiers declarator ;*/
+        /* this is declaration */
+        
+        init_declrtor = make_ast_init_declarator(declrtor, NULL);
+        BINDING_COORDINATE(init_declrtor, saved_coord);
+        HCC_AST_LIST_APPEND(c_init_declr_list, init_declrtor);
+
+        declare = make_ast_declaration(declr_specifier, init_declr_list);
+        ext_declr = make_ast_external_declaration(func_def, declare);
+        BINDING_COORDINATE(declare, saved_coord);
+        BINDING_COORDINATE(ext_declr, saved_coord);
+
 		GET_NEXT_TOKEN;
-        return;
+        return ext_declr;
 	}
     else if (cptk == TK_LBRACE)
     {
         /* declaration_specifiers declarator compound_statement */
+        /* this is function definition */
 		compound_stmt = compound_statement();
-        return;
+        
+        func_def = make_ast_function_definition(declr_specifier, declrtor, declr_list, compound_stmt);
+        ext_declr = make_ast_external_declaration(func_def, declare);
+        BINDING_COORDINATE(func_def, saved_coord);
+        BINDING_COORDINATE(ext_declr, saved_coord);
+
+        return ext_declr;
     }
     else if (is_current_token_declaration_specifier_token())
     {
         /* declaration_specifiers declarator declaration_list compound_statement*/
+        /* this is a function */
         while (is_current_token_declaration_specifier_token())
         {
 			HCC_AST_LIST_APPEND(declr_list, declaration());
         }
 
 		compound_stmt = compound_statement();
-        return;
+
+        func_def = make_ast_function_definition(declr_specifier, declrtor, declr_list, compound_stmt);
+        ext_declr = make_ast_external_declaration(func_def, declare);
+        BINDING_COORDINATE(func_def, saved_coord);
+        BINDING_COORDINATE(ext_declr, saved_coord);
+
+        return ext_declr;
     }
   
     /*
-     * survive crossfire
+     * survive crossfire - this is a declaration
 	 * declaration_specifiers init_declarator_list
      */
-	declr = make_ast_declaration(declr_specifier, init_declr_list);
-	BINDING_COORDINATE(declr, saved_coord);
+	declare = make_ast_declaration(declr_specifier, init_declr_list);
+	BINDING_COORDINATE(declare, saved_coord);
 
     /* init_declarator_list */
     if (cptk == TK_COMMA || cptk == TK_ASSIGN)
@@ -2719,6 +2751,8 @@ void external_declaration()
     {
 		syntax_error("illegal token detected in declaration parsing");
     }
+
+    return ext_declr;
 }
 
 /*

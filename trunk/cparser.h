@@ -531,7 +531,7 @@ t_ast_enumerator* enumerator();
 t_ast_type_name* type_name();
 
 void translation_unit();
-void external_declaration();
+t_ast_external_declaration* external_declaration();
 
 
 int is_typedef_id(char* token_name);

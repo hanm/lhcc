@@ -247,11 +247,11 @@ HCC_MEM_CHECK_START
 
    time(&t1);
 
-//#define ATOMIC_TEST
+#define ATOMIC_TEST
 #ifdef ATOMIC_TEST
    (names);
    (i);
-    test_parser("G:\\src\\mit.c", path);
+    test_parser("G:\\src\\bloom-filter.c", path);
 #else
     for (; i < NUMBEROFELEMENTS(names); i ++)
     {
