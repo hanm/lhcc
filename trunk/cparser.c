@@ -2728,7 +2728,9 @@ t_ast_external_declaration* external_declaration()
 	 * declaration_specifiers init_declarator_list
      */
 	declare = make_ast_declaration(declr_specifier, init_declr_list);
+    ext_declr = make_ast_external_declaration(func_def, declare);
 	BINDING_COORDINATE(declare, saved_coord);
+    BINDING_COORDINATE(ext_declr, saved_coord);
 
     /* init_declarator_list */
     if (cptk == TK_COMMA || cptk == TK_ASSIGN)
@@ -2736,13 +2738,16 @@ t_ast_external_declaration* external_declaration()
         if (cptk == TK_ASSIGN)
         {
             GET_NEXT_TOKEN;
-            initializer();
+            init_declrtor = make_ast_init_declarator(declrtor, initializer());
+            BINDING_COORDINATE(init_declrtor, saved_coord);
+
+            HCC_AST_LIST_APPEND(c_init_declr_list, init_declrtor);
         }
 
         while (cptk == TK_COMMA)
         {
             GET_NEXT_TOKEN;
-            init_declarator(storage_class);
+            HCC_AST_LIST_APPEND(c_init_declr_list, init_declarator(storage_class));
         }
 
         match(TK_SEMICOLON);
