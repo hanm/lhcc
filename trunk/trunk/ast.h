@@ -719,6 +719,13 @@ typedef struct hcc_ast_external_declaration
 	}u;
 } t_ast_external_declaration;
 
+typedef struct hcc_ast_translation_unit
+{
+    t_ast_coord coord;
+
+    t_ast_list *ext_declaration_list;
+} t_ast_translation_unit;
+
 
 t_ast_enumerator* make_ast_enumerator(char*id, t_ast_exp* exp);
 t_ast_enum_specifier* make_ast_enum_specifier(char* id, t_ast_list* enumerator_list);
@@ -759,5 +766,7 @@ t_ast_function_definition* make_ast_function_definition(t_ast_declaration_specif
 	t_ast_stmt* compound_stmt);
 
 t_ast_external_declaration* make_ast_external_declaration(t_ast_function_definition* func_def, t_ast_declaration* declar);
+
+t_ast_translation_unit* make_ast_translation_unit(t_ast_list *ext_declaration_list);
 
 #endif
