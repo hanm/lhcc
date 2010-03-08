@@ -2877,21 +2877,3 @@ int is_token_typename_token(int token_code, char* token_symbol)
       
     return 0;
 }
-
-void semantic_check(t_ast_translation_unit* translation_unit)
-{
-    t_ast_list *ext_declr_list;
-    t_ast_declaration *declr;
-
-    assert(translation_unit);
-
-    ext_declr_list = translation_unit->ext_declaration_list;
-
-    while(!HCC_AST_LIST_IS_END(ext_declr_list))
-    {
-        declr = ext_declr_list->item;
-        ext_declr_list = ext_declr_list->next;
-
-        assert(declr);
-    }
-}

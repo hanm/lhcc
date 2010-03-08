@@ -64,3 +64,29 @@ static void check_outer_declaration(t_ast_declaration* declr)
         semantic_error("global declaration can't have register or auto storage specifier!", &specifiers->coord);
     }
 }
+
+void semantic_check(t_ast_translation_unit* translation_unit)
+{
+    t_ast_list *ext_declr_list;
+	t_ast_external_declaration* ext_declr;
+
+    assert(translation_unit);
+
+    ext_declr_list = translation_unit->ext_declaration_list;
+
+    while(!HCC_AST_LIST_IS_END(ext_declr_list))
+    {
+		ext_declr = ext_declr_list->item;
+        ext_declr_list = ext_declr_list->next;
+
+		if (ext_declr->fun_def)
+		{
+			/* check function */
+		}
+		else
+		{
+			check_outer_declaration(ext_declr->u.declr);
+		}
+    }
+}
+

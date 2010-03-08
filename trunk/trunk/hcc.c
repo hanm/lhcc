@@ -251,7 +251,8 @@ HCC_MEM_CHECK_START
 #ifdef ATOMIC_TEST
    (names);
    (i);
-    test_parser("G:\\src\\bloom-filter.c", path);
+   test_parser("G:\\src\\bloom-filter.c", path);
+   //test_parser("G:\\src\\mass.c",path);
 #else
     for (; i < NUMBEROFELEMENTS(names); i ++)
     {
