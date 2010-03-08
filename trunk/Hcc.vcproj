@@ -331,18 +331,6 @@
 				</File>
 			</Filter>
 			<Filter
-				Name="parser"
-				>
-				<File
-					RelativePath=".\cparser.c"
-					>
-				</File>
-				<File
-					RelativePath=".\cparser.h"
-					>
-				</File>
-			</Filter>
-			<Filter
 				Name="ast"
 				>
 				<File
@@ -351,6 +339,38 @@
 				</File>
 				<File
 					RelativePath=".\ast.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="semantic-check"
+				>
+				<File
+					RelativePath=".\sc-declr.c"
+					>
+				</File>
+				<File
+					RelativePath=".\sc-exp.c"
+					>
+				</File>
+				<File
+					RelativePath=".\sc-stmt.c"
+					>
+				</File>
+				<File
+					RelativePath=".\sc-type.c"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="parser"
+				>
+				<File
+					RelativePath=".\cparser.c"
+					>
+				</File>
+				<File
+					RelativePath=".\cparser.h"
 					>
 				</File>
 			</Filter>

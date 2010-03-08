@@ -530,11 +530,17 @@ t_ast_enum_specifier* enum_specifier();
 t_ast_enumerator* enumerator();
 t_ast_type_name* type_name();
 
-void translation_unit();
+t_ast_translation_unit* translation_unit();
 t_ast_external_declaration* external_declaration();
+
+/* perform a semantic check over abstract syntact trees of declarations, statements, and expressions 
+ * ensure syntactic integrity and type integrity of the translation unit
+ */
+void semantic_check(t_ast_translation_unit* translation_unit);
 
 
 int is_typedef_id(char* token_name);
+
 /*
  * check if current token is in declaration specifier token set
  *

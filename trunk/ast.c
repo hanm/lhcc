@@ -834,3 +834,15 @@ t_ast_external_declaration* make_ast_external_declaration(t_ast_function_definit
 
     return ext_declr;
 }
+
+t_ast_translation_unit* make_ast_translation_unit(t_ast_list *ext_declaration_list)
+{
+    t_ast_translation_unit* t = NULL;
+    CALLOC(t, PERM);
+
+    assert(ext_declaration_list);
+
+    t->ext_declaration_list = ext_declaration_list;
+
+    return t;
+}

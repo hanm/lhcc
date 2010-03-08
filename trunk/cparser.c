@@ -2576,12 +2576,18 @@ translation_unit
 	| translation_unit external_declaration
 	;
 */
-void translation_unit()
+t_ast_translation_unit* translation_unit()
 {
+    t_ast_list* ext_declaration_list = make_ast_list_entry();
+    t_ast_translation_unit* t = make_ast_translation_unit(ext_declaration_list);
+    BINDING_COORDINATE(t, coord);
+
 	while (cptk != TK_END)
 	{
-		external_declaration();
+        HCC_AST_LIST_APPEND(ext_declaration_list, external_declaration());
 	}
+
+    return t;
 }
 
 /*
@@ -2867,4 +2873,9 @@ int is_token_typename_token(int token_code, char* token_symbol)
     }
       
     return 0;
+}
+
+void semantic_check(t_ast_translation_unit* translation_unit)
+{
+    assert(translation_unit);
 }
