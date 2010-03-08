@@ -47,6 +47,8 @@ t_ast_list* make_ast_list_entry();
                 (l)->next = make_ast_list_entry(); \
                 (l) = (l)->next;
 
+#define HCC_AST_LIST_IS_END(l) ((!(l)->item) && (!(l)->next)) ? 1 : 0
+
 /* WARNING - there might be a compiler out there which checks array bondary
  * which renders this trick useless
  */

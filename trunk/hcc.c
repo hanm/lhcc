@@ -202,7 +202,7 @@ void test_parser(char* filename, char** include_path)
 	initialize_clexer(&sc);
 	initialize_parser();
 
-	translation_unit();		
+    semantic_check(translation_unit());		
 
 	free_clexer();
     free_symbol_tables();

@@ -26,6 +26,8 @@ OTHER DEALINGS IN THE SOFTWARE.
 ****************************************************************/
 
 #include "ast.h"
+#include "error.h"
+
 /* Semantic check for declarations */
 
 /* place holder */
@@ -59,7 +61,6 @@ static void check_outer_declaration(t_ast_declaration* declr)
     if (specifiers->storage_kind == AST_STORAGE_AUTO ||
         specifiers->storage_kind == AST_STORAGE_REGISTER)
     {
-        
+        semantic_error("global declaration can't have register or auto storage specifier!", &specifiers->coord);
     }
-
 }
