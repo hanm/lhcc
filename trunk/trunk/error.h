@@ -29,12 +29,14 @@ OTHER DEALINGS IN THE SOFTWARE.
 #define __HCC_TRACE_HANDLING
 /* include this file for getting literal token from token code */
 #include "clexer.h" 
+#include "ast.h"
 
 /* [TODO] these error reporting funcs should accept varidic parameters */
 
 void error(char* expect_token, char* actual_token);
 void syntax_error(char* error_msg);
 void lexeme_error(char* error_msg);
+void semantic_error(char* msg, t_ast_coord* coord);
 void warning(char*);
 void type_error(char* msg);
 

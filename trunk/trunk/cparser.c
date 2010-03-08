@@ -2667,13 +2667,16 @@ t_ast_external_declaration* external_declaration()
     
     if (cptk == TK_SEMICOLON)
     {
-		/* for non struct/union declaration this should issue a warning */
-		/* TODO - for example, int; long; is by itself not meaningful declarations */
+		/* declaration only have declr specifiers. in this case it's a type def
+         * for example, typedef long LONG;
+         */
         GET_NEXT_TOKEN;
 
-		(declare);
+		declare = make_ast_declaration(declr_specifier, init_declr_list);
+        ext_declr = make_ast_external_declaration(func_def, declare);
+        BINDING_COORDINATE(declare, saved_coord);
+        BINDING_COORDINATE(ext_declr, saved_coord);
 
-        /* GETH - this return NULL! */
         return ext_declr;
     }
 
@@ -2877,5 +2880,18 @@ int is_token_typename_token(int token_code, char* token_symbol)
 
 void semantic_check(t_ast_translation_unit* translation_unit)
 {
+    t_ast_list *ext_declr_list;
+    t_ast_declaration *declr;
+
     assert(translation_unit);
+
+    ext_declr_list = translation_unit->ext_declaration_list;
+
+    while(!HCC_AST_LIST_IS_END(ext_declr_list))
+    {
+        declr = ext_declr_list->item;
+        ext_declr_list = ext_declr_list->next;
+
+        assert(declr);
+    }
 }

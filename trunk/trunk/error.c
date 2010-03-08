@@ -124,6 +124,18 @@ void type_error(char* msg)
 	error_count ++;
 }
 
+void semantic_error(char* msg, t_ast_coord* coord)
+{
+    printf("semantic error in file %s on line %d : %s\n", coord->file, coord->line,msg);
+
+    if (fp)
+    {
+        printf("semantic error in file %s on line %d : %s\n", coord->file, coord->line,msg);
+    }
+
+    error_count ++;
+}
+
 void log_initialize(char* filename)
 {
     fp = fopen(filename, "wb+");
