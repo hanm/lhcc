@@ -572,13 +572,11 @@ t_ast_storage_specifier* make_ast_storage_specifier(t_ast_storage_specifier_kind
 	return s;
 }
 
-t_ast_declaration_specifier* make_ast_declaration_specifier(t_ast_list* list)
+t_ast_declaration_specifier* make_ast_declaration_specifier()
 {
 	t_ast_declaration_specifier* s = NULL;
 	CALLOC(s, PERM);
 
-	assert(list);
-	s->list = list;
 	return s;
 }
 
