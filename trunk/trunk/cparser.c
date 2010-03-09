@@ -1555,8 +1555,14 @@ declaration_specifiers
 */
 t_ast_declaration_specifier* declaration_specifiers()
 {
-    int storage_specifier = TK_AUTO;
-	t_ast_storage_specifier_kind storage_kind = AST_STORAGE_AUTO;
+    /* default value for storage specifier / class 
+     * by default doesn't assume any specific value it takes, so assign null for both
+     * actual value depends on contexts
+     * global declaration assume extern
+     * local declaration assume auto
+     */
+    int storage_specifier = TK_NULL;
+    t_ast_storage_specifier_kind storage_kind = AST_STORAGE_NA;
 	t_ast_type_specifier* s = NULL;
 	t_ast_list* list = make_ast_list_entry();
 	t_ast_declaration_specifier* declr_specifiers = make_ast_declaration_specifier(list);
