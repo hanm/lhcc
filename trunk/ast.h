@@ -535,7 +535,8 @@ typedef enum
 	AST_STORAGE_EXTERN,
 	AST_STORAGE_STATIC,
 	AST_STORAGE_AUTO,
-	AST_STORAGE_REGISTER
+	AST_STORAGE_REGISTER,
+    AST_STORAGE_NA /* sentinel */
 } t_ast_storage_specifier_kind;
 
 typedef struct hcc_ast_storage_specifier

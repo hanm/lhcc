@@ -130,7 +130,7 @@ void semantic_error(char* msg, t_ast_coord* coord)
 
     if (fp)
     {
-        printf("semantic error in file %s on line %d : %s\n", coord->file, coord->line,msg);
+        fprintf(fp, "semantic error in file %s on line %d : %s \r\n", coord->file, coord->line,msg);
     }
 
     error_count ++;
