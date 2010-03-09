@@ -37,6 +37,7 @@ void error(char* expect_token, char* actual_token);
 void syntax_error(char* error_msg);
 void lexeme_error(char* error_msg);
 void semantic_error(char* msg, t_ast_coord* coord);
+void semantic_warning(char* msg, t_ast_coord* coord);
 void warning(char*);
 void type_error(char* msg);
 

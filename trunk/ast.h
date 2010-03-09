@@ -548,8 +548,10 @@ typedef struct hcc_ast_storage_specifier
 typedef struct hcc_ast_declr_specifier
 {
 	t_ast_coord coord;
-	t_ast_list* list;
-	t_ast_storage_specifier_kind storage_kind;
+    t_ast_storage_specifier* storage_specifier;
+    t_ast_list* type_qualifier_list;
+	t_ast_list* type_specifier_list;
+
 	int storage_class;
 } t_ast_declaration_specifier;
 
@@ -741,7 +743,7 @@ t_ast_type_specifier* make_ast_type_specifier_enum(t_ast_enum_specifier* specifi
 t_ast_type_specifier* make_ast_type_specifier_typedef(char* id);
 t_ast_type_qualifier* make_ast_type_qualifer(t_ast_type_qualifier_kind kind);
 t_ast_storage_specifier* make_ast_storage_specifier(t_ast_storage_specifier_kind kind);
-t_ast_declaration_specifier* make_ast_declaration_specifier(t_ast_list* list);
+t_ast_declaration_specifier* make_ast_declaration_specifier();
 
 t_ast_pointer* make_ast_pointer(t_ast_list* list, t_ast_pointer* pointer);
 

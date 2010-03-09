@@ -1555,24 +1555,23 @@ declaration_specifiers
 */
 t_ast_declaration_specifier* declaration_specifiers()
 {
-    /* default value for storage specifier / class 
-     * by default doesn't assume any specific value it takes, so assign null for both
-     * actual value depends on contexts
-     * global declaration assume extern
-     * local declaration assume auto
-     */
-    int storage_specifier = TK_NULL;
+    int storage_specifier = TK_NULL; /* only TK_TYPEDEF is non trivial value in this case */
+
     t_ast_storage_specifier_kind storage_kind = AST_STORAGE_NA;
 	t_ast_type_specifier* s = NULL;
-	t_ast_list* list = make_ast_list_entry();
-	t_ast_declaration_specifier* declr_specifiers = make_ast_declaration_specifier(list);
+    t_ast_list *type_specifier_list = make_ast_list_entry(), *type_qualifier_list = make_ast_list_entry();
+	
+    t_ast_declaration_specifier* declr_specifiers = make_ast_declaration_specifier();
+        
 	int alien_type_engaged = 0;
 	int storage_specifier_engaged = 0;
 
-	BINDING_COORDINATE(declr_specifiers, coord);
-	declr_specifiers->storage_kind = storage_kind;
+    declr_specifiers->type_specifier_list = type_specifier_list;
+    declr_specifiers->type_qualifier_list = type_qualifier_list;
 	declr_specifiers->storage_class = storage_specifier;
 
+    BINDING_COORDINATE(declr_specifiers, coord);
+    
     for(;;)
     {
         switch(cptk)
@@ -1599,9 +1598,10 @@ t_ast_declaration_specifier* declaration_specifiers()
 				storage_kind = token_to_ast_storage_kind(cptk);
 				s = make_ast_storage_specifier(storage_kind);
 				BINDING_COORDINATE(s, coord);
-				HCC_AST_LIST_APPEND(list, s);
+				
+                declr_specifiers->storage_specifier = s;
 
-				declr_specifiers->storage_kind = storage_kind;
+                declr_specifiers->storage_specifier->kind = storage_kind;
 				declr_specifiers->storage_class = storage_specifier;
 				
 				GET_NEXT_TOKEN;
@@ -1613,7 +1613,7 @@ t_ast_declaration_specifier* declaration_specifiers()
 				t_ast_type_qualifier_kind kind = (cptk == TK_CONST)? AST_TYPE_CONST : AST_TYPE_VOLATILE;
 				t_ast_type_qualifier* q = make_ast_type_qualifer(kind);
 				BINDING_COORDINATE(q, coord);
-				HCC_AST_LIST_APPEND(list, q);
+                HCC_AST_LIST_APPEND(type_qualifier_list, q);
 
 				GET_NEXT_TOKEN;
 				break;
@@ -1631,7 +1631,7 @@ t_ast_declaration_specifier* declaration_specifiers()
 			{
 				s = make_ast_type_specifier_native_type(token_to_ast_native_type(cptk));
 				BINDING_COORDINATE(s, coord);
-				HCC_AST_LIST_APPEND(list, s);
+                HCC_AST_LIST_APPEND(type_specifier_list, s);
 
 				GET_NEXT_TOKEN;
 				break;
@@ -1641,7 +1641,7 @@ t_ast_declaration_specifier* declaration_specifiers()
             {
 				s = make_ast_type_specifier_typedef(lexeme_value.string_value);
 				BINDING_COORDINATE(s, coord);
-				HCC_AST_LIST_APPEND(list, s);
+                HCC_AST_LIST_APPEND(type_specifier_list, s);
 
 				alien_type_engaged = 1;
                 GET_NEXT_TOKEN;
@@ -1653,7 +1653,7 @@ t_ast_declaration_specifier* declaration_specifiers()
 		case TK_UNION:
 			{
 				s = make_ast_type_specifier_struct_union(struct_or_union_specifier());
-				HCC_AST_LIST_APPEND(list, s);
+                HCC_AST_LIST_APPEND(type_specifier_list, s);
 
 				alien_type_engaged = 1;
 				break;
@@ -1661,7 +1661,7 @@ t_ast_declaration_specifier* declaration_specifiers()
         case TK_ENUM:
 			{
 				s = make_ast_type_specifier_enum(enum_specifier());
-				HCC_AST_LIST_APPEND(list, s);
+                HCC_AST_LIST_APPEND(type_specifier_list, s);
 
 				alien_type_engaged = 1;
 				break;

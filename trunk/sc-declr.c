@@ -30,8 +30,10 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 /* Semantic check for declarations */
 
-/* place holder */
-static int foo = 0;
+static void sc_declaration_specifiers(t_ast_declaration_specifier* spec)
+{   
+    assert(spec);   
+}
 
 /* http://www.mers.byu.edu/docs/standardC/declare.html */
 
@@ -51,18 +53,22 @@ Storage specifiers are omittable (implicit external declaration assumed extern)
 Type specifiers are omittable (implicit assumed as int)
 */
 
-static void check_outer_declaration(t_ast_declaration* declr)
+static void sc_outer_declaration(t_ast_declaration* declr)
 {
     t_ast_declaration_specifier* specifiers;
+    t_ast_storage_specifier* storage_specifier;
     
     assert(declr);
 
     specifiers = declr->declr_specifiers;
-    if (specifiers->storage_kind == AST_STORAGE_AUTO ||
-        specifiers->storage_kind == AST_STORAGE_REGISTER)
+    storage_specifier = specifiers->storage_specifier;
+
+    if (storage_specifier && 
+        (storage_specifier->kind == AST_STORAGE_AUTO ||
+            specifiers->storage_specifier->kind == AST_STORAGE_REGISTER))
     {
         semantic_error("global declaration can't have register or auto storage specifier!", &specifiers->coord);
-    }
+    }    
 }
 
 void semantic_check(t_ast_translation_unit* translation_unit)
@@ -85,7 +91,7 @@ void semantic_check(t_ast_translation_unit* translation_unit)
 		}
 		else
 		{
-			check_outer_declaration(ext_declr->u.declr);
+			sc_outer_declaration(ext_declr->u.declr);
 		}
     }
 }

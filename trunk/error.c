@@ -136,6 +136,18 @@ void semantic_error(char* msg, t_ast_coord* coord)
     error_count ++;
 }
 
+void semantic_warning(char* msg, t_ast_coord* coord)
+{
+    printf("Semantic warning in file %s on line %d : %s\n", coord->file, coord->line,msg);
+
+    if (fp)
+    {
+        fprintf(fp, "Semantic warning in file %s on line %d : %s \r\n", coord->file, coord->line,msg);
+    }
+
+    warning_count ++;
+}  
+
 void log_initialize(char* filename)
 {
     fp = fopen(filename, "wb+");
