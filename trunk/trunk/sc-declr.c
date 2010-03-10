@@ -53,6 +53,9 @@ Storage specifiers are omittable (implicit external declaration assumed extern)
 Type specifiers are omittable (implicit assumed as int)
 */
 
+/*
+ semantic check for global declarations
+ */
 static void sc_outer_declaration(t_ast_declaration* declr)
 {
     t_ast_declaration_specifier* specifiers;
