@@ -32,7 +32,26 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 static void sc_declaration_specifiers(t_ast_declaration_specifier* spec)
 {   
+    t_ast_list* qualifiers;
+    t_ast_type_qualifier* q;
+    int flag = 0;
+
     assert(spec);   
+
+    qualifiers = spec->type_qualifier_list;
+    while(!HCC_AST_LIST_IS_END(qualifiers))
+    {
+        /* TODO - check duplicates need a smart way*/
+        q = (t_ast_type_qualifier*)qualifiers->item;
+        if (q->kind = AST_TYPE_CONST)
+        {
+            flag |= 0x01;
+        }
+        else if (q->kind == AST_TYPE_VOLATILE)
+        {
+            flag |= 0x10;
+        }
+    }
 }
 
 /* http://www.mers.byu.edu/docs/standardC/declare.html */
