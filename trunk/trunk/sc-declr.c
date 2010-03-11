@@ -34,23 +34,28 @@ static void sc_declaration_specifiers(t_ast_declaration_specifier* spec)
 {   
     t_ast_list* qualifiers;
     t_ast_type_qualifier* q;
-    int flag = 0;
+    int f = 0;
 
     assert(spec);   
 
     qualifiers = spec->type_qualifier_list;
     while(!HCC_AST_LIST_IS_END(qualifiers))
     {
-        /* TODO - check duplicates need a smart way*/
         q = (t_ast_type_qualifier*)qualifiers->item;
-        if (q->kind = AST_TYPE_CONST)
+        if (q->kind == AST_TYPE_CONST && !(f & 0x01))
         {
-            flag |= 0x01;
+            f |= 0x01;
         }
-        else if (q->kind == AST_TYPE_VOLATILE)
+        else if (q->kind == AST_TYPE_VOLATILE && !(f & 0x10))
         {
-            flag |= 0x10;
+            f |= 0x10;
         }
+		else
+		{
+			semantic_warning("duplicate type qualifiers are ignored!", &q->coord);
+		}
+
+		qualifiers = qualifiers->next;
     }
 }
 
@@ -91,6 +96,8 @@ static void sc_outer_declaration(t_ast_declaration* declr)
     {
         semantic_error("global declaration can't have register or auto storage specifier!", &specifiers->coord);
     }    
+
+	sc_declaration_specifiers(specifiers);
 }
 
 void semantic_check(t_ast_translation_unit* translation_unit)
