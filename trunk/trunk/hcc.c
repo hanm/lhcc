@@ -31,6 +31,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 #include "cparser.h"
 #include "hconfig.h"
 #include "arena.h"
+#include "type.h"
 #include <crtdbg.h>
 
 #include <time.h>
@@ -201,6 +202,7 @@ void test_parser(char* filename, char** include_path)
 
 	initialize_clexer(&sc);
 	initialize_parser();
+    type_system_initialize();
 
     semantic_check(translation_unit());		
 
