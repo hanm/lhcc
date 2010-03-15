@@ -485,14 +485,14 @@ typedef enum
 {
     AST_NTYPE_VOID,
     AST_NTYPE_CHAR,
-    AST_NTYPE_SHORT,
     AST_NTYPE_INT,
-    AST_NTYPE_LONG,
     AST_NTYPE_FLOAT,
     AST_NTYPE_DOUBLE,
+    AST_NTYPE_SHORT,
+    AST_NTYPE_LONG,
     AST_NTYPE_SIGNED,
     AST_NTYPE_UNSIGNED,
-	AST_NTYPE_INT64
+	AST_NTYPE_INT64 /* none standard ! */
 } t_ast_native_type_kind;
 
 typedef enum
