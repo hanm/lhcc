@@ -40,7 +40,7 @@ static void sc_declaration_specifiers(t_ast_declaration_specifier* spec)
     t_ast_type_qualifier* q;
     t_ast_type_specifier* s;
     int f = 0; /* qualifier flag */
-//    int g = 0; /* type specifier flag */
+    int g = 0; /* type specifier flag */
 
     assert(spec);   
 
@@ -74,6 +74,15 @@ static void sc_declaration_specifiers(t_ast_declaration_specifier* spec)
         {
         case AST_TYPE_SPECIFIER_NATIVE:
             {
+				if ( (g & (1 << s->u.native_type)) != 0)
+				{
+					if (s->u.native_type <= AST_NTYPE_SHORT)
+					{
+						semantic_error("duplicate type specifier is illegal", &s->coord);
+					}
+				}
+
+				g |= (1 << s->u.native_type);
                 break;
             }
         case AST_TYPE_SPECIFIER_STRUCT_OR_UNION:

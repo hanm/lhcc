@@ -38,7 +38,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 #include "preprocessor/cpp.h"
 
 // enable trace in lexical analysis
-#define HCC_TRACE_ENABLE
+//#define HCC_TRACE_ENABLE
 #include "trace.h"
 
 /*
@@ -254,7 +254,7 @@ void initialize_clexer(t_scanner_context* sc)
      */
     define_macro(&ls, "wchar_t=int");
     define_macro(&ls, "NULL=((void *)0)");
-    define_macro(&ls, "size_t=unsigned int");
+    //define_macro(&ls, "size_t=unsigned int");
     
 #if defined(_WIN32)
     define_macro(&ls, "_WIN32");
