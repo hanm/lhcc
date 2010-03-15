@@ -29,37 +29,18 @@ OTHER DEALINGS IN THE SOFTWARE.
 #include "error.h"
 
 /* Semantic check for declarations - prototypes */
-static void sc_type_specifier(t_ast_type_specifier* spec);
 static void sc_declaration_specifiers(t_ast_declaration_specifier* spec);
 static void sc_outer_declaration(t_ast_declaration* declr);
 
 /* Semantic check for declarations - implementations */
-static void sc_type_specifier(t_ast_type_specifier* spec)
-{
-    assert(spec);
-
-    switch (spec->kind)
-    {
-    case AST_TYPE_SPECIFIER_NATIVE:
-        break;
-    case AST_TYPE_SPECIFIER_STRUCT_OR_UNION:
-        break;
-    case AST_TYPE_SPECIFIER_TYPEDEF:
-        break;
-    case AST_TYPE_SPECIFIER_ENUM:
-        break;
-    default:
-        break;
-    }
-}
-
 static void sc_declaration_specifiers(t_ast_declaration_specifier* spec)
 {   
     t_ast_list* qualifiers;
     t_ast_list* specifiers;
     t_ast_type_qualifier* q;
     t_ast_type_specifier* s;
-    int f = 0;
+    int f = 0; /* qualifier flag */
+//    int g = 0; /* type specifier flag */
 
     assert(spec);   
 
@@ -86,12 +67,31 @@ static void sc_declaration_specifiers(t_ast_declaration_specifier* spec)
     specifiers = spec->type_specifier_list;
     while(!HCC_AST_LIST_IS_END(specifiers))
     {
-        s = (t_ast_type_specifier*)specifiers->item;
+        s = (t_ast_type_specifier*)specifiers->item; 
         specifiers = specifiers->next;
 
-        sc_type_specifier(s);        
+        switch (s->kind)
+        {
+        case AST_TYPE_SPECIFIER_NATIVE:
+            {
+                break;
+            }
+        case AST_TYPE_SPECIFIER_STRUCT_OR_UNION:
+            {
+                break;
+            }
+        case AST_TYPE_SPECIFIER_TYPEDEF:
+            {
+                break;
+            }
+        case AST_TYPE_SPECIFIER_ENUM:
+            {
+                break;
+            }
+        default:
+            break;
+        }  
     }
-
 }
 
 /* http://www.mers.byu.edu/docs/standardC/declare.html */
