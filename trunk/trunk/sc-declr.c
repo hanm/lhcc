@@ -41,6 +41,7 @@ static void sc_declaration_specifiers(t_ast_declaration_specifier* spec)
     t_ast_type_specifier* s;
     int f = 0; /* qualifier flag */
     int g = 0; /* type specifier flag */
+	int long_long = 0; /* long long type as a special case */
 
     assert(spec);   
 
@@ -74,15 +75,32 @@ static void sc_declaration_specifiers(t_ast_declaration_specifier* spec)
         {
         case AST_TYPE_SPECIFIER_NATIVE:
             {
-				if ( (g & (1 << s->u.native_type)) != 0)
+				int ntype = s->u.native_type;
+				if ( (g & (1 << ntype)) != 0)
 				{
-					if (s->u.native_type <= AST_NTYPE_SHORT)
+					if (ntype <= AST_NTYPE_SHORT || ntype == AST_NTYPE_INT64)
 					{
 						semantic_error("duplicate type specifier is illegal", &s->coord);
 					}
+					else if (ntype == AST_NTYPE_SIGNED || ntype == AST_NTYPE_UNSIGNED)
+					{
+						semantic_warning("duplicate signedness specifier is ignored", &s->coord);
+					}
+					else if (ntype == AST_NTYPE_LONG)
+					{
+						g &= ~ (1 << AST_NTYPE_LONG);
+						if (long_long)
+						{
+							semantic_error("too many long long specifier", &s->coord);
+						}
+						long_long = 1;
+					}
+				}
+				else
+				{
+					g |= (1 << s->u.native_type);
 				}
 
-				g |= (1 << s->u.native_type);
                 break;
             }
         case AST_TYPE_SPECIFIER_STRUCT_OR_UNION:
@@ -100,7 +118,13 @@ static void sc_declaration_specifiers(t_ast_declaration_specifier* spec)
         default:
             break;
         }  
-    }
+    } /* end iteration */
+
+	if (long_long)
+	{
+		spec->type = type_longlong;
+	}
+
 }
 
 /* http://www.mers.byu.edu/docs/standardC/declare.html */
