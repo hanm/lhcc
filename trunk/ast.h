@@ -35,6 +35,7 @@ typedef struct hcc_ast_declarator t_ast_declarator;
 typedef struct hcc_ast_abstract_declarator t_ast_abstract_declarator;
 typedef struct hcc_ast_all_declarator t_ast_all_declarator;
 
+
 typedef struct hcc_ast_list
 {
     void* item;
@@ -492,7 +493,7 @@ typedef enum
     AST_NTYPE_LONG,
     AST_NTYPE_SIGNED,
     AST_NTYPE_UNSIGNED,
-	AST_NTYPE_INT64 /* none standard ! */
+	AST_NTYPE_INT64 /* WARNING - NON STD USED */
 } t_ast_native_type_kind;
 
 typedef enum
@@ -553,6 +554,8 @@ typedef struct hcc_ast_declr_specifier
 	t_ast_list* type_specifier_list;
 
 	int storage_class;
+	
+	struct type* type;
 } t_ast_declaration_specifier;
 
 typedef struct hcc_ast_pointer
