@@ -76,7 +76,7 @@ static void sc_declaration_specifiers(t_ast_declaration_specifier* spec)
         case AST_TYPE_SPECIFIER_NATIVE:
             {
 				int ntype = s->u.native_type;
-				if ( (g & (1 << ntype)) != 0)
+				if ((g & (1 << ntype)))
 				{
 					if (ntype <= AST_NTYPE_SHORT || ntype == AST_NTYPE_INT64)
 					{
@@ -120,11 +120,67 @@ static void sc_declaration_specifiers(t_ast_declaration_specifier* spec)
         }  
     } /* end iteration */
 
+    /* TODO - remove ! */
 	if (long_long)
 	{
 		spec->type = type_longlong;
 	}
 
+    /* list of possible type specifiers from C99 standard.
+    — void
+    — char
+    — signed char
+    — unsigned char
+    — short, signed short, short int, or signed short int
+    — unsigned short, or unsigned short int
+    — int, signed, or signed int
+    — unsigned, or unsigned int
+    — long, signed long, long int, or signed long int
+    — unsigned long, or unsigned long int
+    — long long, signed long long, long long int, or
+    — signed long long int
+    — unsigned long long, or unsigned long long int
+    — float
+    — double
+    — long double
+    — _Bool
+    — float _Complex
+    — double _Complex
+    — long double _Complex
+    — struct or union specifier *
+    — enum specifier
+    — typedef name
+    */
+
+    /* void */
+    if (( g & (1 << AST_NTYPE_VOID)))
+    {
+        if (g & ~(1 << AST_NTYPE_VOID))
+        {
+            semantic_error("void can't be used with other types", &spec->coord);
+        }
+        else
+        {
+            spec->type = type_void;
+        }
+    }
+     /* char, signed char, unsigned char */
+    else if ( (g & ( 1 << AST_NTYPE_CHAR)))
+    {
+        int t = g & ~(1 << AST_NTYPE_CHAR);
+        if (t)
+        {
+            if ( ( t & ( 1 << AST_NTYPE_SIGNED))  && !( t & ~( 1 << AST_NTYPE_SIGNED)))
+            {
+
+            }
+        }
+        else
+        {
+            spec->type = type_char;
+        }
+    }
+    
 }
 
 /* http://www.mers.byu.edu/docs/standardC/declare.html */
