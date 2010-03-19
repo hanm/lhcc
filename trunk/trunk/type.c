@@ -48,6 +48,7 @@ static struct type_entry
 }* type_table[__HCC_TYPE_TABLE_HASHSIZE];
 
 t_type* type_char;
+t_type* type_signed_char;
 t_type* type_unsigned_char;
 t_type* type_short;
 t_type* type_unsigned_short;
@@ -121,6 +122,8 @@ void type_system_initialize()
     if (type_system_initialized) return;
 
 	type_char = install_type_symbol(TYPE_CHAR, atom_string("char"), HCC_CHAR_SIZE, HCC_CHAR_SIZE);
+
+    type_signed_char = install_type_symbol(TYPE_SIGNED_CHAR, atom_string("signed char"), HCC_CHAR_SIZE, HCC_CHAR_SIZE);
 	
 	type_unsigned_char = install_type_symbol(TYPE_UNSIGNED_CHAR, atom_string("unsigned char"), HCC_CHAR_SIZE, HCC_CHAR_SIZE);
 	

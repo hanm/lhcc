@@ -33,7 +33,8 @@ OTHER DEALINGS IN THE SOFTWARE.
  ************************************************/
 enum 
 {
-	TYPE_CHAR, /* signed char */
+	TYPE_CHAR, /* char */
+    TYPE_SIGNED_CHAR, /* signed char */
 	TYPE_UNSIGNED_CHAR, /* unsigned char */
 	TYPE_SHORT, /* short, signed short, short int, signed short int */
 	TYPE_UNSIGNED_SHORT, /* unsigned short, unsigned short int */
@@ -155,6 +156,7 @@ typedef struct function_type
  * ANSI C Defined Types
  */
 extern t_type* type_char;
+extern t_type* type_signed_char;
 extern t_type* type_unsigned_char;
 extern t_type* type_short;
 extern t_type* type_unsigned_short;
