@@ -172,12 +172,48 @@ static void sc_declaration_specifiers(t_ast_declaration_specifier* spec)
         {
             if ( ( t & ( 1 << AST_NTYPE_SIGNED))  && !( t & ~( 1 << AST_NTYPE_SIGNED)))
             {
-
+                spec->type = type_signed_char;
+            }
+            else if ( (t & ( 1<< AST_NTYPE_UNSIGNED)) && !( t & ~( 1 << AST_NTYPE_UNSIGNED)))
+            {
+                spec->type = type_unsigned_char;
+            }
+            else
+            {
+                semantic_error("char can only be decorated by signed or unsigned", &spec->coord);
             }
         }
         else
         {
             spec->type = type_char;
+        }
+    }
+    /* short, signed short, short int, or signed short int */
+    else if ( (g & ( 1 << AST_NTYPE_SHORT)))
+    {
+        int t = g & ~( 1 << AST_NTYPE_SHORT);
+        if (t)
+        {
+            if ( t & ( 1 << AST_NTYPE_SIGNED))
+            {
+                if ( (t & ( 1 << AST_NTYPE_INT)))
+                {
+                    if (!( t & ~( 1 << AST_NTYPE_INT)))
+                    {
+                         /* signed short int */
+                        spec->type = type_short;
+                    }
+                    else
+                    {
+                        semantic_error("type error - short type can only be decorated by signed or int", &spec->coord);
+                    }
+                }
+                // else if ( ! (t & ~( 1 << AST_NTYPE_INT)))....
+            }
+        }
+        else
+        {
+            spec->type = type_short;
         }
     }
     
