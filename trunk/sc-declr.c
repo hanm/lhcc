@@ -42,6 +42,7 @@ static void sc_declaration_specifiers(t_ast_declaration_specifier* spec)
     int f = 0; /* qualifier flag */
     int g = 0; /* type specifier flag */
 	int long_long = 0; /* long long type as a special case */
+	int unsign = 0;
 
     assert(spec);   
 
@@ -120,36 +121,39 @@ static void sc_declaration_specifiers(t_ast_declaration_specifier* spec)
         }  
     } /* end iteration */
 
-    /* TODO - remove ! */
-	if (long_long)
+	if ((g & ( 1 << AST_NTYPE_UNSIGNED)) && (g & ( 1 << AST_NTYPE_SIGNED)))
 	{
-		spec->type = type_longlong;
+		semantic_error("unsigned and signed can't be mixed used together", &spec->coord);
+	}
+	else if ( g & ( 1 << AST_NTYPE_UNSIGNED))
+	{
+		unsign = 1;
 	}
 
     /* list of possible type specifiers from C99 standard.
-    — void
-    — char
-    — signed char
-    — unsigned char
-    — short, signed short, short int, or signed short int
-    — unsigned short, or unsigned short int
-    — int, signed, or signed int
-    — unsigned, or unsigned int
-    — long, signed long, long int, or signed long int
-    — unsigned long, or unsigned long int
-    — long long, signed long long, long long int, or
-    — signed long long int
-    — unsigned long long, or unsigned long long int
-    — float
-    — double
-    — long double
-    — _Bool
-    — float _Complex
-    — double _Complex
-    — long double _Complex
-    — struct or union specifier *
-    — enum specifier
-    — typedef name
+		void
+		char
+		signed char
+		unsigned char
+		short, signed short, short int, or signed short int
+		unsigned short, or unsigned short int
+		int, signed, or signed int
+		unsigned, or unsigned int
+		long, signed long, long int, or signed long int
+		unsigned long, or unsigned long int
+		long long, signed long long, long long int, or
+		signed long long int
+		unsigned long long, or unsigned long long int
+		float
+		double
+		long double
+		_Bool
+		float _Complex
+		double _Complex
+		long double _Complex
+		struct or union specifier *
+		enum specifier
+		typedef name
     */
 
     /* void */
@@ -189,33 +193,23 @@ static void sc_declaration_specifiers(t_ast_declaration_specifier* spec)
         }
     }
     /* short, signed short, short int, or signed short int */
+	/* unsigned short, unsigned short int */
     else if ( (g & ( 1 << AST_NTYPE_SHORT)))
     {
-        int t = g & ~( 1 << AST_NTYPE_SHORT);
-        if (t)
-        {
-            if ( t & ( 1 << AST_NTYPE_SIGNED))
-            {
-                if ( (t & ( 1 << AST_NTYPE_INT)))
-                {
-                    if (!( t & ~( 1 << AST_NTYPE_INT)))
-                    {
-                         /* signed short int */
-                        spec->type = type_short;
-                    }
-                    else
-                    {
-                        semantic_error("type error - short type can only be decorated by signed or int", &spec->coord);
-                    }
-                }
-                // else if ( ! (t & ~( 1 << AST_NTYPE_INT)))....
-            }
-        }
-        else
-        {
-            spec->type = type_short;
-        }
-    }
+		int m = (1 << AST_NTYPE_SIGNED) | 
+				(1 << AST_NTYPE_UNSIGNED) | 
+				(1 << AST_NTYPE_INT) | 
+				(1 << AST_NTYPE_SHORT);
+		
+		if ( g & ~m)
+		{
+			semantic_error("illegal short type", &spec->coord);
+		}
+		else
+		{
+			spec->type = unsign ? type_unsigned_short : type_short;
+		}
+	}
     
 }
 
