@@ -210,7 +210,66 @@ static void sc_declaration_specifiers(t_ast_declaration_specifier* spec)
 			spec->type = unsign ? type_unsigned_short : type_short;
 		}
 	}
-    
+    /* all kinds of long :)
+
+        long, signed long, long int, or signed long int
+        unsigned long, or unsigned long int
+        long long, signed long long, long long int, or
+        signed long long int
+        unsigned long long, or unsigned long long int
+
+        and long double :)
+    */
+    else if ( (g & ( 1 << AST_NTYPE_LONG)))
+    {
+        int m = (1 << AST_NTYPE_SIGNED) | 
+				(1 << AST_NTYPE_UNSIGNED) | 
+				(1 << AST_NTYPE_INT) | 
+                (1 << AST_NTYPE_LONG);
+
+        int n = (1 << AST_NTYPE_LONG) | 
+            (1 << AST_NTYPE_DOUBLE);
+
+        if ( g & ~m)
+        {
+            if ( g & ~n)
+            {
+                semantic_error("illegal long type", &spec->coord);
+            }
+            
+            if ( g & (1 << AST_NTYPE_DOUBLE))
+            {
+                spec->type = type_longdouble;
+            }
+        }
+        else
+        {
+            if (unsign)
+            {
+                if (long_long)
+                {
+                    spec->type = type_unsigned_longlong;
+                }
+                else
+                {
+                    spec->type = type_unsigned_long;
+                }
+            }
+            else
+            {
+                if (long_long)
+                {
+                    spec->type = type_longlong;
+                }
+                else
+                {
+                    spec->type = type_long;
+                }
+            }
+        }
+    } /* end various long long*/
+    //else if 
+    // float, double, and int TODO.
 }
 
 /* http://www.mers.byu.edu/docs/standardC/declare.html */
