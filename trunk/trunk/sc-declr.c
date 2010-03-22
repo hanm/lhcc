@@ -268,8 +268,62 @@ static void sc_declaration_specifiers(t_ast_declaration_specifier* spec)
             }
         }
     } /* end various long long*/
-    //else if 
-    // float, double, and int TODO.
+	/*
+	  unsigned int, signed int, int
+	*/
+	else if(g & ( 1 << AST_NTYPE_INT))
+	{
+		int m = (1 << AST_NTYPE_SIGNED) | 
+				(1 << AST_NTYPE_UNSIGNED) | 
+				(1 << AST_NTYPE_INT);
+
+		if (g & ~m)
+		{
+			semantic_error("illegal int type", &spec->coord);
+		}
+		else
+		{
+			spec->type = unsign ? type_unsigned_int : type_int;
+		}
+	}
+	/* float */
+	else if(g & ( 1 << AST_NTYPE_FLOAT))
+	{
+		if (g & ~( 1 << AST_NTYPE_FLOAT))
+		{
+			semantic_error("illegal float type", &spec->coord);
+		}
+		else
+		{
+			spec->type = type_float;	
+		}
+	}
+	else if(g & ( 1 << AST_NTYPE_DOUBLE))
+	{
+		if (g & ~( 1 << AST_NTYPE_DOUBLE))
+		{
+			semantic_error("illegal double type", &spec->coord);
+		}
+		else
+		{
+			spec->type = type_double;	
+		}
+	}
+	else
+	{
+		int m = (1 << AST_NTYPE_SIGNED) |
+				(1 << AST_NTYPE_UNSIGNED);
+
+		if (g & ~m)
+		{
+			/* here could be struct or union or enum specifier [TODO]*/
+			/*semantic_error("unrecognized type", &spec->coord);*/
+		}
+		else
+		{
+			spec->type = unsign ? type_unsigned_int : type_int;
+		}
+	}
 }
 
 /* http://www.mers.byu.edu/docs/standardC/declare.html */
