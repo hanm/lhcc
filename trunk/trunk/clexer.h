@@ -28,6 +28,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 #ifndef __HCC_SCANNER_H
 #define __HCC_SCANNER_H
 
+#include "hcc.h"
 #include "symbol.h"
 
 enum TOKEN
@@ -40,13 +41,6 @@ enum TOKEN
 #define HCC_ISDECIMAL_DIGIT(n) (n >= '0' && n <= '9')
 #define HCC_ISOCT_DIGIT(n)       (n >= '0' && n <= '7')
 #define HCC_ISHEX_DIGIT(n)        (HCC_ISDECIMAL_DIGIT(n) || (n >= 'A' && n <= 'F') || (n >= 'a' && n <= 'f'))
-
-typedef struct coordinate
-{
-    char* filename;
-    int line;
-    int column;
-} t_coordinate;
 
 typedef struct clexer_context
 {

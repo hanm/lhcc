@@ -33,13 +33,6 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 extern int symbol_scope;
 
-typedef struct token_coordinate
-{
-    char* file;
-    unsigned long line, column;
-} t_token_coordinate;
-
-
 enum {
 	SYMBOL_TYPEDEF, /* typedef names */
 	SYMBOL_IDENTIFIER, /* normal identifier */
@@ -84,7 +77,7 @@ typedef struct symbol
     int defined; /* symbol definition flag */
 
     int hidden_typedef;
-    t_token_coordinate coordinate;
+    t_coordinate coordinate;
 
 	struct symbol* previous;
 

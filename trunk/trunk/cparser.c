@@ -1812,10 +1812,13 @@ t_ast_parameter_declaration* parameter_declaration()
     {
         if (cptk == TK_ID && is_typedef_id(lexeme_value.string_value))
         {
-            /* typedef name is hidden by redeclaring the name as a normal identifier */
             t_symbol* sym = find_symbol(lexeme_value.string_value, sym_table_identifiers);
-            sym->hidden_typedef = 1;
-            record_hidden_typedef_name(sym);
+
+            if (symbol_scope > sym->scope)
+            {
+                sym->hidden_typedef = 1;
+                record_hidden_typedef_name(sym);
+            }
         }
         else
         {
@@ -2091,18 +2094,14 @@ t_ast_direct_declarator* direct_declarator(int storage_class)
 		*/
 		if (storage_class == TK_TYPEDEF)
 		{
-			t_symbol* symbol = add_symbol(lexeme_value.string_value, &sym_table_identifiers, symbol_scope, FUNC);
+            /*[TODO] -check type def here - mix some semantic stuff*/
+            t_symbol* symbol = add_symbol(lexeme_value.string_value, &sym_table_identifiers, symbol_scope, FUNC);
 			symbol->storage = TK_TYPEDEF;
-		}
-		else
-		{
-			/* [DEBUG] */
-			(lexeme_value.string_value);
-			(storage_class);
+            symbol->coordinate = coord;
 		}
 
         /* DEBUG */
-        if (strcmp("CreatePrivateObjectSecurity"/*"PRKCRM_MARSHAL_HEADER"*/, lexeme_value.string_value) == 0)
+        if (strcmp("Token"/*"PRKCRM_MARSHAL_HEADER"*/, lexeme_value.string_value) == 0)
         {
 			int a = 0;
             (a);
@@ -2239,6 +2238,7 @@ t_ast_all_declarator* all_declarator(int storage_class)
 		{
 			t_symbol* symbol = add_symbol(lexeme_value.string_value, &sym_table_identifiers, symbol_scope, FUNC);
 			symbol->storage = TK_TYPEDEF;
+            symbol->coordinate = coord;
 		}
 
         id = lexeme_value.string_value;
@@ -2804,7 +2804,7 @@ int is_typedef_id(char* token_name)
 {
     t_symbol* sym = find_symbol(token_name, sym_table_identifiers);
 
-    return (sym != NULL) && (sym->storage == TK_TYPEDEF) && (sym->scope <= symbol_scope);
+    return (sym != NULL) && (sym->storage == TK_TYPEDEF) && (sym->scope <= symbol_scope) && (!sym->hidden_typedef);
 }
 
 int is_current_token_declaration_specifier_token()
