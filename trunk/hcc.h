@@ -82,4 +82,12 @@ enum { STORAGE_AUTO=0, STORAGE_REGISTER, STORAGE_STATIC, STORAGE_EXTERN};
 void llcc_test_symbol_table();
 #endif
 
+typedef struct coordinate
+{
+    char* filename;
+    int line;
+    int column;
+} t_coordinate;
+
+
 #endif

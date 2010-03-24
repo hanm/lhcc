@@ -146,6 +146,7 @@ t_symbol* add_symbol(char* name, t_symbol_table** table, int level, int arena)
 
 	p->symbol.name = (char *)name;
     p->symbol.scope = level;
+    //p->symbol.coordinate = 0;
     p->symbol.previous = tb->all_symbols;
 	tb->all_symbols = &p->symbol;
 	p->next = tb->buckets[h];
