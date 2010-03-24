@@ -1563,7 +1563,7 @@ t_ast_declaration_specifier* declaration_specifiers()
 	
     t_ast_declaration_specifier* declr_specifiers = make_ast_declaration_specifier();
         
-	int alien_type_engaged = 0;
+	int type_engaged = 0;
 	int storage_specifier_engaged = 0;
 
     declr_specifiers->type_specifier_list = type_specifier_list;
@@ -1633,17 +1633,18 @@ t_ast_declaration_specifier* declaration_specifiers()
 				BINDING_COORDINATE(s, coord);
                 HCC_AST_LIST_APPEND(type_specifier_list, s);
 
+                type_engaged = 1;
 				GET_NEXT_TOKEN;
 				break;
 			}
         case TK_ID:
-			if (!alien_type_engaged && is_typedef_id(lexeme_value.string_value))
+			if (!type_engaged && is_typedef_id(lexeme_value.string_value))
             {
 				s = make_ast_type_specifier_typedef(lexeme_value.string_value);
 				BINDING_COORDINATE(s, coord);
                 HCC_AST_LIST_APPEND(type_specifier_list, s);
 
-				alien_type_engaged = 1;
+				type_engaged = 1;
                 GET_NEXT_TOKEN;
 				break;
             }
@@ -1655,7 +1656,7 @@ t_ast_declaration_specifier* declaration_specifiers()
 				s = make_ast_type_specifier_struct_union(struct_or_union_specifier());
                 HCC_AST_LIST_APPEND(type_specifier_list, s);
 
-				alien_type_engaged = 1;
+				type_engaged = 1;
 				break;
 			}
         case TK_ENUM:
@@ -1663,7 +1664,7 @@ t_ast_declaration_specifier* declaration_specifiers()
 				s = make_ast_type_specifier_enum(enum_specifier());
                 HCC_AST_LIST_APPEND(type_specifier_list, s);
 
-				alien_type_engaged = 1;
+				type_engaged = 1;
 				break;
 			}
         default:
@@ -2082,6 +2083,8 @@ t_ast_direct_declarator* direct_declarator(int storage_class)
     }
     else
     {
+        t_symbol* symbol;
+
 		if (cptk != TK_ID)
 		{
 			syntax_error("direct declarator must end with an identifier");
@@ -2095,10 +2098,19 @@ t_ast_direct_declarator* direct_declarator(int storage_class)
 		if (storage_class == TK_TYPEDEF)
 		{
             /*[TODO] -check type def here - mix some semantic stuff*/
-            t_symbol* symbol = add_symbol(lexeme_value.string_value, &sym_table_identifiers, symbol_scope, FUNC);
+            symbol = add_symbol(lexeme_value.string_value, &sym_table_identifiers, symbol_scope, FUNC);
 			symbol->storage = TK_TYPEDEF;
             symbol->coordinate = coord;
 		}
+        else
+        {
+            symbol = find_symbol(lexeme_value.string_value, sym_table_identifiers);
+            
+            if (symbol && symbol->storage == TK_TYPEDEF && symbol->scope < symbol_scope)
+            {
+                record_hidden_typedef_name(symbol);
+            }
+        }
 
         /* DEBUG */
         if (strcmp("Token"/*"PRKCRM_MARSHAL_HEADER"*/, lexeme_value.string_value) == 0)
@@ -2397,7 +2409,7 @@ specifier_qualifier_list
 t_ast_list* specifiers_qualifier_list()
 {
 	t_ast_list *list = make_ast_list_entry(), *c_list = list;
-    int alien_type_engaged = 0;
+    int type_engaged = 0;
 	t_ast_type_specifier* s = NULL;
 
     for(;;)
@@ -2430,18 +2442,19 @@ t_ast_list* specifiers_qualifier_list()
 				BINDING_COORDINATE(s, coord);
 				HCC_AST_LIST_APPEND(c_list, s);
 				
+                type_engaged = 1;
 				GET_NEXT_TOKEN;
 				break;
 			}
         case TK_ID:
-			if (!alien_type_engaged && is_typedef_id(lexeme_value.string_value))
+			if (!type_engaged && is_typedef_id(lexeme_value.string_value))
             {
 				s = make_ast_type_specifier_typedef(lexeme_value.string_value);
 				BINDING_COORDINATE(s, coord);
 				HCC_AST_LIST_APPEND(c_list, s);
 
                 GET_NEXT_TOKEN;
-                alien_type_engaged = 1; 
+                type_engaged = 1; 
                 break;
             }
 
@@ -2451,14 +2464,14 @@ t_ast_list* specifiers_qualifier_list()
 			{
 				s = make_ast_type_specifier_struct_union(struct_or_union_specifier());
 				HCC_AST_LIST_APPEND(c_list, s);
-				alien_type_engaged = 1;
+				type_engaged = 1;
 				break;
 			}
         case TK_ENUM:
 			{
 				s = make_ast_type_specifier_enum(enum_specifier());
 				HCC_AST_LIST_APPEND(c_list, s);
-				alien_type_engaged = 1;
+				type_engaged = 1;
 				break;
 			}
         case TK_AUTO:
