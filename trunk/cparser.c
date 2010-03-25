@@ -2090,22 +2090,35 @@ t_ast_direct_declarator* direct_declarator(int storage_class)
 			syntax_error("direct declarator must end with an identifier");
 		}
 
-		/*
-		 * parser has to know if an ID is typedefined type name or not to make some decisions
-		 * this is the place where C grammar's LL(0) is violated
-		 * otherwise symbol management could all be done in semantic checking phase.
-		*/
+		symbol = find_symbol(lexeme_value.string_value, sym_table_identifiers);
+
 		if (storage_class == TK_TYPEDEF)
-		{
-            /*[TODO] -check type def here - mix some semantic stuff*/
-            symbol = add_symbol(lexeme_value.string_value, &sym_table_identifiers, symbol_scope, FUNC);
-			symbol->storage = TK_TYPEDEF;
-            symbol->coordinate = coord;
+		{ 
+			if (symbol && symbol->storage == TK_TYPEDEF && symbol->scope == symbol_scope)
+			{
+				/* [todo] - not necessarily issue an error here
+				 same typedef twice looks ok on vc
+				 need check standard to make sure.
+				*/
+				syntax_error("redefinition of type ");
+			}
+			else
+			{
+				if (!strcmp("PFORMAT_STRING", lexeme_value.string_value))
+				{
+					/* FOR DEBUG ONLY*/
+					int a;
+					int b;
+					a = 0;
+					b = a + 1;
+				}
+				symbol = add_symbol(lexeme_value.string_value, &sym_table_identifiers, symbol_scope, FUNC);
+				symbol->storage = TK_TYPEDEF;
+				symbol->coordinate = coord;
+			}
 		}
         else
-        {
-            symbol = find_symbol(lexeme_value.string_value, sym_table_identifiers);
-            
+        {   
             if (symbol && symbol->storage == TK_TYPEDEF && symbol->scope < symbol_scope)
             {
                 record_hidden_typedef_name(symbol);
