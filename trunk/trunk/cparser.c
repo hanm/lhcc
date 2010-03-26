@@ -2094,24 +2094,19 @@ t_ast_direct_declarator* direct_declarator(int storage_class)
 
 		if (storage_class == TK_TYPEDEF)
 		{ 
-			if (symbol && symbol->storage == TK_TYPEDEF && symbol->scope == symbol_scope)
+			if (symbol && symbol->scope == symbol_scope)
 			{
-				/* [todo] - not necessarily issue an error here
-				 same typedef twice looks ok on vc
-				 need check standard to make sure.
-				*/
-				syntax_error("redefinition of type ");
+                if (symbol->storage == TK_TYPEDEF)
+                {
+                    warning("redefinition of typedef type name!");
+                }
+                else
+                {
+                    type_error("type redefinition - different storage classes");
+                }
 			}
 			else
 			{
-				if (!strcmp("PFORMAT_STRING", lexeme_value.string_value))
-				{
-					/* FOR DEBUG ONLY*/
-					int a;
-					int b;
-					a = 0;
-					b = a + 1;
-				}
 				symbol = add_symbol(lexeme_value.string_value, &sym_table_identifiers, symbol_scope, FUNC);
 				symbol->storage = TK_TYPEDEF;
 				symbol->coordinate = coord;
@@ -2123,13 +2118,6 @@ t_ast_direct_declarator* direct_declarator(int storage_class)
             {
                 record_hidden_typedef_name(symbol);
             }
-        }
-
-        /* DEBUG */
-        if (strcmp("Token"/*"PRKCRM_MARSHAL_HEADER"*/, lexeme_value.string_value) == 0)
-        {
-			int a = 0;
-            (a);
         }
 
         id = lexeme_value.string_value;

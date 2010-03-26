@@ -38,7 +38,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 #include "preprocessor/cpp.h"
 
 // enable trace in lexical analysis
-#define HCC_TRACE_ENABLE
+//#define HCC_TRACE_ENABLE
 #include "trace.h"
 
 /*
@@ -719,10 +719,10 @@ static int get_token_internal()
 #ifdef HCC_TRACE_ENABLE
         printf("new context: file '%s', line %ld\n",
             ls.ctok->name, ls.ctok->line);
-
+#endif
+        
         coord.filename = atom_string(ls.ctok->name);
         coord.line = ls.ctok->line;
-#endif
 
 		/* HACK! TODO */
         retval = TK_WHITESPACE;
