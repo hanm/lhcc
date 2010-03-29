@@ -64,7 +64,8 @@ enum
 	TYPE_RESTRICT, /* restrict (C99) */
 
 	/* extended types [FIX ME] */
-	TYPE_INT64 /* int 64 */
+	TYPE_INT64, /* int 64 */
+    TYPE_UNSIGNED_INT64
 };
 
 
@@ -166,11 +167,14 @@ extern t_type* type_long;
 extern t_type* type_unsigned_long;
 extern t_type* type_longlong;
 extern t_type* type_unsigned_longlong;
+extern t_type* type_int64; /* non std extension */
+extern t_type* type_unsigned_int64; /* non std extension */
 extern t_type* type_float;
 extern t_type* type_double;
 extern t_type* type_longdouble;
 extern t_type* type_ptr;
 extern t_type* type_void;
+
 
 t_type* remove_type_qualifier(t_type* type);
 
