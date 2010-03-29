@@ -63,6 +63,8 @@ t_type* type_double;
 t_type* type_longdouble;
 t_type* type_ptr;
 t_type* type_void;
+t_type* type_int64;
+t_type* type_unsigned_int64;
 
 static t_type* atomic_type(t_type* type, int code, int align, int size, t_symbol* symbol_link)
 {
@@ -152,6 +154,10 @@ void type_system_initialize()
 	type_ptr = install_type_symbol(TYPE_PTR, atom_string("T*"), HCC_PTR_SIZE, HCC_PTR_SIZE);
 	
 	type_void = install_type_symbol(TYPE_VOID, atom_string("void"), 0, 0);
+
+    /* non std usage - extension */
+    type_int64 = install_type_symbol(TYPE_INT64, atom_string("int64"), HCC_LONGLONG_SIZE, HCC_LONGLONG_SIZE);
+    type_unsigned_int64 = install_type_symbol(TYPE_UNSIGNED_INT64, atom_string("unsigned int64"), HCC_LONGLONG_SIZE, HCC_LONGLONG_SIZE);
 
     type_system_initialized = 1;
 }

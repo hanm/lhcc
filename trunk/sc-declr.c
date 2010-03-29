@@ -31,6 +31,40 @@ OTHER DEALINGS IN THE SOFTWARE.
 /* Semantic check for declarations - prototypes */
 static void sc_declaration_specifiers(t_ast_declaration_specifier* spec);
 static void sc_outer_declaration(t_ast_declaration* declr);
+/*
+ * semantic check for type specifier list (composed of a chain of native types)
+ * return the composed type if everything conforms to spec, or signal semantic error
+ *
+ * param mask the bit mask represent type specifier list
+ * param coord coordinate for firing logging
+ * param unsign/long_long two special flags indicates the type is signed/unsigned or long_long
+*/
+static t_type* sc_native_type_specifiers(int mask, t_ast_coord* coord, int unsign, int long_long);
+
+void semantic_check(t_ast_translation_unit* translation_unit)
+{
+    t_ast_list *ext_declr_list;
+	t_ast_external_declaration* ext_declr;
+
+    assert(translation_unit);
+
+    ext_declr_list = translation_unit->ext_declaration_list;
+
+    while(!HCC_AST_LIST_IS_END(ext_declr_list))
+    {
+		ext_declr = ext_declr_list->item;
+        ext_declr_list = ext_declr_list->next;
+
+		if (ext_declr->fun_def)
+		{
+			/* check function */
+		}
+		else
+		{
+			sc_outer_declaration(ext_declr->u.declr);
+		}
+    }
+}
 
 /* Semantic check for declarations - implementations */
 static void sc_declaration_specifiers(t_ast_declaration_specifier* spec)
@@ -40,7 +74,10 @@ static void sc_declaration_specifiers(t_ast_declaration_specifier* spec)
     t_ast_type_qualifier* q;
     t_ast_type_specifier* s;
     int f = 0; /* qualifier flag */
-    int g = 0; /* type specifier flag */
+    int g = 0; /* bit mask for type specifier list */
+    int h = 0; /* bit mask for different kinds of type specifiers 
+                    * from MSB to LSB: native type, struct, enum, typedef.
+                   */
 	int long_long = 0; /* long long type as a special case */
 	int unsign = 0;
 
@@ -102,24 +139,44 @@ static void sc_declaration_specifiers(t_ast_declaration_specifier* spec)
 					g |= (1 << s->u.native_type);
 				}
 
+                h |= 0x08;
                 break;
             }
         case AST_TYPE_SPECIFIER_STRUCT_OR_UNION:
             {
-                break;
-            }
-        case AST_TYPE_SPECIFIER_TYPEDEF:
-            {
+                h |= 0x04;
                 break;
             }
         case AST_TYPE_SPECIFIER_ENUM:
             {
+                h |= 0x02;
+                break;
+            }
+        case AST_TYPE_SPECIFIER_TYPEDEF:
+            {
+                t_symbol* sym = find_symbol(s->u.type_def, sym_table_identifiers);
+                assert(sym && sym->storage == TK_TYPEDEF);
+                spec->type = sym->type;
+                assert(!sym->type); /* TODO - this validation should be reverted later. */
+
+                h |= 0x01;
                 break;
             }
         default:
             break;
         }  
-    } /* end iteration */
+    }
+
+    if ((h & (h -1)))
+    {
+        semantic_error("illegal type usage detected - likely you mixed use typedef/enum/struct/union/other types together", &spec->coord);
+        return;
+    }
+    else if ( h != 8)
+    {
+        /* enum, struct/union, typedef already validates their types in specific sub routines */
+        return;
+    }
 
 	if ((g & ( 1 << AST_NTYPE_UNSIGNED)) && (g & ( 1 << AST_NTYPE_SIGNED)))
 	{
@@ -130,200 +187,7 @@ static void sc_declaration_specifiers(t_ast_declaration_specifier* spec)
 		unsign = 1;
 	}
 
-    /* list of possible type specifiers from C99 standard.
-		void
-		char
-		signed char
-		unsigned char
-		short, signed short, short int, or signed short int
-		unsigned short, or unsigned short int
-		int, signed, or signed int
-		unsigned, or unsigned int
-		long, signed long, long int, or signed long int
-		unsigned long, or unsigned long int
-		long long, signed long long, long long int, or
-		signed long long int
-		unsigned long long, or unsigned long long int
-		float
-		double
-		long double
-		_Bool
-		float _Complex
-		double _Complex
-		long double _Complex
-		struct or union specifier *
-		enum specifier
-		typedef name
-    */
-
-    /* void */
-    if (( g & (1 << AST_NTYPE_VOID)))
-    {
-        if (g & ~(1 << AST_NTYPE_VOID))
-        {
-            semantic_error("void can't be used with other types", &spec->coord);
-        }
-        else
-        {
-            spec->type = type_void;
-        }
-    }
-     /* char, signed char, unsigned char */
-    else if ( (g & ( 1 << AST_NTYPE_CHAR)))
-    {
-        int t = g & ~(1 << AST_NTYPE_CHAR);
-        if (t)
-        {
-            if ( ( t & ( 1 << AST_NTYPE_SIGNED))  && !( t & ~( 1 << AST_NTYPE_SIGNED)))
-            {
-                spec->type = type_signed_char;
-            }
-            else if ( (t & ( 1<< AST_NTYPE_UNSIGNED)) && !( t & ~( 1 << AST_NTYPE_UNSIGNED)))
-            {
-                spec->type = type_unsigned_char;
-            }
-            else
-            {
-                semantic_error("char can only be decorated by signed or unsigned", &spec->coord);
-            }
-        }
-        else
-        {
-            spec->type = type_char;
-        }
-    }
-    /* short, signed short, short int, or signed short int */
-	/* unsigned short, unsigned short int */
-    else if ( (g & ( 1 << AST_NTYPE_SHORT)))
-    {
-		int m = (1 << AST_NTYPE_SIGNED) | 
-				(1 << AST_NTYPE_UNSIGNED) | 
-				(1 << AST_NTYPE_INT) | 
-				(1 << AST_NTYPE_SHORT);
-		
-		if ( g & ~m)
-		{
-			semantic_error("illegal short type", &spec->coord);
-		}
-		else
-		{
-			spec->type = unsign ? type_unsigned_short : type_short;
-		}
-	}
-    /* all kinds of long :)
-
-        long, signed long, long int, or signed long int
-        unsigned long, or unsigned long int
-        long long, signed long long, long long int, or
-        signed long long int
-        unsigned long long, or unsigned long long int
-
-        and long double :)
-    */
-    else if ( (g & ( 1 << AST_NTYPE_LONG)))
-    {
-        int m = (1 << AST_NTYPE_SIGNED) | 
-				(1 << AST_NTYPE_UNSIGNED) | 
-				(1 << AST_NTYPE_INT) | 
-                (1 << AST_NTYPE_LONG);
-
-        int n = (1 << AST_NTYPE_LONG) | 
-            (1 << AST_NTYPE_DOUBLE);
-
-        if ( g & ~m)
-        {
-            if ( g & ~n)
-            {
-                semantic_error("illegal long type", &spec->coord);
-            }
-            
-            if ( g & (1 << AST_NTYPE_DOUBLE))
-            {
-                spec->type = type_longdouble;
-            }
-        }
-        else
-        {
-            if (unsign)
-            {
-                if (long_long)
-                {
-                    spec->type = type_unsigned_longlong;
-                }
-                else
-                {
-                    spec->type = type_unsigned_long;
-                }
-            }
-            else
-            {
-                if (long_long)
-                {
-                    spec->type = type_longlong;
-                }
-                else
-                {
-                    spec->type = type_long;
-                }
-            }
-        }
-    } /* end various long long*/
-	/*
-	  unsigned int, signed int, int
-	*/
-	else if(g & ( 1 << AST_NTYPE_INT))
-	{
-		int m = (1 << AST_NTYPE_SIGNED) | 
-				(1 << AST_NTYPE_UNSIGNED) | 
-				(1 << AST_NTYPE_INT);
-
-		if (g & ~m)
-		{
-			semantic_error("illegal int type", &spec->coord);
-		}
-		else
-		{
-			spec->type = unsign ? type_unsigned_int : type_int;
-		}
-	}
-	/* float */
-	else if(g & ( 1 << AST_NTYPE_FLOAT))
-	{
-		if (g & ~( 1 << AST_NTYPE_FLOAT))
-		{
-			semantic_error("illegal float type", &spec->coord);
-		}
-		else
-		{
-			spec->type = type_float;	
-		}
-	}
-	else if(g & ( 1 << AST_NTYPE_DOUBLE))
-	{
-		if (g & ~( 1 << AST_NTYPE_DOUBLE))
-		{
-			semantic_error("illegal double type", &spec->coord);
-		}
-		else
-		{
-			spec->type = type_double;	
-		}
-	}
-	else
-	{
-		int m = (1 << AST_NTYPE_SIGNED) |
-				(1 << AST_NTYPE_UNSIGNED);
-
-		if (g & ~m)
-		{
-			/* here could be struct or union or enum specifier [TODO]*/
-			/*semantic_error("unrecognized type", &spec->coord);*/
-		}
-		else
-		{
-			spec->type = unsign ? type_unsigned_int : type_int;
-		}
-	}
+    spec->type = sc_native_type_specifiers(g, &spec->coord, unsign, long_long);
 }
 
 /* http://www.mers.byu.edu/docs/standardC/declare.html */
@@ -367,28 +231,221 @@ static void sc_outer_declaration(t_ast_declaration* declr)
 	sc_declaration_specifiers(specifiers);
 }
 
-void semantic_check(t_ast_translation_unit* translation_unit)
+
+
+static t_type* sc_native_type_specifiers(int mask, t_ast_coord* coord, int unsign, int long_long)
 {
-    t_ast_list *ext_declr_list;
-	t_ast_external_declaration* ext_declr;
+      /* list of possible type specifiers from C99 standard.
+		void
+		char
+		signed char
+		unsigned char
+		short, signed short, short int, or signed short int
+		unsigned short, or unsigned short int
+		int, signed, or signed int
+		unsigned, or unsigned int
+		long, signed long, long int, or signed long int
+		unsigned long, or unsigned long int
+		long long, signed long long, long long int, or
+		signed long long int
+		unsigned long long, or unsigned long long int
+		float
+		double
+		long double
+		_Bool
+		float _Complex
+		double _Complex
+		long double _Complex
+		struct or union specifier *
+		enum specifier
+		typedef name
+    */
 
-    assert(translation_unit);
+    t_type* type;
 
-    ext_declr_list = translation_unit->ext_declaration_list;
-
-    while(!HCC_AST_LIST_IS_END(ext_declr_list))
+    /* void */
+    if (( mask & (1 << AST_NTYPE_VOID)))
     {
-		ext_declr = ext_declr_list->item;
-        ext_declr_list = ext_declr_list->next;
-
-		if (ext_declr->fun_def)
+        if (mask & ~(1 << AST_NTYPE_VOID))
+        {
+            semantic_error("void can't be used with other types", coord);
+        }
+        else
+        {
+            type = type_void;
+        }
+    }
+     /* char, signed char, unsigned char */
+    else if ( (mask & ( 1 << AST_NTYPE_CHAR)))
+    {
+        int t = mask & ~(1 << AST_NTYPE_CHAR);
+        if (t)
+        {
+            if ( ( t & ( 1 << AST_NTYPE_SIGNED))  && !( t & ~( 1 << AST_NTYPE_SIGNED)))
+            {
+                type = type_signed_char;
+            }
+            else if ( (t & ( 1<< AST_NTYPE_UNSIGNED)) && !( t & ~( 1 << AST_NTYPE_UNSIGNED)))
+            {
+                type = type_unsigned_char;
+            }
+            else
+            {
+                semantic_error("char can only be decorated by signed or unsigned", coord);
+            }
+        }
+        else
+        {
+            type = type_char;
+        }
+    }
+    /* short, signed short, short int, or signed short int */
+	/* unsigned short, unsigned short int */
+    else if ( (mask & ( 1 << AST_NTYPE_SHORT)))
+    {
+		int m = (1 << AST_NTYPE_SIGNED) | 
+				(1 << AST_NTYPE_UNSIGNED) | 
+				(1 << AST_NTYPE_INT) | 
+				(1 << AST_NTYPE_SHORT);
+		
+		if ( mask & ~m)
 		{
-			/* check function */
+			semantic_error("illegal short type", coord);
 		}
 		else
 		{
-			sc_outer_declaration(ext_declr->u.declr);
+			type = unsign ? type_unsigned_short : type_short;
 		}
-    }
-}
+	}
+    /* all kinds of long :)
 
+        long, signed long, long int, or signed long int
+        unsigned long, or unsigned long int
+        long long, signed long long, long long int, or
+        signed long long int
+        unsigned long long, or unsigned long long int
+
+        and long double :)
+    */
+    else if ( (mask & ( 1 << AST_NTYPE_LONG)))
+    {
+        int m = (1 << AST_NTYPE_SIGNED) | 
+				(1 << AST_NTYPE_UNSIGNED) | 
+				(1 << AST_NTYPE_INT) | 
+                (1 << AST_NTYPE_LONG);
+
+        int n = (1 << AST_NTYPE_LONG) | 
+            (1 << AST_NTYPE_DOUBLE);
+
+        if ( mask & ~m)
+        {
+            if ( mask & ~n)
+            {
+                semantic_error("illegal long type", coord);
+            }
+            
+            if ( mask & (1 << AST_NTYPE_DOUBLE))
+            {
+                type = type_longdouble;
+            }
+        }
+        else
+        {
+            if (unsign)
+            {
+                if (long_long)
+                {
+                    type = type_unsigned_longlong;
+                }
+                else
+                {
+                    type = type_unsigned_long;
+                }
+            }
+            else
+            {
+                if (long_long)
+                {
+                    type = type_longlong;
+                }
+                else
+                {
+                    type = type_long;
+                }
+            }
+        }
+    } /* end various long long*/
+	/*
+	  unsigned int, signed int, int
+	*/
+	else if(mask & ( 1 << AST_NTYPE_INT))
+	{
+		int m = (1 << AST_NTYPE_SIGNED) | 
+				(1 << AST_NTYPE_UNSIGNED) | 
+				(1 << AST_NTYPE_INT);
+
+		if (mask & ~m)
+		{
+			semantic_error("illegal int type", coord);
+		}
+		else
+		{
+			type = unsign ? type_unsigned_int : type_int;
+		}
+	}
+	/* float */
+	else if(mask & ( 1 << AST_NTYPE_FLOAT))
+	{
+		if (mask & ~( 1 << AST_NTYPE_FLOAT))
+		{
+			semantic_error("illegal float type", coord);
+		}
+		else
+		{
+			type = type_float;	
+		}
+	}
+	else if(mask & ( 1 << AST_NTYPE_DOUBLE))
+	{
+		if (mask & ~( 1 << AST_NTYPE_DOUBLE))
+		{
+			semantic_error("illegal double type", coord);
+		}
+		else
+		{
+			type = type_double;	
+		}
+	}
+    else if (mask & ( 1 << AST_NTYPE_INT64)) /* [WARNING] non std extension - int64 type is not part of C99 or C90/95*/
+    {
+        int m = ( 1 << AST_NTYPE_INT64) |
+            ( 1 << AST_NTYPE_UNSIGNED) |
+            ( 1 << AST_NTYPE_SIGNED);
+
+        if (mask & ~m)
+        {
+            semantic_error("illegal int64 type usage", coord);
+        }
+        else
+        {
+            type = unsign ? type_unsigned_int64 : type_int64;
+        }
+    }
+	else
+	{
+		int m = (1 << AST_NTYPE_SIGNED) |
+				(1 << AST_NTYPE_UNSIGNED);
+
+		if (mask & ~m)
+		{
+			semantic_error("unrecognized type", coord);
+            type = type_int;
+		}
+		else
+		{
+			type = unsign ? type_unsigned_int : type_int;
+		}
+	}
+
+    return type;
+}
