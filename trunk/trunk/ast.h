@@ -465,6 +465,8 @@ typedef struct hcc_ast_enum_specifier
     t_ast_coord coord;
 	char* id;
 	t_ast_list* enumerator_list;
+
+    int scope;
 } t_ast_enum_specifier;
 
 typedef struct hcc_ast_typedef

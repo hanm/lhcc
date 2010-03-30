@@ -499,5 +499,6 @@ static t_type* sc_enum_specifier(t_ast_enum_specifier* enum_specifier)
         semantic_error("illegal enum type", &enum_specifier->coord);
     }
 
+    /* check enum content */
     return type;
 }

@@ -31,7 +31,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 /***********************************************
  * ANSI C build in types and type qualifiers
  ************************************************/
-enum 
+typedef enum
 {
 	TYPE_CHAR, /* char */
     TYPE_SIGNED_CHAR, /* signed char */
@@ -66,7 +66,7 @@ enum
 	/* extended types [FIX ME] */
 	TYPE_INT64, /* int 64 */
     TYPE_UNSIGNED_INT64
-};
+} t_type_kind;
 
 
 typedef struct type
@@ -265,10 +265,10 @@ t_type* make_function_type(t_type* type, t_param* parameter, int prototype, int 
 
 /*
  * construct a record type
- * record_type - type of record could be one of either a struct or union
- * name - name of struct/union, could be null (anonymous struct/union)
+ * record_type - struct, union, enum
+ * tag - tag of the record. could be null
  */
-t_type* make_record_type(int record_type, char* name);
+t_type* make_record_type(t_type_kind kind, char* tag, int scope);
 
 /*
  * construct a field type and associate it with specified record type

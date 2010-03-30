@@ -334,48 +334,40 @@ t_type* make_function_type(t_type* type, t_param* parameter, int prototype, int 
 }
 
 
-t_type* make_record_type(int record_type, char* name)
+t_type* make_record_type(t_type_kind kind, char* tag, int scope)
 {
     t_symbol* symbol = NULL;
     t_record* record = NULL;
     static int a = 0; /* for anonymous record hcc generate the name */
+    
+    assert(kind == TYPE_ENUM || kind == TYPE_STRUCT || kind == TYPE_UNION);
 
-    assert(record_type == TYPE_ENUM || record_type == TYPE_STRUCT || record_type == TYPE_UNION);
-
-    if (name == NULL)
+    if (tag == NULL)
     {
-        name = atom_int(a ++);
+        tag = atom_int(a ++);
     }
     else
     {
-        symbol = find_symbol(name, sym_table_types);
-        if (symbol != NULL)
+        symbol = find_symbol(tag, sym_table_types);
+        if (!symbol && (symbol->scope == scope || symbol->scope == PARAM && scope == PARAM + 1))
         {
-            /* this implicitly means a new record type is only created in current scope (symbol_scope) */
-            if (symbol->scope == symbol_scope || symbol->scope == PARAM && symbol_scope == PARAM + 1)
+            if (symbol->type->code == kind && !symbol->defined)
             {
-                if (symbol->type->code == record_type && !symbol->defined)
-                {
-                    return symbol->type;               
-                }
-                else if (symbol->type->code == record_type && symbol->defined)
-                {
-                    type_error("\'record\' type redefinition");
-                    return NULL;
-                }
+                return symbol->type;               
+            }
+            else
+            {
+                type_error("type redefinition");
+                return type_int;
             }
         }
     }
 
-    /* after cross fire either the type is missing or not satisfy our needs
-     * so create a new one and set up links with sym table
-     * the fields of record will be added later and size/align will be adjusted accordingly.
-	 */
-    symbol = add_symbol(name, &sym_table_types, symbol_scope, PERM);
-    symbol->type = atomic_type(NULL, record_type, 0, 0, symbol); /* a new record type has align 0 and size 0 */
+    symbol = add_symbol(tag, &sym_table_types, scope, PERM);
+    symbol->type = atomic_type(NULL, kind, 0, 0, symbol); /* a new record type has align 0 and size 0 */
     
     CALLOC(record, sizeof *record);
-    record->name = name;
+    record->name = tag;
     record->fields = NULL;
     symbol->type->u.record = record;
     
