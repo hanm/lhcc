@@ -71,9 +71,7 @@ typedef struct symbol
 	char *name; /* symbol name - eg, literal string for an identifier */
     int storage; /* stroage class - auto, register, extern, static, typedef, enum */
 	int scope; /* symbol effective scope */
-	int category; /* symbol category */
 	t_type* type; /* symbol type */
-
     int defined; /* symbol definition flag */
 
     int hidden_typedef;

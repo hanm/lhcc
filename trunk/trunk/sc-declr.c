@@ -40,6 +40,7 @@ static void sc_outer_declaration(t_ast_declaration* declr);
  * param unsign/long_long two special flags indicates the type is signed/unsigned or long_long
 */
 static t_type* sc_native_type_specifiers(int mask, t_ast_coord* coord, int unsign, int long_long);
+static t_type* sc_enum_specifier(t_ast_enum_specifier* enum_specifier);
 
 void semantic_check(t_ast_translation_unit* translation_unit)
 {
@@ -150,6 +151,7 @@ static void sc_declaration_specifiers(t_ast_declaration_specifier* spec)
         case AST_TYPE_SPECIFIER_ENUM:
             {
                 h |= 0x02;
+                spec->type = sc_enum_specifier(s->u.enum_specifier);
                 break;
             }
         case AST_TYPE_SPECIFIER_TYPEDEF:
@@ -165,14 +167,15 @@ static void sc_declaration_specifiers(t_ast_declaration_specifier* spec)
         default:
             break;
         }  
+
+        if ((h & (h -1)))
+        {
+            semantic_error("illegal type usage detected - likely you mixed use typedef/enum/struct/union/other types together", &spec->coord);
+            return;
+        }
     }
 
-    if ((h & (h -1)))
-    {
-        semantic_error("illegal type usage detected - likely you mixed use typedef/enum/struct/union/other types together", &spec->coord);
-        return;
-    }
-    else if ( h != 8)
+    if ( h != 8)
     {
         /* enum, struct/union, typedef already validates their types in specific sub routines */
         return;
@@ -446,6 +449,55 @@ static t_type* sc_native_type_specifiers(int mask, t_ast_coord* coord, int unsig
 			type = unsign ? type_unsigned_int : type_int;
 		}
 	}
+
+    return type;
+}
+
+static t_type* sc_enum_specifier(t_ast_enum_specifier* enum_specifier)
+{
+    t_type* type = NULL;
+    assert(enum_specifier && (enum_specifier->id || enum_specifier->enumerator_list));
+
+    if (enum_specifier->id && ! enum_specifier->enumerator_list) 
+    {
+        t_symbol* sym = find_symbol(enum_specifier->id, sym_table_types);
+
+        if (!sym)
+        {
+            /* incomplete enum type assume int - note the enum type 
+             * is completely implementation dependent per spec, valid choice
+             * including char, signed int, or unsigned int. I choose int.
+            */
+            type = type_int;
+        }
+        else
+        {
+            assert(sym->type);
+            if (sym->type->code != TYPE_ENUM)
+            {
+                semantic_error("enum type redefinition", &enum_specifier->coord);   
+                type = type_int;
+            }
+            else
+            {
+                type = sym->type;
+            }
+        }
+
+        return type;
+    }
+    else if (!enum_specifier->id && enum_specifier->enumerator_list)
+    {
+        
+    }
+    else if (enum_specifier->id && enum_specifier->enumerator_list)
+    {
+
+    }
+    else
+    {
+        semantic_error("illegal enum type", &enum_specifier->coord);
+    }
 
     return type;
 }

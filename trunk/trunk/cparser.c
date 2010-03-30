@@ -2110,6 +2110,7 @@ t_ast_direct_declarator* direct_declarator(int storage_class)
 				symbol = add_symbol(lexeme_value.string_value, &sym_table_identifiers, symbol_scope, FUNC);
 				symbol->storage = TK_TYPEDEF;
 				symbol->coordinate = coord;
+                symbol->defined = 1;
 			}
 		}
         else
@@ -2508,7 +2509,7 @@ t_ast_enum_specifier* enum_specifier()
      * which are the only legal suffix following enum keyword..
     */
     int flag = 0;
-	t_ast_list *enumerator_list = make_ast_list_entry();
+	t_ast_list *enumerator_list = NULL;
 	t_ast_enum_specifier* e = make_ast_enum_specifier(NULL, enumerator_list);
 	BINDING_COORDINATE(e, coord);
 
@@ -2524,6 +2525,10 @@ t_ast_enum_specifier* enum_specifier()
 
     if (cptk == TK_LBRACE)
     {
+        /* here we have enumerator list, regardless of its empty or not we need to instantiate a list */
+        enumerator_list = make_ast_list_entry();
+        e->enumerator_list = enumerator_list;
+
         GET_NEXT_TOKEN;
 
         if (cptk == TK_RBRACE)

@@ -457,11 +457,9 @@ t_ast_enumerator* make_ast_enumerator(char*id, t_ast_exp* exp)
 
 t_ast_enum_specifier* make_ast_enum_specifier(char* id, t_ast_list* enumerator_list)
 {
-	t_ast_enum_specifier* e = NULL;
+	t_ast_enum_specifier* e;
 	CALLOC(e, PERM);
 
-	assert(id || enumerator_list);
-	
 	e->id = id;
 	e->enumerator_list = enumerator_list;
 
