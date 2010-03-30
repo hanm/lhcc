@@ -2511,6 +2511,8 @@ t_ast_enum_specifier* enum_specifier()
     int flag = 0;
 	t_ast_list *enumerator_list = NULL;
 	t_ast_enum_specifier* e = make_ast_enum_specifier(NULL, enumerator_list);
+    e->scope = symbol_scope;
+
 	BINDING_COORDINATE(e, coord);
 
     match(TK_ENUM);
