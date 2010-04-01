@@ -334,10 +334,10 @@ t_type* make_function_type(t_type* type, t_param* parameter, int prototype, int 
 }
 
 
-t_type* make_record_type(t_type_kind kind, char* tag, int scope)
+t_type* make_tag_type(t_type_kind kind, char* tag, int scope)
 {
     t_symbol* symbol = NULL;
-    t_record* record = NULL;
+    t_tag* tag_trait = NULL;
     static int a = 0; /* for anonymous record hcc generate the name */
     
     assert(kind == TYPE_ENUM || kind == TYPE_STRUCT || kind == TYPE_UNION);
@@ -366,10 +366,10 @@ t_type* make_record_type(t_type_kind kind, char* tag, int scope)
     symbol = add_symbol(tag, &sym_table_types, scope, PERM);
     symbol->type = atomic_type(NULL, kind, 0, 0, symbol); /* a new record type has align 0 and size 0 */
     
-    CALLOC(record, sizeof *record);
-    record->name = tag;
-    record->fields = NULL;
-    symbol->type->u.record = record;
+	CALLOC(tag_trait, PERM);
+	tag_trait->tag = tag;
+    tag_trait->fields = NULL;
+	symbol->type->u.tag = tag_trait;
     
     return symbol->type;
 }
@@ -383,7 +383,7 @@ t_record_field* make_field_type(t_type* field_type, char* name, t_type* record_t
     /* [TODO] - support unnamed bit field ; at this moment field requires a name */
     assert(field_type != NULL && name != NULL && record_type != NULL);
 
-    next = &record_type->u.record->fields;
+	next = &record_type->u.tag->fields;
     current = *next;
 
     for (; current; next = &current->next, current = *next)
@@ -391,7 +391,7 @@ t_record_field* make_field_type(t_type* field_type, char* name, t_type* record_t
         if (current->name == name) type_error("duplicate field name");
     }
 
-    CALLOC(current, sizeof *current);
+	CALLOC(current, PERM);
     current->name = name;
     current->type = field_type;
     current->bits = 0;

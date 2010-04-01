@@ -89,13 +89,12 @@ typedef struct type
 	void* symbolic_link;
 
 	/*
-	 * record/enum/function types
+	 * user defined types
 	 */
 	union  
 	{
-		struct record_type* record;
-		struct enum_type* enums;
-		struct function_type* function;
+		struct tag_trait* tag;
+		struct func_trait* function;
 	} u;
 
 } t_type;
@@ -114,19 +113,14 @@ typedef struct field_type
 } t_record_field;
 
 /*
- * struct / union
+ * struct / union / enum tag traits
+ * determined by tag name only
  */
-typedef struct record_type
+typedef struct tag_trait
 {
-	char* name; 
+	char* tag; 
 	t_record_field* fields; 
-} t_record;
-
-
-typedef struct enum_type
-{
-	char* name; 
-} t_enum;
+} t_tag;
 
 /*
  * function parameter type
@@ -142,10 +136,9 @@ typedef struct paremeter_type
 } t_param;
 
 /*
- * function type
- * a function type is signed by its parameter and return value
+ * function trait is decided by its parameter and return value
  */
-typedef struct function_type
+typedef struct func_trait
 {
 	int prototype;
 	int ellipse;
@@ -264,11 +257,11 @@ t_type* qualify_type(t_type* type, int code);
 t_type* make_function_type(t_type* type, t_param* parameter, int prototype, int ellipse);
 
 /*
- * construct a record type
+ * construct a "tag" type
  * record_type - struct, union, enum
  * tag - tag of the record. could be null
  */
-t_type* make_record_type(t_type_kind kind, char* tag, int scope);
+t_type* make_tag_type(t_type_kind kind, char* tag, int scope);
 
 /*
  * construct a field type and associate it with specified record type
