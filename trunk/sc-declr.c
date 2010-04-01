@@ -488,11 +488,11 @@ static t_type* sc_enum_specifier(t_ast_enum_specifier* enum_specifier)
     }
     else if (!enum_specifier->id && enum_specifier->enumerator_list)
     {
-        
+		type = make_tag_type(TYPE_ENUM, enum_specifier->id, enum_specifier->scope);
     }
     else if (enum_specifier->id && enum_specifier->enumerator_list)
     {
-
+		
     }
     else
     {
