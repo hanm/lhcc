@@ -492,7 +492,20 @@ static t_type* sc_enum_specifier(t_ast_enum_specifier* enum_specifier)
     }
     else if (enum_specifier->id && enum_specifier->enumerator_list)
     {
-		
+		t_symbol* sym = find_symbol(enum_specifier->id, sym_table_types);
+
+		if (!sym || sym->scope < enum_specifier->scope)
+		{
+			type = make_tag_type(TYPE_ENUM, enum_specifier->id, enum_specifier->scope);
+		}
+		else
+		{
+			if (sym->type->code != TYPE_ENUM)
+			{
+				semantic_error("enum type redefinition", &enum_specifier->coord);   
+				type = type_int;
+			}
+		}
     }
     else
     {
