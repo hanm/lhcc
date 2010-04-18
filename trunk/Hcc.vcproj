@@ -361,6 +361,10 @@
 					RelativePath=".\sc-type.c"
 					>
 				</File>
+				<File
+					RelativePath=".\semantic_check.h"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="parser"

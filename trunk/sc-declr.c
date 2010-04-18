@@ -28,6 +28,13 @@ OTHER DEALINGS IN THE SOFTWARE.
 #include "ast.h"
 #include "error.h"
 
+/* construct a lexical coordinate from ast coordinate 
+ * hate this but.. this is a cost to pay to make lex analysis and semantic check in two stages
+*/
+#define HCC_ASSIGN_COORDINATE(lex, ast) (lex)->coordinate.column = (ast)->coord.column; \
+		(lex)->coordinate.line = (ast)->coord.line; \
+		(lex)->coordinate.filename = (ast)->coord.file;
+
 /* Semantic check for declarations - prototypes */
 static void sc_declaration_specifiers(t_ast_declaration_specifier* spec);
 static void sc_outer_declaration(t_ast_declaration* declr);
@@ -40,6 +47,7 @@ static void sc_outer_declaration(t_ast_declaration* declr);
  * param unsign/long_long two special flags indicates the type is signed/unsigned or long_long
 */
 static t_type* sc_native_type_specifiers(int mask, t_ast_coord* coord, int unsign, int long_long);
+static int sc_enumerator(t_ast_enumerator* enumerator, int value, t_type* type, int scope);
 static t_type* sc_enum_specifier(t_ast_enum_specifier* enum_specifier);
 
 void semantic_check(t_ast_translation_unit* translation_unit)
@@ -456,6 +464,8 @@ static t_type* sc_native_type_specifiers(int mask, t_ast_coord* coord, int unsig
 static t_type* sc_enum_specifier(t_ast_enum_specifier* enum_specifier)
 {
     t_type* type = NULL;
+	t_ast_list* enumerator_list = NULL;
+	int value = 0;
     assert(enum_specifier && (enum_specifier->id || enum_specifier->enumerator_list));
 
     if (enum_specifier->id && ! enum_specifier->enumerator_list) 
@@ -464,10 +474,6 @@ static t_type* sc_enum_specifier(t_ast_enum_specifier* enum_specifier)
 
         if (!sym)
         {
-            /* incomplete enum type assume int - note the enum type 
-             * is completely implementation dependent per spec, valid choice
-             * including char, signed int, or unsigned int. I choose int.
-            */
             type = type_int;
         }
         else
@@ -489,6 +495,7 @@ static t_type* sc_enum_specifier(t_ast_enum_specifier* enum_specifier)
     else if (!enum_specifier->id && enum_specifier->enumerator_list)
     {
 		type = make_tag_type(TYPE_ENUM, enum_specifier->id, enum_specifier->scope);
+		HCC_ASSIGN_COORDINATE((t_symbol*)type->symbolic_link, enum_specifier);
     }
     else if (enum_specifier->id && enum_specifier->enumerator_list)
     {
@@ -497,6 +504,7 @@ static t_type* sc_enum_specifier(t_ast_enum_specifier* enum_specifier)
 		if (!sym || sym->scope < enum_specifier->scope)
 		{
 			type = make_tag_type(TYPE_ENUM, enum_specifier->id, enum_specifier->scope);
+			HCC_ASSIGN_COORDINATE((t_symbol*)type->symbolic_link, enum_specifier);
 		}
 		else
 		{
@@ -512,6 +520,46 @@ static t_type* sc_enum_specifier(t_ast_enum_specifier* enum_specifier)
         semantic_error("illegal enum type", &enum_specifier->coord);
     }
 
+	printf("%d\n",sym_table_identifiers->level);
+	printf("%d\n", enum_specifier->scope);
     /* check enum content */
+	enumerator_list = enum_specifier->enumerator_list;
+	assert(enumerator_list);
+	while (!HCC_AST_LIST_IS_END(enumerator_list))
+	{
+		value = sc_enumerator((t_ast_enumerator*)enumerator_list->item, value, type, enum_specifier->scope + 1);
+		enumerator_list = enumerator_list->next;
+	}
     return type;
+}
+
+static int sc_enumerator(t_ast_enumerator* enumerator, int value, t_type* type, int scope)
+{
+	t_symbol* sym = find_symbol(enumerator->id, sym_table_identifiers);
+	if (sym && sym->scope == scope)
+	{
+		semantic_error("redeclaration of identifier in enumerator", &enumerator->coord);
+		return value;
+	}
+
+	if (!enumerator->exp)
+	{    
+		(type);
+		/*
+		sym = add_symbol(enumerator->id, &sym_table_identifiers, scope, PERM);
+		sym->value.i = value;
+		sym->storage = TK_ENUM;
+		sym->type = type;
+		sym->defined = 1;
+		HCC_ASSIGN_COORDINATE(sym, enumerator);
+		*/
+		return ++ value;
+	}
+	else
+	{
+		/* TODO - check constant expression and return integer value */
+	}
+
+	(enumerator, value);
+	return value;
 }
