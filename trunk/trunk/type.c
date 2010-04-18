@@ -363,6 +363,7 @@ t_type* make_tag_type(t_type_kind kind, char* tag, int scope)
         }
     }
 
+	/* TODO - might select a func arean for a scoped closure */
     symbol = add_symbol(tag, &sym_table_types, scope, PERM);
     symbol->type = atomic_type(NULL, kind, 0, 0, symbol); /* a new record type has align 0 and size 0 */
     
@@ -370,6 +371,7 @@ t_type* make_tag_type(t_type_kind kind, char* tag, int scope)
 	tag_trait->tag = tag;
     tag_trait->fields = NULL;
 	symbol->type->u.tag = tag_trait;
+	symbol->type->symbolic_link = symbol;
     
     return symbol->type;
 }

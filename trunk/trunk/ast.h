@@ -457,6 +457,7 @@ typedef struct hcc_ast_enumerator
 {
 	t_ast_coord coord;
 	char* id;
+	int value;
 	t_ast_exp* exp;
 } t_ast_enumerator;
 

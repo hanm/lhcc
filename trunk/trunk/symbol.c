@@ -79,6 +79,7 @@ t_symbol_table* make_symbol_table(int arena)
 void enter_scope()
 {
 	symbol_scope ++;
+
 	/*
 	 * I don't allocate a symbol table here because in practice when entering a scope
      * there might be no need to create a new symbol context at all

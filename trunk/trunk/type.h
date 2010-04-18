@@ -68,7 +68,6 @@ typedef enum
     TYPE_UNSIGNED_INT64
 } t_type_kind;
 
-
 typedef struct type
 {
 	int code; /* type code */
