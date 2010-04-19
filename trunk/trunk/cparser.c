@@ -2018,10 +2018,7 @@ t_ast_suffix_declarator* suffix_declarator()
 
         if (new_scope)
         {
-            if (cptk != TK_LBRACE)
-            {
-                exit_scope();
-            }
+			exit_scope();
         }
     }
 

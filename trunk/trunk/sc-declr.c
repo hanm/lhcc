@@ -520,8 +520,6 @@ static t_type* sc_enum_specifier(t_ast_enum_specifier* enum_specifier)
         semantic_error("illegal enum type", &enum_specifier->coord);
     }
 
-	printf("%d\n",sym_table_identifiers->level);
-	printf("%d\n", enum_specifier->scope);
     /* check enum content */
 	enumerator_list = enum_specifier->enumerator_list;
 	assert(enumerator_list);
@@ -544,15 +542,13 @@ static int sc_enumerator(t_ast_enumerator* enumerator, int value, t_type* type, 
 
 	if (!enumerator->exp)
 	{    
-		(type);
-		/*
 		sym = add_symbol(enumerator->id, &sym_table_identifiers, scope, PERM);
 		sym->value.i = value;
 		sym->storage = TK_ENUM;
 		sym->type = type;
 		sym->defined = 1;
 		HCC_ASSIGN_COORDINATE(sym, enumerator);
-		*/
+
 		return ++ value;
 	}
 	else
