@@ -34,7 +34,7 @@ typedef struct hcc_ast_stmt t_ast_stmt;
 typedef struct hcc_ast_declarator t_ast_declarator;
 typedef struct hcc_ast_abstract_declarator t_ast_abstract_declarator;
 typedef struct hcc_ast_all_declarator t_ast_all_declarator;
-
+typedef struct hcc_ast_type_name t_ast_type_name;
 
 typedef struct hcc_ast_list
 {
@@ -250,16 +250,14 @@ typedef struct hcc_ast_exp
 
         struct
         {
-            t_ast_exp* type; /* [FIX ME] this needs to be type declaration or such. 
-                                      * type name can't be expressed as an expression.
-                                      */
+			t_ast_type_name* type; 
             t_ast_exp* exp;
         } ast_cast_exp;
 
         struct
         {
             t_ast_exp* exp;
-            t_ast_exp* type; /* [FIX ME] Same as above */
+			t_ast_type_name* type; 
         } ast_sizeof_exp;
 
         struct
@@ -295,18 +293,13 @@ t_ast_exp* make_ast_subscript_exp(t_ast_exp* main, t_ast_exp* index);
 t_ast_exp* make_ast_call_exp(t_ast_exp* func, t_ast_list* args);
 t_ast_exp* make_ast_indir_exp(t_ast_exp* exp, t_ast_exp_op op, char* id);
 t_ast_exp* make_ast_postop_exp(t_ast_exp* exp, t_ast_exp_op op);
-t_ast_exp* make_ast_cast_exp(t_ast_exp* type, t_ast_exp* exp);
-t_ast_exp* make_ast_sizeof_exp(t_ast_exp* type, t_ast_exp* exp);
+t_ast_exp* make_ast_cast_exp(t_ast_type_name* type, t_ast_exp* exp);
+t_ast_exp* make_ast_sizeof_exp(t_ast_type_name* type, t_ast_exp* exp);
 t_ast_exp* make_ast_unary_exp(t_ast_exp* exp, t_ast_exp_op op);
 t_ast_exp* make_ast_binary_exp(t_ast_exp* left, t_ast_exp_op op, t_ast_exp* right);
 t_ast_exp* make_ast_conditional_exp(t_ast_exp* cond_exp, t_ast_exp* true_exp, t_ast_exp* false_exp);
 t_ast_exp* make_ast_assignment_exp(t_ast_exp* cond_exp, t_ast_exp_op op, t_ast_exp* assign_exp);
 t_ast_exp* make_ast_comma_exp(t_ast_exp* comma_exp, t_ast_exp* assign_exp);
-
-/* temp solution for typename ast ctor 
- * [TODO] hook with declaration ast construction
- */
-t_ast_exp* make_ast_typename_exp();
 
 
 /**************************** Statements *****************************************/

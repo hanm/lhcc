@@ -146,7 +146,7 @@ t_ast_exp* make_ast_unary_exp(t_ast_exp* expression, t_ast_exp_op op)
     return exp;
 }
 
-t_ast_exp* make_ast_cast_exp(t_ast_exp* type, t_ast_exp* expression)
+t_ast_exp* make_ast_cast_exp(t_ast_type_name* type, t_ast_exp* expression)
 {
     ALLOCATE_GENERIC_AST_EXP;
     
@@ -159,7 +159,7 @@ t_ast_exp* make_ast_cast_exp(t_ast_exp* type, t_ast_exp* expression)
     return exp;
 }
 
-t_ast_exp* make_ast_sizeof_exp(t_ast_exp* type, t_ast_exp* expression)
+t_ast_exp* make_ast_sizeof_exp(t_ast_type_name* type, t_ast_exp* expression)
 {
     ALLOCATE_GENERIC_AST_EXP;
 
@@ -228,14 +228,6 @@ t_ast_exp* make_ast_comma_exp(t_ast_exp* comma_exp, t_ast_exp* assign_exp)
     /* note comma expression could decay to just single assignment expression 
      * which is the normal expression so called.
     */
-    return exp;
-}
-
-t_ast_exp* make_ast_typename_exp()
-{
-    ALLOCATE_GENERIC_AST_EXP;
-    exp->kind = AST_EXP_GENERIC_EXP_KIND;
-
     return exp;
 }
 

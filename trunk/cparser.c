@@ -691,13 +691,14 @@ t_ast_exp* unary_expression()
 
             if (is_token_typename_token(peek_token_code, peek_lexeme_value.string_value))
             {
+				t_ast_type_name* tname = NULL;
+
                 GET_NEXT_TOKEN; 
                 
-                /* [TODO][AST] hook type declaration ast with unary ast */
-                type_name();
+                tname = type_name();
                 match(TK_RPAREN);
 
-                exp = make_ast_cast_exp(make_ast_typename_exp(), unary_expression());
+                exp = make_ast_cast_exp(tname, unary_expression());
 				BINDING_COORDINATE(exp, saved_coord);
             }
             else
@@ -727,7 +728,7 @@ sizeof_expression
 t_ast_exp* sizeof_expression()
 {
     t_ast_exp* exp = NULL;
-    t_ast_exp* type = NULL;
+	t_ast_type_name* type = NULL;
 	t_coordinate saved_coord = coord;
 
     GET_NEXT_TOKEN;
@@ -738,9 +739,7 @@ t_ast_exp* sizeof_expression()
 
         if (is_token_typename_token(cptk, lexeme_value.string_value))
         {
-            type_name();
-            type = make_ast_typename_exp();
-			BINDING_COORDINATE(type, saved_coord);
+            type = type_name();
         }
         else
         {
@@ -1217,15 +1216,14 @@ Both case are dealt explicitly.
 */
 t_ast_stmt* labeled_statement()
 {
-	t_ast_stmt* stmt = NULL;
+	t_ast_stmt *stmt = NULL, *_stmt = NULL;
 	t_coordinate saved_coord = coord;
 
     match(TK_ID); 
 	match(TK_COLON);
-	statement();
+	_stmt = statement();
 	
-	/* [FIX ME] hook with statment instead of empty place holder!*/
-	stmt = make_ast_label_stmt(lexeme_value.string_value, make_ast_empty_stmt());
+	stmt = make_ast_label_stmt(lexeme_value.string_value, _stmt);
 	BINDING_COORDINATE(stmt, saved_coord);
 	
 	return stmt;
