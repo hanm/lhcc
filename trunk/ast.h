@@ -328,10 +328,7 @@ typedef enum hcc_ast_statement_kind
     AST_STMT_GOTO_KIND,
     AST_STMT_CONTINUE__KIND, 
     AST_STMT_BREAK_KIND, 
-    AST_STMT_RETURN_KIND,
-	AST_STMT_EMPTY_KIND /* empty statement in compound statement 
-						 * no corresponding NT symbol in grammar 
-						 */
+    AST_STMT_RETURN_KIND
 } t_ast_stmt_kind;
 
 typedef struct hcc_ast_stmt
@@ -440,8 +437,6 @@ t_ast_stmt* make_ast_continue_stmt();
 t_ast_stmt* make_ast_break_stmt();
 t_ast_stmt* make_ast_return_stmt(t_ast_exp* return_exp);
 t_ast_stmt* make_ast_compound_stmt(t_ast_list* stmts, t_ast_list* declrs);
-/* [TODO] may not needed this...*/
-t_ast_stmt* make_ast_empty_stmt();
 
 
 /******************* Declarations *****************/
