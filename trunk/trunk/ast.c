@@ -248,8 +248,6 @@ t_ast_stmt* make_ast_expression_stmt(t_ast_exp* exp)
 {
 	ALLOCATE_GENERIC_AST_STMT;
 
-	assert(exp);
-
 	stmt->kind = AST_STMT_EXPRESSION_KIND;
 	stmt->u.ast_expression_stmt.exp = exp;
 
@@ -398,15 +396,6 @@ t_ast_stmt* make_ast_default_stmt(t_ast_stmt* body_stmt)
 
 	stmt->kind = AST_STMT_DEFAULT_KIND;
 	stmt->u.ast_default_stmt.stmt = body_stmt;
-
-	return stmt;
-}
-
-t_ast_stmt* make_ast_empty_stmt()
-{
-	ALLOCATE_GENERIC_AST_STMT;
-
-	stmt->kind = AST_STMT_EMPTY_KIND;
 
 	return stmt;
 }

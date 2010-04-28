@@ -1163,11 +1163,12 @@ expression_statement
 */
 t_ast_stmt* expression_statement()
 {
-	t_ast_stmt* stmt = make_ast_empty_stmt();
+	t_ast_stmt* stmt = NULL;
+	t_coordinate saved_coord = coord;
 
     if (cptk == TK_ID && peek_token() == TK_COLON)
     {
-        labeled_statement();
+        stmt = labeled_statement();
     }
     else if (cptk == TK_ID && strcmp(lexeme_value.string_value, "__asm") == 0)
     {
@@ -1197,9 +1198,18 @@ t_ast_stmt* expression_statement()
 	}
     else
     {
-        expression();
+		stmt = make_ast_expression_stmt(expression());
+		BINDING_COORDINATE(stmt, saved_coord);
+
         match(TK_SEMICOLON);
     }
+	
+	if (!stmt)
+	{
+		/* empty statement either because only ";" is engaged or becasue we skipped __asm blocks */
+		/* anyways, need produce something not empty! */
+		stmt = make_ast_expression_stmt(NULL); 
+	}
 
 	return stmt;
 }
