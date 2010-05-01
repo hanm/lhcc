@@ -2304,7 +2304,6 @@ t_ast_struct_or_union_specifier* struct_or_union_specifier()
     GET_NEXT_TOKEN;
     if (cptk  == TK_ID)
     {
-        /* [TODO] [SYMBOL MANAGE] - install tag name into the types table? */
 		id = lexeme_value.string_value;
         GET_NEXT_TOKEN;
     }
