@@ -341,28 +341,20 @@
 					RelativePath=".\ast.h"
 					>
 				</File>
-			</Filter>
-			<Filter
-				Name="semantic-check"
-				>
 				<File
-					RelativePath=".\sc-declr.c"
+					RelativePath=".\ssc-all.h"
 					>
 				</File>
 				<File
-					RelativePath=".\sc-exp.c"
+					RelativePath=".\ssc-declr.c"
 					>
 				</File>
 				<File
-					RelativePath=".\sc-stmt.c"
+					RelativePath=".\ssc-exp.c"
 					>
 				</File>
 				<File
-					RelativePath=".\sc-type.c"
-					>
-				</File>
-				<File
-					RelativePath=".\semantic_check.h"
+					RelativePath=".\ssc-stmt.c"
 					>
 				</File>
 			</Filter>
