@@ -35,22 +35,22 @@ OTHER DEALINGS IN THE SOFTWARE.
 		(lex)->coordinate.line = (ast)->coord.line; \
 		(lex)->coordinate.filename = (ast)->coord.file;
 
-/* Semantic check for declarations - prototypes */
-static void sc_declaration_specifiers(t_ast_declaration_specifier* spec);
-static void sc_outer_declaration(t_ast_declaration* declr);
+/* static semantic check for declarations - prototypes */
+static void ssc_declaration_specifiers(t_ast_declaration_specifier* spec);
+static void ssc_outer_declaration(t_ast_declaration* declr);
 /*
- * semantic check for type specifier list (composed of a chain of native types)
+ * static semantic check for type specifier list (composed of a chain of native types)
  * return the composed type if everything conforms to spec, or signal semantic error
  *
  * param mask the bit mask represent type specifier list
  * param coord coordinate for firing logging
  * param unsign/long_long two special flags indicates the type is signed/unsigned or long_long
 */
-static t_type* sc_native_type_specifiers(int mask, t_ast_coord* coord, int unsign, int long_long);
-static int sc_enumerator(t_ast_enumerator* enumerator, int value, t_type* type, int scope);
-static t_type* sc_enum_specifier(t_ast_enum_specifier* enum_specifier);
+static t_type* ssc_native_type_specifiers(int mask, t_ast_coord* coord, int unsign, int long_long);
+static int ssc_enumerator(t_ast_enumerator* enumerator, int value, t_type* type, int scope);
+static t_type* ssc_enum_specifier(t_ast_enum_specifier* enum_specifier);
 
-void semantic_check(t_ast_translation_unit* translation_unit)
+void static_semantic_check(t_ast_translation_unit* translation_unit)
 {
     t_ast_list *ext_declr_list;
 	t_ast_external_declaration* ext_declr;
@@ -70,13 +70,13 @@ void semantic_check(t_ast_translation_unit* translation_unit)
 		}
 		else
 		{
-			sc_outer_declaration(ext_declr->u.declr);
+			ssc_outer_declaration(ext_declr->u.declr);
 		}
     }
 }
 
-/* Semantic check for declarations - implementations */
-static void sc_declaration_specifiers(t_ast_declaration_specifier* spec)
+/* static semantic check for declarations - implementations */
+static void ssc_declaration_specifiers(t_ast_declaration_specifier* spec)
 {   
     t_ast_list* qualifiers;
     t_ast_list* specifiers;
@@ -159,7 +159,7 @@ static void sc_declaration_specifiers(t_ast_declaration_specifier* spec)
         case AST_TYPE_SPECIFIER_ENUM:
             {
                 h |= 0x02;
-                spec->type = sc_enum_specifier(s->u.enum_specifier);
+                spec->type = ssc_enum_specifier(s->u.enum_specifier);
                 break;
             }
         case AST_TYPE_SPECIFIER_TYPEDEF:
@@ -198,7 +198,7 @@ static void sc_declaration_specifiers(t_ast_declaration_specifier* spec)
 		unsign = 1;
 	}
 
-    spec->type = sc_native_type_specifiers(g, &spec->coord, unsign, long_long);
+    spec->type = ssc_native_type_specifiers(g, &spec->coord, unsign, long_long);
 }
 
 /* http://www.mers.byu.edu/docs/standardC/declare.html */
@@ -222,7 +222,7 @@ Type specifiers are omittable (implicit assumed as int)
 /*
  semantic check for global declarations
  */
-static void sc_outer_declaration(t_ast_declaration* declr)
+static void ssc_outer_declaration(t_ast_declaration* declr)
 {
     t_ast_declaration_specifier* specifiers;
     t_ast_storage_specifier* storage_specifier;
@@ -239,12 +239,12 @@ static void sc_outer_declaration(t_ast_declaration* declr)
         semantic_error("global declaration can't have register or auto storage specifier!", &specifiers->coord);
     }    
 
-	sc_declaration_specifiers(specifiers);
+	ssc_declaration_specifiers(specifiers);
 }
 
 
 
-static t_type* sc_native_type_specifiers(int mask, t_ast_coord* coord, int unsign, int long_long)
+static t_type* ssc_native_type_specifiers(int mask, t_ast_coord* coord, int unsign, int long_long)
 {
       /* list of possible type specifiers from C99 standard.
 		void
@@ -461,7 +461,7 @@ static t_type* sc_native_type_specifiers(int mask, t_ast_coord* coord, int unsig
     return type;
 }
 
-static t_type* sc_enum_specifier(t_ast_enum_specifier* enum_specifier)
+static t_type* ssc_enum_specifier(t_ast_enum_specifier* enum_specifier)
 {
     t_type* type = NULL;
 	t_ast_list* enumerator_list = NULL;
@@ -525,13 +525,13 @@ static t_type* sc_enum_specifier(t_ast_enum_specifier* enum_specifier)
 	assert(enumerator_list);
 	while (!HCC_AST_LIST_IS_END(enumerator_list))
 	{
-		value = sc_enumerator((t_ast_enumerator*)enumerator_list->item, value, type, enum_specifier->scope + 1);
+		value = ssc_enumerator((t_ast_enumerator*)enumerator_list->item, value, type, enum_specifier->scope + 1);
 		enumerator_list = enumerator_list->next;
 	}
     return type;
 }
 
-static int sc_enumerator(t_ast_enumerator* enumerator, int value, t_type* type, int scope)
+static int ssc_enumerator(t_ast_enumerator* enumerator, int value, t_type* type, int scope)
 {
 	t_symbol* sym = find_symbol(enumerator->id, sym_table_identifiers);
 	if (sym && sym->scope == scope)
