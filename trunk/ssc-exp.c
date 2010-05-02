@@ -27,4 +27,90 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 /* Semantic check for expressions */
 
-static int foo = 0;
+#include "ast.h"
+
+
+static t_ast_exp* scc_primary_expression(t_ast_exp* exp)
+{
+	return exp;
+}
+    
+static t_ast_exp* scc_postfix_expression(t_ast_exp* exp)
+{
+	return exp;
+}
+      
+static t_ast_exp* scc_unary_expression(t_ast_exp* exp)
+{
+	return exp;
+}
+
+static t_ast_exp* scc_cast_expression(t_ast_exp* exp)
+{
+	return exp;
+}
+
+static t_ast_exp* multiplicative_expression(t_ast_exp* exp)
+{
+	return exp;
+}
+
+static t_ast_exp* additive_expression(t_ast_exp* exp)
+{
+	return exp;
+}
+
+static t_ast_exp*shift_expression(t_ast_exp* exp)
+{
+	return exp;
+}
+
+static t_ast_exp* relational_expression(t_ast_exp* exp)
+{
+	return exp;
+}
+
+static t_ast_exp* equality_expression(t_ast_exp* exp)
+{
+	return exp;
+}
+
+static t_ast_exp* and_expression(t_ast_exp* exp)
+{
+	return exp;
+}
+
+static t_ast_exp* exclusive_or_expression(t_ast_exp* exp)
+{
+	return exp;
+}
+
+static t_ast_exp* inclusive_or_expression(t_ast_exp* exp)
+{
+	return exp;
+}
+
+static t_ast_exp* logical_and_expression(t_ast_exp* exp)
+{
+	return exp;
+}
+
+static t_ast_exp* logical_or_expression(t_ast_exp* exp)
+{
+	return exp;
+}
+
+static t_ast_exp* conditional_expression(t_ast_exp* exp)
+{
+	return exp;
+}
+
+static t_ast_exp* assignment_expression(t_ast_exp* exp)
+{
+	return exp;
+}
+
+t_ast_exp* ssc_expression(t_ast_exp* exp)
+{
+	return exp;
+}
