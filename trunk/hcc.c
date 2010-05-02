@@ -204,7 +204,7 @@ void test_parser(char* filename, char** include_path)
 	initialize_parser();
     type_system_initialize();
 
-    semantic_check(translation_unit());		
+    static_semantic_check(translation_unit());		
 
 	free_clexer();
     free_symbol_tables();
