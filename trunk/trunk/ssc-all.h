@@ -25,5 +25,9 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 ****************************************************************/
 
+#include "ast.h"
+
+t_ast_exp* ssc_expression(t_ast_exp* exp);
+
 
 

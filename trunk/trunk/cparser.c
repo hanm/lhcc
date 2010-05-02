@@ -2103,7 +2103,8 @@ t_ast_direct_declarator* direct_declarator(int storage_class)
 			{
                 if (symbol->storage == TK_TYPEDEF)
                 {
-                    warning("redefinition of typedef type name!");
+					/* TODO - exact type info is not clear yet so no warning..*/
+                    /* warning("redefinition of typedef type name!"); */
                 }
                 else
                 {
