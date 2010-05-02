@@ -105,10 +105,8 @@ typedef enum hcc_ast_expression_kind
 
     /* string literal expression kind */
     AST_EXP_LITERAL_STRING_KIND,
-    AST_EXP_LITERAL_STRING_WIDE_KIND,
+    AST_EXP_LITERAL_STRING_WIDE_KIND
 
-    /* [FIX ME] temp solutoin */
-    AST_EXP_GENERIC_EXP_KIND
 } t_ast_exp_kind;
 
 
