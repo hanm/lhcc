@@ -28,6 +28,8 @@ OTHER DEALINGS IN THE SOFTWARE.
 /* Semantic check for expressions */
 
 #include "ast.h"
+#include "ssc-all.h"
+#include "error.h"
 
 /* Define NULL pointer value */
 #ifndef NULL
@@ -144,50 +146,74 @@ static t_ast_exp* scc_binary_expression(t_ast_exp* exp)
 			r = ssc_multiplicative_expression(exp);
 			break;
 		}
+	case AST_OP_BIT_AND :
+		{
+			r = ssc_and_expression(exp);
+			break;
+		}
+	case AST_OP_BIT_OR :
+		{
+			r = ssc_inclusive_or_expression(exp);
+			break;
+		}
+	case AST_OP_BIT_XOR :
+		{
+			r = ssc_exclusive_or_expression(exp);
+			break;
+		}
+	case AST_OP_LSHIFT :
+	case AST_OP_RSHIFT :
+		{
+			r = ssc_shift_expression(exp);
+			break;
+		}
+	case AST_OP_LESS :
+	case AST_OP_LESS_EQ :
+	case AST_OP_GREAT :
+	case AST_OP_GREAT_EQ :
+		{
+			r = ssc_relational_expression(exp);
+			break;
+		}
+	case AST_OP_EQUAL :
+	case AST_OP_UNEQUAL :
+		{
+			r = ssc_equality_expression(exp);
+			break;
+		}
+	case AST_OP_AND :
+		{
+			r = ssc_logical_and_expression(exp);
+			break;
+		}
+	case AST_OP_OR :
+		{
+			r = ssc_logical_or_expression(exp);
+			break;
+		}
+	case AST_OP_ASSIGN :
+    case AST_OP_MUL_ASSIGN :
+    case AST_OP_DIV_ASSIGN :
+    case AST_OP_MOD_ASSIGN :
+    case AST_OP_ADD_ASSIGN :
+    case AST_OP_SUB_ASSIGN :
+    case AST_OP_LSHIFT_ASSIGN :
+    case AST_OP_RSHIFT_ASSIGN :
+    case AST_OP_BIT_AND_ASSIGN :
+    case AST_OP_BIT_OR_ASSIGN :
+    case AST_OP_BIT_XOR_ASSIGN :
+		{
+			r = ssc_assignment_expression(exp);
+			break;
+		}
+	default:
+		assert(0);
 	}
 
-	
-/*
-	AST_OP_BIT_AND,
-	AST_OP_BIT_OR,
-	AST_OP_BIT_XOR,
-	AST_OP_LSHIFT,
-	AST_OP_RSHIFT,
-
-
-	AST_OP_LESS,
-	AST_OP_LESS_EQ,
-	AST_OP_GREAT,
-	AST_OP_GREAT_EQ,
-	AST_OP_EQUAL,
-	AST_OP_UNEQUAL,
-
-	AST_OP_AND,
-	AST_OP_OR,
-
-
-    AST_OP_ASSIGN,
-    AST_OP_MUL_ASSIGN,
-    AST_OP_DIV_ASSIGN,
-    AST_OP_MOD_ASSIGN,
-    AST_OP_ADD_ASSIGN,
-    AST_OP_SUB_ASSIGN,
-    AST_OP_LSHIFT_ASSIGN,
-    AST_OP_RSHIFT_ASSIGN,
-    AST_OP_BIT_AND_ASSIGN,
-    AST_OP_BIT_OR_ASSIGN,
-    AST_OP_BIT_XOR_ASSIGN,
-
-
-	AST_OP_PTR,
-	AST_OP_DOT,
-	AST_OP_INC,
-	AST_OP_DEC
-*/
 	return r;
 }
 
-static t_ast_exp* ssc_expression(t_ast_exp* exp)
+t_ast_exp* ssc_expression(t_ast_exp* exp)
 {
 	t_ast_exp* r = NULL;
 
