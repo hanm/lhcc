@@ -27,6 +27,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 #include "ast.h"
 #include "error.h"
+#include "ssc-all.h"
 
 /* construct a lexical coordinate from ast coordinate 
  * hate this but.. this is a cost to pay to make lex analysis and semantic check in two stages
@@ -554,6 +555,7 @@ static int ssc_enumerator(t_ast_enumerator* enumerator, int value, t_type* type,
 	else
 	{
 		/* TODO - check constant expression and return integer value */
+		ssc_expression(enumerator->exp);
 	}
 
 	(enumerator, value);
