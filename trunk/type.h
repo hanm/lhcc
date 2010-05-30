@@ -213,6 +213,24 @@ t_type* remove_type_qualifier(t_type* type);
 #define IS_VOID_TYPE(t) (UNQUALIFY_TYPE(type)->code == TYPE_VOID)
 
 #define IS_SCALAR_TYPE(t) (UNQUALIFY_TYPE(type)->code <= TYPE_PTR)
+
+/* below for arithmetic type conversion */
+#define IS_LONGDOUBLE_TYPE(t) (UNQUALIFY_TYPE(t)->code == TYPE_LONGDOUBLE)
+
+#define IS_DOUBLE_TYPE(t) (UNQUALIFY_TYPE(t)->code == TYPE_DOUBLE)
+
+#define IS_FLOAT_TYPE(t) (UNQUALIFY_TYPE(t)->code == TYPE_FLOAT)
+
+#define IS_UNSIGNED_LONGLONG_TYPE(t) (UNQUALIFY_TYPE(t)->code == TYPE_UNSIGNED_LONGLONG)
+
+#define IS_LONGLONG_TYPE(t) (UNQUALIFY_TYPE(t)->code == TYPE_LONGLONG)
+
+#define IS_UNSIGNED_LONG_TYPE(t) (UNQUALIFY_TYPE(t)->code == TYPE_UNSIGNED_LONG)
+
+#define IS_LONG_TYPE(t) (UNQUALIFY_TYPE(t)->code == TYPE_LONG)
+
+#define IS_UNSIGNED_INT_TYPE(t) (UNQUALIFY_TYPE(t)->code == TYPE_UNSIGNED_INT)
+
  
 /*
  * initialize type system by initializing c build in types and install their on type table
@@ -307,5 +325,27 @@ t_type* composite_type(t_type* type1, t_type* type2);
  * for example, const volatile restrict would be treat the same set of qualifier as restrict volatile const.. etc.
  */ 
 int has_same_type_qualifier(t_type* type1, t_type* type2);
+
+/*
+ * usual arithmetic converstion
+ * calculate the result type based on two operator types (more operators can be recursively apply this)
+ * ANSI type conversion rules:
+ *
+ * (in the order of "precedence")
+ * long double -> long double
+ * double -> double
+ * float -> float
+ * 
+ * ---- integer promotions -----
+ * 
+ * unsigned long long -> unsigned long long
+ * long long
+ * unsigned long
+ * long
+ * unsigned int
+ * otherwise -> int
+*/
+t_type* arithmetic_conversion(t_type* t1, t_type* t2);
+
 
 #endif
