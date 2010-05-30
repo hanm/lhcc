@@ -655,3 +655,69 @@ t_type* composite_type(t_type* type1, t_type* type2)
     assert(0);
     return NULL;
 }
+
+/*
+ * usual arithmetic converstion
+ * calculate the result type based on two operator types (more operators can be recursively apply this)
+ * ANSI type conversion rules:
+ *
+ * (in the order of "precedence")
+ * long double -> long double
+ * double -> double
+ * float -> float
+ * 
+ * ---- integer promotions -----
+ * 
+ * unsigned long long -> unsigned long long
+ * long long
+ * unsigned long
+ * long
+ * unsigned int
+ * otherwise -> int
+*/
+t_type* arithmetic_conversion(t_type* t1, t_type* t2)
+{
+	assert( t1 && t2);
+
+	if (IS_LONGDOUBLE_TYPE(t1) || IS_LONGDOUBLE_TYPE(t2))
+	{
+		return type_longdouble;
+	}
+
+	if (IS_DOUBLE_TYPE(t1) || IS_DOUBLE_TYPE(t2))
+	{
+		return type_double;
+	}
+
+	if (IS_FLOAT_TYPE(t1) || IS_FLOAT_TYPE(t2))
+	{
+		return type_float;
+	}
+
+	if (IS_UNSIGNED_LONGLONG_TYPE(t1) || IS_UNSIGNED_LONGLONG_TYPE(t2))
+	{
+		return type_unsigned_longlong;
+	}
+
+	if (IS_LONGLONG_TYPE(t1) || IS_LONGLONG_TYPE(t2))
+	{
+		return type_longlong;
+	}
+
+	if (IS_UNSIGNED_LONG_TYPE(t1) || IS_UNSIGNED_LONG_TYPE(t2))
+	{
+		return type_unsigned_long;
+	}
+
+	if (IS_LONG_TYPE(t1) || IS_LONG_TYPE(t2))
+	{
+		return type_long;
+	}
+
+	if (IS_UNSIGNED_INT_TYPE(t1) || IS_UNSIGNED_INT_TYPE(t2))
+	{
+		return type_unsigned_int;
+	}
+
+	return type_int;
+}
