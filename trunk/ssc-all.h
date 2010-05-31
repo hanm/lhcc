@@ -29,5 +29,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 t_ast_exp* ssc_expression(t_ast_exp* exp);
 
+t_ast_exp* ssc_const_expression(t_ast_exp* exp);
+
 
 

@@ -554,10 +554,21 @@ static int ssc_enumerator(t_ast_enumerator* enumerator, int value, t_type* type,
 	}
 	else
 	{
-		/* TODO - check constant expression and return integer value */
-		ssc_expression(enumerator->exp);
-	}
+		enumerator->exp = ssc_const_expression(enumerator->exp);
 
-	(enumerator, value);
-	return value;
+		if ( !enumerator->exp )
+		{
+			semantic_error("enumerator must be constant expression", &enumerator->coord);
+			return value;
+		}
+
+		sym = add_symbol(enumerator->id, &sym_table_identifiers, scope, PERM);
+		sym->value.i = value; // TODO - expression.value
+		sym->storage = TK_ENUM;
+		sym->type = type;
+		sym->defined = 1;
+		HCC_ASSIGN_COORDINATE(sym, enumerator);
+
+		return value; // TODO - expression.value
+	}
 }

@@ -36,6 +36,8 @@ typedef struct hcc_ast_abstract_declarator t_ast_abstract_declarator;
 typedef struct hcc_ast_all_declarator t_ast_all_declarator;
 typedef struct hcc_ast_type_name t_ast_type_name;
 
+typedef struct type t_type;
+
 typedef struct hcc_ast_list
 {
     void* item;
@@ -282,6 +284,8 @@ typedef struct hcc_ast_exp
         } ast_comma_exp;
 
 	} u;
+
+	t_type* type;
 
 } t_ast_exp;
 
