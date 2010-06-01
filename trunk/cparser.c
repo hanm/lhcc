@@ -428,7 +428,7 @@ t_ast_exp* primary_expression()
     case TK_CONST_INTEGER :
     case TK_CONST_CHAR_LITERAL :
         {
-            exp_val.i = lexeme_value.integer_value;
+            exp_val.i = (int)lexeme_value.integer_value;
             exp = make_ast_const_exp(exp_val, AST_EXP_CONST_INTEGER_KIND);
 			BINDING_COORDINATE(exp, coord);
 
@@ -464,7 +464,7 @@ t_ast_exp* primary_expression()
         }
 	case TK_CONST_LONG_INTEGER :
         {
-            exp_val.l = lexeme_value.integer_value;
+            exp_val.l = (long)lexeme_value.integer_value;
             exp = make_ast_const_exp(exp_val, AST_EXP_CONST_LONG_INTEGER_KIND);
 			BINDING_COORDINATE(exp, coord);
             
@@ -473,7 +473,7 @@ t_ast_exp* primary_expression()
         }
 	case TK_CONST_LONG_LONG :
         {
-            /* [TODO] support long long*/
+			exp_val.ll = (long long)lexeme_value.integer_value;
             exp = make_ast_const_exp(exp_val, AST_EXP_CONST_LONG_LONG_KIND);
 			BINDING_COORDINATE(exp, coord);
             
@@ -482,7 +482,7 @@ t_ast_exp* primary_expression()
         }
 	case TK_CONST_UNSIGNED_INTEGER :
         {
-            exp_val.ui = lexeme_value.integer_value;
+            exp_val.ui = (unsigned int)lexeme_value.integer_value;
             exp = make_ast_const_exp(exp_val, AST_EXP_CONST_UNSIGNED_INTEGER_KIND);
 			BINDING_COORDINATE(exp, coord);
             
@@ -491,7 +491,7 @@ t_ast_exp* primary_expression()
         }
 	case TK_CONST_UNSIGNED_LONG_INTEGER :
         {
-            exp_val.ul = lexeme_value.integer_value;
+            exp_val.ul = (unsigned long)lexeme_value.integer_value;
             exp = make_ast_const_exp(exp_val, AST_EXP_CONST_UNSIGNED_LONG_INTEGER_KIND);
 			BINDING_COORDINATE(exp, coord);
             
@@ -500,7 +500,7 @@ t_ast_exp* primary_expression()
         }
 	case TK_CONST_UNSIGNED_LONG_LONG :
         {
-            /* [TODO] support unsigned long long*/
+			exp_val.ull = lexeme_value.integer_value;
             exp = make_ast_const_exp(exp_val, AST_EXP_CONST_UNSIGNED_LONG_LONG_KIND);
 			BINDING_COORDINATE(exp, coord);
             
