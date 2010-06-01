@@ -180,6 +180,8 @@ typedef union hcc_ast_exp_value
 	unsigned int ui;
 	long l;
 	unsigned long ul;
+	long long ll;
+	unsigned long long ull;
 	float f;
 	double d;
 	long double ld;
