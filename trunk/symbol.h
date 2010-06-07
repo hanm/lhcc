@@ -123,8 +123,9 @@ t_symbol* install_symbol(char* name, t_symbol_table* table);
  */
 t_symbol* add_symbol(char* name, t_symbol_table** table, int symbol_scope, int arena);
 
-/* search a symbol in symbol table - if the symbol is not there then search previous chained symbol tables if any
+/* search a symbol in symbol table of current and enclosing scope - if the symbol is not there then search previous chained symbol tables if any
  * (it doesn't make sense to search next chained symbol table constrained by C binding rules)
+ * 
 */
 t_symbol* find_symbol(char* name, t_symbol_table* table);
 
