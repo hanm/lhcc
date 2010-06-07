@@ -42,6 +42,37 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 static t_ast_exp* scc_primary_expression(t_ast_exp* exp)
 {
+    t_symbol* sym_id = NULL;
+
+    assert(exp);
+
+    /* constant */
+    if ((exp->kind >= AST_EXP_CONST_FLOAT_KIND && 
+        exp->kind <= AST_EXP_CONST_UNSIGNED_LONG_LONG_KIND) ||
+        exp->kind == AST_EXP_LITERAL_STRING_KIND ||
+        exp->kind == AST_EXP_LITERAL_STRING_WIDE_KIND)
+    {
+        return exp;
+    }
+
+    /* identifier */
+    assert(exp->kind == AST_EXP_IDENTIFIER_KIND);
+    
+    sym_id = find_symbol(exp->u.ast_id_exp.name, sym_table_identifiers);
+   
+    if (sym_id == NULL)
+    {
+       /* TODO - after declarations are parsed, check this id is in symbol table
+        * For now leave the check otherwise too many false positives
+        */
+        return exp;
+    }
+    
+    if (!sym_id->hidden_typedef && sym_id->storage ==  TK_TYPEDEF)
+    {
+        semantic_error("Identifier name can't be a type defined by typedef!", &exp->coord);
+    }
+    
 	return exp;
 }
     
