@@ -71,7 +71,19 @@ static t_ast_exp* scc_primary_expression(t_ast_exp* exp)
     if (!sym_id->hidden_typedef && sym_id->storage ==  TK_TYPEDEF)
     {
         semantic_error("Identifier name can't be a type defined by typedef!", &exp->coord);
+		return exp;
     }
+
+	if (sym_id->storage == TK_ENUM)
+	{
+		/* enum has int type implicitly */
+		t_ast_exp_val value;
+		value.i = sym_id->value.i;
+
+		/* constant folding */
+		exp = make_ast_const_exp(value, AST_EXP_CONST_INTEGER_KIND);
+		return exp;
+	}
     
 	return exp;
 }
