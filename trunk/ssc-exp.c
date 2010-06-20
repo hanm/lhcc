@@ -85,6 +85,8 @@ static t_ast_exp* scc_primary_expression(t_ast_exp* exp)
 		return exp;
 	}
     
+	/* identifier expression, must be lvalue */
+	exp->lvalue = 1;
 	return exp;
 }
     
@@ -357,4 +359,30 @@ t_ast_exp* ssc_const_expression(t_ast_exp* exp)
 	}
 
 	return NULL;
+}
+
+t_ast_exp* ssc_implicit_conversion(t_ast_exp* exp, int rvalue)
+{
+	assert(exp != NULL);
+
+    if (rvalue)
+	{
+		exp->type = UNQUALIFY_TYPE(exp->type);
+		exp->lvalue = 0;
+	}
+
+	if (IS_FUNCTION_TYPE(exp->type))
+	{
+		exp->type = pointer_type(exp->type);
+		/* [TODO] - function marker? */
+	}
+	
+	if (IS_ARRAY_TYPE(exp->type))
+	{
+		exp->type = pointer_type(exp->type->link);
+		exp->lvalue = 0;
+		/* [TODO] - array type marker ??*/
+	}
+
+	return exp;
 }

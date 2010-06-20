@@ -31,5 +31,12 @@ t_ast_exp* ssc_expression(t_ast_exp* exp);
 
 t_ast_exp* ssc_const_expression(t_ast_exp* exp);
 
+/*
+implicit conversions including
+- convert between lvalue and rvalue
+- convert function and array types into pointer types
+- [TODO]
+*/
+t_ast_exp* ssc_implicit_conversion(t_ast_exp* exp, int rvalue);
 
 
