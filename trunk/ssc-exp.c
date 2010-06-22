@@ -92,6 +92,29 @@ static t_ast_exp* scc_primary_expression(t_ast_exp* exp)
     
 static t_ast_exp* scc_postfix_expression(t_ast_exp* exp)
 {
+	assert(exp != NULL);
+
+	switch (exp->kind)
+	{
+	case AST_EXP_SUBSCRIPT_KIND :
+		{
+			t_ast_exp* main_exp = ssc_implicit_conversion(exp->u.ast_subscript_exp.main, 1);
+			t_ast_exp* index_exp = ssc_implicit_conversion(exp->u.ast_subscript_exp.index, 1);
+
+			assert(main_exp && index_exp);
+
+			if (IS_INTEGER_TYPE(main_exp->type))
+			{
+				t_ast_exp* temp = main_exp;
+				main_exp = index_exp;
+				index_exp = temp;
+			}
+		}
+	default:
+		break;
+	}
+
+
 	return exp;
 }
       
