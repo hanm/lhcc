@@ -100,15 +100,48 @@ static t_ast_exp* scc_postfix_expression(t_ast_exp* exp)
 		{
 			t_ast_exp* main_exp = ssc_implicit_conversion(exp->u.ast_subscript_exp.main, 1);
 			t_ast_exp* index_exp = ssc_implicit_conversion(exp->u.ast_subscript_exp.index, 1);
+			t_type* type = NULL;
 
 			assert(main_exp && index_exp);
 
+			/*
+			 * Usually, the subscript expression has type ¡°pointer to <type>¡±, the expression within the
+			 * square brackets has type int, and the type of the result is <type>. However, it is
+			 * equally valid if the types of the postfix expression and the expression in brackets are
+			 * reversed. This is because the expression E1[E2] is identical (by definition) to
+			 * *((E1)+(E2)). Because addition is commutative, E1 and E2 can be interchanged.
+			 *
+			 * below code normalized the expression such that main is always type ptr
+			 * and index is always type int
+			*/
 			if (IS_INTEGER_TYPE(main_exp->type))
 			{
 				t_ast_exp* temp = main_exp;
 				main_exp = index_exp;
 				index_exp = temp;
 			}
+
+			type = main_exp->type;
+
+			if (IS_INTEGER_TYPE(index_exp->type) &&
+				IS_PTR_TYPE(type) && 
+				type->link &&
+				!(IS_FUNCTION_TYPE(type->link)))
+			{
+				exp->type = type;
+				/* array dereference yields a rvalue */
+				exp->lvalue = 0;
+
+				/* [TODO] 
+				 1. pointer arithmetic
+				 2. index checking (bounds check? no!)
+				*/
+			}
+			else
+			{
+				semantic_error("subscript expression type error", &exp->coord);
+			}
+
 		}
 	default:
 		break;
