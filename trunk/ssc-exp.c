@@ -85,8 +85,8 @@ static t_ast_exp* scc_primary_expression(t_ast_exp* exp)
 		return exp;
 	}
     
-	/* identifier expression, must be lvalue */
-	exp->lvalue = 1;
+	/* identifier must have lvalue */
+	exp->has_lvalue = 1;
 	return exp;
 }
     
@@ -98,8 +98,8 @@ static t_ast_exp* scc_postfix_expression(t_ast_exp* exp)
 	{
 	case AST_EXP_SUBSCRIPT_KIND :
 		{
-			t_ast_exp* main_exp = ssc_implicit_conversion(exp->u.ast_subscript_exp.main, 1);
-			t_ast_exp* index_exp = ssc_implicit_conversion(exp->u.ast_subscript_exp.index, 1);
+			t_ast_exp* main_exp = ssc_implicit_conversion(ssc_expression(exp->u.ast_subscript_exp.main), 1);
+			t_ast_exp* index_exp = ssc_implicit_conversion(ssc_expression(exp->u.ast_subscript_exp.index), 1);
 			t_type* type = NULL;
 
 			assert(main_exp && index_exp);
@@ -130,7 +130,7 @@ static t_ast_exp* scc_postfix_expression(t_ast_exp* exp)
 			{
 				exp->type = type;
 				/* array dereference yields a rvalue */
-				exp->lvalue = 0;
+				exp->has_lvalue = 0;
 
 				/* [TODO] 
 				 1. pointer arithmetic
@@ -417,27 +417,31 @@ t_ast_exp* ssc_const_expression(t_ast_exp* exp)
 	return NULL;
 }
 
-t_ast_exp* ssc_implicit_conversion(t_ast_exp* exp, int rvalue)
+t_ast_exp* ssc_implicit_conversion(t_ast_exp* exp, int lvalue_to_rvalue)
 {
 	assert(exp != NULL);
 
-    if (rvalue)
+	if (lvalue_to_rvalue)
 	{
 		exp->type = UNQUALIFY_TYPE(exp->type);
-		exp->lvalue = 0;
+		exp->has_lvalue = 0;
 	}
 
 	if (IS_FUNCTION_TYPE(exp->type))
 	{
 		exp->type = pointer_type(exp->type);
-		/* [TODO] - function marker? */
 	}
 	
 	if (IS_ARRAY_TYPE(exp->type))
 	{
 		exp->type = pointer_type(exp->type->link);
-		exp->lvalue = 0;
-		/* [TODO] - array type marker ??*/
+
+		/* per standard, except as noted, if an lvalue that has type ¡°array of <type>¡± appears as an operand,
+			it is converted to an expression of the type ¡°pointer to <type>.¡± The resultant pointer
+			points to the initial element of the array. In this case, the resultant pointer ceases to be
+			an lvalue
+	    */
+		exp->has_lvalue = 0;
 	}
 
 	return exp;

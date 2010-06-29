@@ -32,10 +32,17 @@ t_ast_exp* ssc_expression(t_ast_exp* exp);
 t_ast_exp* ssc_const_expression(t_ast_exp* exp);
 
 /*
-implicit conversions including
-- convert between lvalue and rvalue
-- convert function and array types into pointer types
-- [TODO]
+implicit conversions between lvalue and rvalues and between array/function and pointer types
+
+-	Convert between lvalue and rvalue :
+	When an lvalue appears in a context that requires an rvalue, 
+	the lvalue is implicitly converted to an rvalue. 
+	The reverse, however, is not true: an rvalue cannot be converted to an lvalue. 
+	Rvalues always have complete types or the void type.
+
+-	Convert function and array types into pointer type
+    per standard, when operands are function and/or array types, the type should be converted
+	to a pointer type
 */
 t_ast_exp* ssc_implicit_conversion(t_ast_exp* exp, int rvalue);
 

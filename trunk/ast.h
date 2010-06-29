@@ -288,7 +288,9 @@ typedef struct hcc_ast_exp
 	} u;
 
 	t_type* type;
-	int lvalue;
+	
+	int has_lvalue;
+	int no_rvalue;
 
 } t_ast_exp;
 
