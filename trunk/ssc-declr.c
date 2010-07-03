@@ -27,7 +27,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 #include "ast.h"
 #include "error.h"
-#include "ssc-all.h"
+#include "ssc.h"
 
 /* construct a lexical coordinate from ast coordinate 
  * hate this but.. this is a cost to pay to make lex analysis and semantic check in two stages
@@ -35,6 +35,9 @@ OTHER DEALINGS IN THE SOFTWARE.
 #define HCC_ASSIGN_COORDINATE(lex, ast) (lex)->coordinate.column = (ast)->coord.column; \
 		(lex)->coordinate.line = (ast)->coord.line; \
 		(lex)->coordinate.filename = (ast)->coord.file;
+
+/* semantic check for function definitions */
+static void ssc_function_definition(t_ast_function_definition*);
 
 /* static semantic check for declarations - prototypes */
 static void ssc_declaration_specifiers(t_ast_declaration_specifier* spec);
@@ -67,7 +70,7 @@ void static_semantic_check(t_ast_translation_unit* translation_unit)
 
 		if (ext_declr->fun_def)
 		{
-			/* check function */
+			ssc_function_definition(ext_declr->u.func_def);
 		}
 		else
 		{
@@ -571,4 +574,8 @@ static int ssc_enumerator(t_ast_enumerator* enumerator, int value, t_type* type,
 
 		return value; // TODO - expression.value
 	}
+}
+static void ssc_function_definition(t_ast_function_definition* func_def)
+{
+	assert(func_def);
 }

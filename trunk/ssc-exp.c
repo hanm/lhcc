@@ -28,7 +28,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 /* Semantic check for expressions */
 
 #include "ast.h"
-#include "ssc-all.h"
+#include "ssc.h"
 #include "error.h"
 
 /* Define NULL pointer value */
