@@ -27,8 +27,9 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 #include "ast.h"
 
-t_ast_exp* ssc_expression(t_ast_exp* exp);
+void static_semantic_check(t_ast_translation_unit* translation_unit);
 
+t_ast_exp* ssc_expression(t_ast_exp* exp);
 t_ast_exp* ssc_const_expression(t_ast_exp* exp);
 
 /*

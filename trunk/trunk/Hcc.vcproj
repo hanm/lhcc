@@ -342,10 +342,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\ssc-all.h"
-					>
-				</File>
-				<File
 					RelativePath=".\ssc-declr.c"
 					>
 				</File>
@@ -355,6 +351,10 @@
 				</File>
 				<File
 					RelativePath=".\ssc-stmt.c"
+					>
+				</File>
+				<File
+					RelativePath=".\ssc.h"
 					>
 				</File>
 			</Filter>
