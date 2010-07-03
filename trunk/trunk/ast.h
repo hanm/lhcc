@@ -333,7 +333,7 @@ typedef enum hcc_ast_statement_kind
     AST_STMT_FOR_KIND,
     AST_STMT_WHILE_KIND,
     AST_STMT_GOTO_KIND,
-    AST_STMT_CONTINUE__KIND, 
+    AST_STMT_CONTINUE_KIND, 
     AST_STMT_BREAK_KIND, 
     AST_STMT_RETURN_KIND
 } t_ast_stmt_kind;

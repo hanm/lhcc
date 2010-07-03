@@ -338,7 +338,7 @@ t_ast_stmt* make_ast_continue_stmt()
 {
 	ALLOCATE_GENERIC_AST_STMT;
 
-	stmt->kind = AST_STMT_CONTINUE__KIND;
+	stmt->kind = AST_STMT_CONTINUE_KIND;
 
 	return stmt;
 }

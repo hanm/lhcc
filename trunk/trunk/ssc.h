@@ -32,6 +32,9 @@ void static_semantic_check(t_ast_translation_unit* translation_unit);
 t_ast_exp* ssc_expression(t_ast_exp* exp);
 t_ast_exp* ssc_const_expression(t_ast_exp* exp);
 
+t_ast_stmt* ssc_compound_stmt(t_ast_stmt* stmt);
+t_ast_stmt* ssc_stmt(t_ast_stmt* stmt);
+
 /*
 implicit conversions between lvalue and rvalues and between array/function and pointer types
 
