@@ -39,7 +39,16 @@ static t_ast_stmt* ssc_label_stmt(t_ast_stmt* stmt)
 
 static t_ast_stmt* ssc_expression_stmt(t_ast_stmt* stmt)
 {
-	assert(stmt);
+    t_ast_exp* exp = NULL;
+
+    assert(stmt);
+
+    exp = stmt->u.ast_expression_stmt.exp;
+
+    if (exp)
+    {
+        stmt->u.ast_expression_stmt.exp = ssc_expression(exp);
+    }
 
 	return stmt;
 }
@@ -123,7 +132,25 @@ static t_ast_stmt* ssc_return_stmt(t_ast_stmt* stmt)
 
 t_ast_stmt* ssc_compound_stmt(t_ast_stmt* stmt)
 {
-	assert(stmt);
+    t_ast_list* declrs = NULL;
+    t_ast_list* stmts = NULL;
+    t_ast_stmt* statement = NULL;
+
+    assert(stmt && stmt->kind == AST_STMT_COMPOUND_KIND);
+
+    stmts = stmt->u.ast_compound_stmt.stmts;
+
+    /* [TODO] - check declarations */
+    (declrs);
+
+    /* check statements */
+    while(!HCC_AST_LIST_IS_END(stmts))
+    {
+        statement = stmts->item;
+        stmts = stmts->next;
+
+        ssc_stmt(statement);
+    }
 
 	return stmt;
 }
