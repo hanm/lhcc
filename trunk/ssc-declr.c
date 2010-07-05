@@ -575,7 +575,10 @@ static int ssc_enumerator(t_ast_enumerator* enumerator, int value, t_type* type,
 		return value; // TODO - expression.value
 	}
 }
+
 static void ssc_function_definition(t_ast_function_definition* func_def)
 {
 	assert(func_def);
+
+    ssc_compound_stmt(func_def->compound_stmt);
 }
