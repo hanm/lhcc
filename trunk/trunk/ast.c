@@ -28,9 +28,12 @@ OTHER DEALINGS IN THE SOFTWARE.
 #include "hcc.h"
 #include "arena.h"
 #include "ast.h"
+#include "type.h"
 
+/* allocate a generic expression construct with zero filled and assign a default type (int) to it */
 #define ALLOCATE_GENERIC_AST_EXP  t_ast_exp* exp; \
-	CALLOC(exp, PERM)
+	CALLOC(exp, PERM); \
+    exp->type = type_int
 
 #define ALLOCATE_GENERIC_AST_STMT t_ast_stmt* stmt; \
 	CALLOC(stmt, PERM)
