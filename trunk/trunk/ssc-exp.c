@@ -139,6 +139,18 @@ static t_ast_exp* scc_postfix_expression(t_ast_exp* exp)
 			}
 			else
 			{
+                printf("%s%d\n", "is integer type", IS_INTEGER_TYPE(index_exp->type));
+                printf("%s%d\n", "is pointer type", IS_PTR_TYPE(type));
+                
+                /*
+                 * note for now since declaration processing is not done some type of expression is not correct
+                 * so it's likely semantic error would report from here
+                 * [TODO] once all declaration processing is done remove these debug information
+                */
+                /*
+                printf("%s%d\n", "sub type is null or not", type->link == 0);
+                printf("%s%d\n", "is function type or not", IS_FUNCTION_TYPE(type->link));
+                */
 				semantic_error("subscript expression type error", &exp->coord);
 			}
 
