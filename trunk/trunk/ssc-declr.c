@@ -52,7 +52,9 @@ static void ssc_outer_declaration(t_ast_declaration* declr);
 */
 static t_type* ssc_native_type_specifiers(int mask, t_ast_coord* coord, int unsign, int long_long);
 static int ssc_enumerator(t_ast_enumerator* enumerator, int value, t_type* type, int scope);
+static t_type* ssc_struct_union_specifier(t_ast_struct_or_union_specifier*);
 static t_type* ssc_enum_specifier(t_ast_enum_specifier* enum_specifier);
+
 
 void static_semantic_check(t_ast_translation_unit* translation_unit)
 {
@@ -463,6 +465,31 @@ static t_type* ssc_native_type_specifiers(int mask, t_ast_coord* coord, int unsi
 	}
 
     return type;
+}
+
+
+static t_type* ssc_struct_union_specifier(t_ast_struct_or_union_specifier* specifier)
+{
+	assert(specifier);
+
+	if (specifier->name != NULL && specifier->struct_declr_list != NULL)
+	{
+
+	}
+	else if (specifier->name == NULL && specifier->struct_declr_list != NULL)
+	{
+
+	}
+	else if(specifier->name != NULL && specifier->struct_declr_list == NULL)
+	{
+
+	}
+	else
+	{
+		// error
+	}
+
+	return NULL;
 }
 
 static t_type* ssc_enum_specifier(t_ast_enum_specifier* enum_specifier)
