@@ -334,7 +334,7 @@ t_type* make_function_type(t_type* type, t_param* parameter, int prototype, int 
 }
 
 
-t_type* make_tag_type(t_type_kind kind, char* tag, int scope)
+t_type* make_record_type(t_type_kind kind, char* tag, int scope)
 {
     t_symbol* symbol = NULL;
     t_tag* tag_trait = NULL;
