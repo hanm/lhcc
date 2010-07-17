@@ -274,11 +274,12 @@ t_type* qualify_type(t_type* type, int code);
 t_type* make_function_type(t_type* type, t_param* parameter, int prototype, int ellipse);
 
 /*
- * construct a "tag" type
+ * construct a record type
  * record_type - struct, union, enum
  * tag - tag of the record. could be null
+ * scope - applicable scope for this type
  */
-t_type* make_tag_type(t_type_kind kind, char* tag, int scope);
+t_type* make_record_type(t_type_kind kind, char* tag, int scope);
 
 /*
  * construct a field type and associate it with specified record type

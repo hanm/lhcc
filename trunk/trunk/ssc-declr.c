@@ -525,7 +525,7 @@ static t_type* ssc_enum_specifier(t_ast_enum_specifier* enum_specifier)
     }
     else if (!enum_specifier->id && enum_specifier->enumerator_list)
     {
-		type = make_tag_type(TYPE_ENUM, enum_specifier->id, enum_specifier->scope);
+		type = make_record_type(TYPE_ENUM, enum_specifier->id, enum_specifier->scope);
 		HCC_ASSIGN_COORDINATE((t_symbol*)type->symbolic_link, enum_specifier);
     }
     else if (enum_specifier->id && enum_specifier->enumerator_list)
@@ -534,7 +534,7 @@ static t_type* ssc_enum_specifier(t_ast_enum_specifier* enum_specifier)
 
 		if (!sym || sym->scope < enum_specifier->scope)
 		{
-			type = make_tag_type(TYPE_ENUM, enum_specifier->id, enum_specifier->scope);
+			type = make_record_type(TYPE_ENUM, enum_specifier->id, enum_specifier->scope);
 			HCC_ASSIGN_COORDINATE((t_symbol*)type->symbolic_link, enum_specifier);
 		}
 		else
