@@ -2318,6 +2318,7 @@ t_ast_struct_or_union_specifier* struct_or_union_specifier()
 
 	s = make_ast_struct_union_specifier(is_struct, id, struct_declr_list);
 	BINDING_COORDINATE(s, saved_coord);
+	s->scope = symbol_scope;
 
 	return s;
 }

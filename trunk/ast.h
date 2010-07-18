@@ -478,6 +478,8 @@ typedef struct hcc_ast_struct_or_union_specifier
     int is_struct; /* set to 1 for struct, 0 for union */
     char* name;
     t_ast_list* struct_declr_list;
+
+	int scope;
 } t_ast_struct_or_union_specifier;
 
 typedef enum 
