@@ -160,6 +160,7 @@ static void ssc_declaration_specifiers(t_ast_declaration_specifier* spec)
         case AST_TYPE_SPECIFIER_STRUCT_OR_UNION:
             {
                 h |= 0x04;
+				spec->type = ssc_struct_union_specifier(s->u.struct_union_specifier);
                 break;
             }
         case AST_TYPE_SPECIFIER_ENUM:
@@ -470,15 +471,33 @@ static t_type* ssc_native_type_specifiers(int mask, t_ast_coord* coord, int unsi
 
 static t_type* ssc_struct_union_specifier(t_ast_struct_or_union_specifier* specifier)
 {
+	t_type* type = NULL;
+	t_type_kind struct_or_union = specifier->is_struct ? TYPE_STRUCT : TYPE_UNION;
+
 	assert(specifier);
 
-	if (specifier->name != NULL && specifier->struct_declr_list != NULL)
+	if (specifier->name && specifier->struct_declr_list)
 	{
+		t_symbol* sym = find_symbol(specifier->name, sym_table_types);
 
+		if (!sym || sym->scope < specifier->scope)
+		{	
+			/* [TODO] really need to add types in sym table at this moment w/o checking declr list?? */
+			type = make_record_type(struct_or_union, specifier->name, specifier->scope);
+			HCC_ASSIGN_COORDINATE((t_symbol*)type->symbolic_link, specifier);
+		}
+		else
+		{
+			if (sym->type->code != struct_or_union)
+			{
+				semantic_error("redefinition type", &specifier->coord);   
+				type = type_int;
+			}
+		}
 	}
 	else if (specifier->name == NULL && specifier->struct_declr_list != NULL)
 	{
-
+		
 	}
 	else if(specifier->name != NULL && specifier->struct_declr_list == NULL)
 	{
