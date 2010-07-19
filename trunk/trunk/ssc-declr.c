@@ -490,7 +490,7 @@ static t_type* ssc_struct_union_specifier(t_ast_struct_or_union_specifier* speci
 		{
 			if (sym->type->code != struct_or_union)
 			{
-				semantic_error("redefinition type", &specifier->coord);   
+				semantic_error("struct or union is already defined as other types", &specifier->coord);   
 				type = type_int;
 			}
 		}
