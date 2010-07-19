@@ -524,6 +524,7 @@ static t_type* ssc_enum_specifier(t_ast_enum_specifier* enum_specifier)
 
         if (!sym)
         {
+            /* incomplete enum type */
             type = type_int;
         }
         else
@@ -558,11 +559,17 @@ static t_type* ssc_enum_specifier(t_ast_enum_specifier* enum_specifier)
 		}
 		else
 		{
-			if (sym->type->code != TYPE_ENUM)
-			{
-				semantic_error("enum type redefinition", &enum_specifier->coord);   
+            /* error condition - redefinition of types */
+            if (sym->scope == enum_specifier->scope)
+            {
+                /*by all means this is a redefinition*/
+                semantic_error("enum type redefinition", &enum_specifier->coord);   
 				type = type_int;
-			}
+            }
+			else
+            {
+               assert(0); /* [TODO ] this should not happen ? that is sym scope would forever not greater than enum spec level ?*/
+            }
 		}
     }
     else
