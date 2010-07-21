@@ -501,7 +501,28 @@ static t_type* ssc_struct_union_specifier(t_ast_struct_or_union_specifier* speci
 	}
 	else if(specifier->name != NULL && specifier->struct_declr_list == NULL)
 	{
+        t_symbol* sym = find_symbol(specifier->name, sym_table_types);
 
+        if (!sym)
+        {
+            type = make_record_type(TYPE_STRUCT, specifier->name, specifier->scope);
+            type->link = type_int; /* declaration only */
+        }
+        else
+        {
+            assert(sym->type);
+            if (sym->type->code != TYPE_STRUCT)
+            {
+                semantic_error("struct type redefinition", &specifier->coord);   
+                type = type_int; // // [TODO] need to figure out the detail of assigning to type or type->link
+            }
+            else
+            {
+                type = sym->type;
+            }
+        }
+
+        return type;
 	}
 	else
 	{
@@ -524,8 +545,8 @@ static t_type* ssc_enum_specifier(t_ast_enum_specifier* enum_specifier)
 
         if (!sym)
         {
-            /* incomplete enum type */
-            type = type_int;
+            type = make_record_type(TYPE_ENUM, enum_specifier->id, enum_specifier->scope);
+            type->link = type_int; /* declaration only */
         }
         else
         {
@@ -533,7 +554,7 @@ static t_type* ssc_enum_specifier(t_ast_enum_specifier* enum_specifier)
             if (sym->type->code != TYPE_ENUM)
             {
                 semantic_error("enum type redefinition", &enum_specifier->coord);   
-                type = type_int;
+                type = type_int; // [TODO] need to figure out the detail of assigning to type or type->link
             }
             else
             {
