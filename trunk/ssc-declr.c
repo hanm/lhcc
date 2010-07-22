@@ -514,7 +514,7 @@ static t_type* ssc_struct_union_specifier(t_ast_struct_or_union_specifier* speci
             if (sym->type->code != TYPE_STRUCT)
             {
                 semantic_error("struct type redefinition", &specifier->coord);   
-                type = type_int; // // [TODO] need to figure out the detail of assigning to type or type->link
+                type = type_int; 
             }
             else
             {
@@ -547,6 +547,7 @@ static t_type* ssc_enum_specifier(t_ast_enum_specifier* enum_specifier)
         {
             type = make_record_type(TYPE_ENUM, enum_specifier->id, enum_specifier->scope);
             type->link = type_int; /* declaration only */
+			assert(!((t_symbol*)type->symbolic_link)->defined);
         }
         else
         {
@@ -554,7 +555,7 @@ static t_type* ssc_enum_specifier(t_ast_enum_specifier* enum_specifier)
             if (sym->type->code != TYPE_ENUM)
             {
                 semantic_error("enum type redefinition", &enum_specifier->coord);   
-                type = type_int; // [TODO] need to figure out the detail of assigning to type or type->link
+                type = type_int; 
             }
             else
             {
@@ -568,6 +569,7 @@ static t_type* ssc_enum_specifier(t_ast_enum_specifier* enum_specifier)
     {
 		type = make_record_type(TYPE_ENUM, enum_specifier->id, enum_specifier->scope);
 		HCC_ASSIGN_COORDINATE((t_symbol*)type->symbolic_link, enum_specifier);
+		((t_symbol*)type->symbolic_link)->defined = 1;
     }
     else if (enum_specifier->id && enum_specifier->enumerator_list)
     {
@@ -577,6 +579,7 @@ static t_type* ssc_enum_specifier(t_ast_enum_specifier* enum_specifier)
 		{
 			type = make_record_type(TYPE_ENUM, enum_specifier->id, enum_specifier->scope);
 			HCC_ASSIGN_COORDINATE((t_symbol*)type->symbolic_link, enum_specifier);
+			((t_symbol*)type->symbolic_link)->defined = 1;
 		}
 		else
 		{
