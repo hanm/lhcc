@@ -497,16 +497,20 @@ static t_type* ssc_struct_union_specifier(t_ast_struct_or_union_specifier* speci
 	}
 	else if (specifier->name == NULL && specifier->struct_declr_list != NULL)
 	{
-		
+		type = make_record_type(TYPE_STRUCT, specifier->name, specifier->scope);
+		HCC_ASSIGN_COORDINATE((t_symbol*)type->symbolic_link, specifier);
+		((t_symbol*)type->symbolic_link)->defined = 1;
 	}
 	else if(specifier->name != NULL && specifier->struct_declr_list == NULL)
 	{
+		/* declaration of a struct type */
         t_symbol* sym = find_symbol(specifier->name, sym_table_types);
 
         if (!sym)
         {
             type = make_record_type(TYPE_STRUCT, specifier->name, specifier->scope);
-            type->link = type_int; /* declaration only */
+			HCC_ASSIGN_COORDINATE((t_symbol*)type->symbolic_link, specifier);
+            type->link = type_int;
         }
         else
         {
@@ -526,10 +530,12 @@ static t_type* ssc_struct_union_specifier(t_ast_struct_or_union_specifier* speci
 	}
 	else
 	{
-		// error
+		semantic_error("illegal struct type", &specifier->coord);
+
+		return type;
 	}
 
-	return NULL;
+	return type;
 }
 
 static t_type* ssc_enum_specifier(t_ast_enum_specifier* enum_specifier)
@@ -541,12 +547,14 @@ static t_type* ssc_enum_specifier(t_ast_enum_specifier* enum_specifier)
 
     if (enum_specifier->id && ! enum_specifier->enumerator_list) 
     {
+		/* declaration an enum type */
         t_symbol* sym = find_symbol(enum_specifier->id, sym_table_types);
 
         if (!sym)
         {
             type = make_record_type(TYPE_ENUM, enum_specifier->id, enum_specifier->scope);
-            type->link = type_int; /* declaration only */
+			HCC_ASSIGN_COORDINATE((t_symbol*)type->symbolic_link, enum_specifier);
+            type->link = type_int; 
 			assert(!((t_symbol*)type->symbolic_link)->defined);
         }
         else
@@ -583,10 +591,9 @@ static t_type* ssc_enum_specifier(t_ast_enum_specifier* enum_specifier)
 		}
 		else
 		{
-            /* error condition - redefinition of types */
+            /* redefinition of a type which is either previously defined or declared */
             if (sym->scope == enum_specifier->scope)
             {
-                /*by all means this is a redefinition*/
                 semantic_error("enum type redefinition", &enum_specifier->coord);   
 				type = type_int;
             }
@@ -599,6 +606,8 @@ static t_type* ssc_enum_specifier(t_ast_enum_specifier* enum_specifier)
     else
     {
         semantic_error("illegal enum type", &enum_specifier->coord);
+
+		return type;
     }
 
     /* check enum content */
