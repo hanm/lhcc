@@ -485,6 +485,7 @@ static t_type* ssc_struct_union_specifier(t_ast_struct_or_union_specifier* speci
 			/* [TODO] really need to add types in sym table at this moment w/o checking declr list?? */
 			type = make_record_type(struct_or_union, specifier->name, specifier->scope);
 			HCC_ASSIGN_COORDINATE((t_symbol*)type->symbolic_link, specifier);
+			((t_symbol*)type->symbolic_link)->defined = 1;
 		}
 		else
 		{
@@ -583,24 +584,42 @@ static t_type* ssc_enum_specifier(t_ast_enum_specifier* enum_specifier)
     {
 		t_symbol* sym = find_symbol(enum_specifier->id, sym_table_types);
 
+#define HCC_DEFINE_ENUM_TYPE 	type = make_record_type(TYPE_ENUM, enum_specifier->id, enum_specifier->scope); \
+			HCC_ASSIGN_COORDINATE((t_symbol*)type->symbolic_link, enum_specifier); \
+			((t_symbol*)type->symbolic_link)->defined = 1;
+
 		if (!sym || sym->scope < enum_specifier->scope)
 		{
-			type = make_record_type(TYPE_ENUM, enum_specifier->id, enum_specifier->scope);
-			HCC_ASSIGN_COORDINATE((t_symbol*)type->symbolic_link, enum_specifier);
-			((t_symbol*)type->symbolic_link)->defined = 1;
+			HCC_DEFINE_ENUM_TYPE
 		}
 		else
 		{
             /* redefinition of a type which is either previously defined or declared */
-            if (sym->scope == enum_specifier->scope)
-            {
-                semantic_error("enum type redefinition", &enum_specifier->coord);   
+			if (sym->type->code != TYPE_ENUM)
+			{
+				semantic_error("redefinition of another type to enum", &enum_specifier->coord);  
 				type = type_int;
-            }
-			else
-            {
-               assert(0); /* [TODO ] this should not happen ? that is sym scope would forever not greater than enum spec level ?*/
-            }
+			}
+			else 
+			{
+				   if (sym->scope == enum_specifier->scope)
+				   {  
+					   if (sym->defined)
+					   {
+							semantic_error("redefinition of enum type - this enum type is already defined", &enum_specifier->coord);  
+							type = type_int;
+					   }
+					   else
+					   {
+						   HCC_DEFINE_ENUM_TYPE
+					   }
+				   }
+				   else
+				   {
+					   /* [TODO] check previous definition is not a struct!!!!*/
+					   HCC_DEFINE_ENUM_TYPE
+				   }
+			}
 		}
     }
     else
