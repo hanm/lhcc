@@ -476,31 +476,42 @@ static t_type* ssc_struct_union_specifier(t_ast_struct_or_union_specifier* speci
 
 	assert(specifier);
 
+#define HCC_DEFINE_STRUCT_UNION_TYPE type = make_record_type(struct_or_union, specifier->name, specifier->scope); \
+			HCC_ASSIGN_COORDINATE((t_symbol*)type->symbolic_link, specifier); \
+			((t_symbol*)type->symbolic_link)->defined = 1; \
+
 	if (specifier->name && specifier->struct_declr_list)
 	{
 		t_symbol* sym = find_symbol(specifier->name, sym_table_types);
 
 		if (!sym || sym->scope < specifier->scope)
 		{	
-			/* [TODO] really need to add types in sym table at this moment w/o checking declr list?? */
-			type = make_record_type(struct_or_union, specifier->name, specifier->scope);
-			HCC_ASSIGN_COORDINATE((t_symbol*)type->symbolic_link, specifier);
-			((t_symbol*)type->symbolic_link)->defined = 1;
+            HCC_DEFINE_STRUCT_UNION_TYPE
 		}
 		else
 		{
 			if (sym->type->code != struct_or_union)
 			{
-				semantic_error("struct or union is already defined as other types", &specifier->coord);   
-				type = type_int;
-			}
+				semantic_error("redefinition of type", &specifier->coord);   
+                type = type_int;
+            }
+            else 
+            {
+                if (sym->defined)
+                {
+                    semantic_error("redefinition of struct type which is already defined", &specifier->coord);  
+                    type = type_int;
+                }
+                else
+                {
+                    HCC_DEFINE_STRUCT_UNION_TYPE
+                }
+            }
 		}
 	}
 	else if (specifier->name == NULL && specifier->struct_declr_list != NULL)
 	{
-		type = make_record_type(TYPE_STRUCT, specifier->name, specifier->scope);
-		HCC_ASSIGN_COORDINATE((t_symbol*)type->symbolic_link, specifier);
-		((t_symbol*)type->symbolic_link)->defined = 1;
+        HCC_DEFINE_STRUCT_UNION_TYPE
 	}
 	else if(specifier->name != NULL && specifier->struct_declr_list == NULL)
 	{
@@ -509,14 +520,14 @@ static t_type* ssc_struct_union_specifier(t_ast_struct_or_union_specifier* speci
 
         if (!sym)
         {
-            type = make_record_type(TYPE_STRUCT, specifier->name, specifier->scope);
+            type = make_record_type(struct_or_union, specifier->name, specifier->scope);
 			HCC_ASSIGN_COORDINATE((t_symbol*)type->symbolic_link, specifier);
             type->link = type_int;
         }
         else
         {
             assert(sym->type);
-            if (sym->type->code != TYPE_STRUCT)
+            if (sym->type->code != struct_or_union)
             {
                 semantic_error("struct type redefinition", &specifier->coord);   
                 type = type_int; 
@@ -553,7 +564,6 @@ static t_type* ssc_enum_specifier(t_ast_enum_specifier* enum_specifier)
 
     if (enum_specifier->id && ! enum_specifier->enumerator_list) 
     {
-		/* declaration an enum type */
         t_symbol* sym = find_symbol(enum_specifier->id, sym_table_types);
 
         if (!sym)
@@ -561,6 +571,7 @@ static t_type* ssc_enum_specifier(t_ast_enum_specifier* enum_specifier)
             type = make_record_type(TYPE_ENUM, enum_specifier->id, enum_specifier->scope);
 			HCC_ASSIGN_COORDINATE((t_symbol*)type->symbolic_link, enum_specifier);
             type->link = type_int; 
+            /* declare only, not defining*/
 			assert(!((t_symbol*)type->symbolic_link)->defined);
         }
         else
@@ -604,7 +615,7 @@ static t_type* ssc_enum_specifier(t_ast_enum_specifier* enum_specifier)
 			{
                 if (sym->defined)
                 {
-                    semantic_error("redefinition of enum type - this enum type is previously defined as enum type", &enum_specifier->coord);  
+                    semantic_error("redefinition of enum type which is already defined", &enum_specifier->coord);  
                     type = type_int;
                 }
                 else
