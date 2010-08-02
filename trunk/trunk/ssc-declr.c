@@ -544,7 +544,12 @@ static t_type* ssc_enum_specifier(t_ast_enum_specifier* enum_specifier)
     t_type* type = NULL;
 	t_ast_list* enumerator_list = NULL;
 	int value = 0;
+    
     assert(enum_specifier && (enum_specifier->id || enum_specifier->enumerator_list));
+    
+#define HCC_DEFINE_ENUM_TYPE 	type = make_record_type(TYPE_ENUM, enum_specifier->id, enum_specifier->scope); \
+			HCC_ASSIGN_COORDINATE((t_symbol*)type->symbolic_link, enum_specifier); \
+			((t_symbol*)type->symbolic_link)->defined = 1;
 
     if (enum_specifier->id && ! enum_specifier->enumerator_list) 
     {
@@ -576,25 +581,20 @@ static t_type* ssc_enum_specifier(t_ast_enum_specifier* enum_specifier)
     }
     else if (!enum_specifier->id && enum_specifier->enumerator_list)
     {
-		type = make_record_type(TYPE_ENUM, enum_specifier->id, enum_specifier->scope);
-		HCC_ASSIGN_COORDINATE((t_symbol*)type->symbolic_link, enum_specifier);
-		((t_symbol*)type->symbolic_link)->defined = 1;
+		HCC_DEFINE_ENUM_TYPE
     }
     else if (enum_specifier->id && enum_specifier->enumerator_list)
     {
 		t_symbol* sym = find_symbol(enum_specifier->id, sym_table_types);
 
-#define HCC_DEFINE_ENUM_TYPE 	type = make_record_type(TYPE_ENUM, enum_specifier->id, enum_specifier->scope); \
-			HCC_ASSIGN_COORDINATE((t_symbol*)type->symbolic_link, enum_specifier); \
-			((t_symbol*)type->symbolic_link)->defined = 1;
-
 		if (!sym || sym->scope < enum_specifier->scope)
 		{
+            /* either not declared/defined or declared/defined in enclosing scope. */
 			HCC_DEFINE_ENUM_TYPE
 		}
 		else
 		{
-            /* redefinition of a type which is either previously defined or declared */
+            /* symbol previously declared or defined in same scope */
 			if (sym->type->code != TYPE_ENUM)
 			{
 				semantic_error("redefinition of another type to enum", &enum_specifier->coord);  
@@ -602,23 +602,15 @@ static t_type* ssc_enum_specifier(t_ast_enum_specifier* enum_specifier)
 			}
 			else 
 			{
-				   if (sym->scope == enum_specifier->scope)
-				   {  
-					   if (sym->defined)
-					   {
-							semantic_error("redefinition of enum type - this enum type is already defined", &enum_specifier->coord);  
-							type = type_int;
-					   }
-					   else
-					   {
-						   HCC_DEFINE_ENUM_TYPE
-					   }
-				   }
-				   else
-				   {
-					   /* [TODO] check previous definition is not a struct!!!!*/
-					   HCC_DEFINE_ENUM_TYPE
-				   }
+                if (sym->defined)
+                {
+                    semantic_error("redefinition of enum type - this enum type is previously defined as enum type", &enum_specifier->coord);  
+                    type = type_int;
+                }
+                else
+                {
+                    HCC_DEFINE_ENUM_TYPE
+                }
 			}
 		}
     }
