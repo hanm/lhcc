@@ -41,7 +41,15 @@ static void ssc_function_definition(t_ast_function_definition*);
 
 /* static semantic check for declarations - prototypes */
 static void ssc_declaration_specifiers(t_ast_declaration_specifier* spec);
+static void ssc_init_declarator_list(t_ast_list*);
+static void ssc_declarator(t_ast_declarator*);
+static void ssc_pointer_declarator();
+static void ssc_array_declarator();
+static void ssc_function_declarator();
+static void ssc_initializer(t_ast_initializer*);
+
 static void ssc_outer_declaration(t_ast_declaration* declr);
+
 /*
  * static semantic check for type specifier list (composed of a chain of native types)
  * return the composed type if everything conforms to spec, or signal semantic error
@@ -51,10 +59,10 @@ static void ssc_outer_declaration(t_ast_declaration* declr);
  * param unsign/long_long two special flags indicates the type is signed/unsigned or long_long
 */
 static t_type* ssc_native_type_specifiers(int mask, t_ast_coord* coord, int unsign, int long_long);
-static int ssc_enumerator(t_ast_enumerator* enumerator, int value, t_type* type, int scope);
 static t_type* ssc_struct_union_specifier(t_ast_struct_or_union_specifier*);
-static t_type* ssc_enum_specifier(t_ast_enum_specifier* enum_specifier);
 
+static t_type* ssc_enum_specifier(t_ast_enum_specifier* enum_specifier);
+static int ssc_enumerator(t_ast_enumerator* enumerator, int value, t_type* type, int scope);
 
 void static_semantic_check(t_ast_translation_unit* translation_unit)
 {
@@ -208,6 +216,40 @@ static void ssc_declaration_specifiers(t_ast_declaration_specifier* spec)
     spec->type = ssc_native_type_specifiers(g, &spec->coord, unsign, long_long);
 }
 
+
+static void ssc_init_declarator_list(t_ast_list* init_declarator_list)
+{
+	t_ast_init_declarator* init_declarator = NULL;
+
+	assert(init_declarator_list);
+
+	while (!HCC_AST_LIST_IS_END(init_declarator_list))
+	{
+		init_declarator = init_declarator_list->item;
+		init_declarator_list = init_declarator_list->next;
+		
+		assert(init_declarator);
+		//printf("declarator... %s\n", init_declarator->declarator->direct_declarator->id);
+		
+		ssc_declarator(init_declarator->declarator);
+		
+		if (init_declarator->initializer)
+		{
+			ssc_initializer(init_declarator->initializer);
+		}
+	}
+}
+
+static void ssc_declarator(t_ast_declarator* declarator)
+{
+	assert(declarator);
+}
+
+static void ssc_initializer(t_ast_initializer* initializer)
+{
+	assert(initializer);
+}
+
 /* http://www.mers.byu.edu/docs/standardC/declare.html */
 
 /* specification of declaration checking */
@@ -247,6 +289,9 @@ static void ssc_outer_declaration(t_ast_declaration* declr)
     }    
 
 	ssc_declaration_specifiers(specifiers);
+
+	ssc_init_declarator_list(declr->init_declr_list);
+	/* [TODO] declarators and semantic checking goes here */
 }
 
 
