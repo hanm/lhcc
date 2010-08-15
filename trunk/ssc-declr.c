@@ -43,7 +43,7 @@ static void ssc_function_definition(t_ast_function_definition*);
 static void ssc_declaration_specifiers(t_ast_declaration_specifier* spec);
 static void ssc_init_declarator_list(t_ast_list*);
 static void ssc_declarator(t_ast_declarator*);
-static void ssc_pointer(t_ast_pointer*);
+static t_type* ssc_pointer(t_ast_pointer*);
 static void ssc_direct_declarator(t_ast_direct_declarator*);
 static void ssc_suffix_declarators(t_ast_list*);
 static void ssc_initializer(t_ast_initializer*);
@@ -246,7 +246,18 @@ static void ssc_declarator(t_ast_declarator* declarator)
 
 	if (declarator->pointer)
 	{
-		ssc_pointer(declarator->pointer);
+		//t_type* type = ssc_pointer(declarator->pointer);
+
+		/*
+		if (!declarator->type)
+		{
+			declarator->type = type;
+		}
+		else
+		{
+			declarator->type->link = type;
+		}
+		*/
 	}
 
 	ssc_direct_declarator(declarator->direct_declarator);
@@ -254,9 +265,11 @@ static void ssc_declarator(t_ast_declarator* declarator)
 	ssc_suffix_declarators(declarator->suffix_delcr_list);
 }
 
-static void ssc_pointer(t_ast_pointer* pointer)
+static t_type* ssc_pointer(t_ast_pointer* pointer)
 {
 	assert(pointer);
+
+	return NULL;
 }
 
 static void ssc_direct_declarator(t_ast_direct_declarator* declarator)
