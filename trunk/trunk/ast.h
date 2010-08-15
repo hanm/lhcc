@@ -615,6 +615,13 @@ typedef struct hcc_ast_declarator
     t_ast_direct_declarator* direct_declarator;
     t_ast_pointer* pointer;
     t_ast_list* suffix_delcr_list;
+
+	/* 
+	 * reverse type list build during semantic check of declarator
+	 * for example, *x[10] yields POINTER(ARRAY 10)
+	*/
+	t_ast_list* type_list;
+
 } t_ast_declarator;
 
 typedef struct hcc_ast_direct_abstract_declarator
