@@ -28,6 +28,9 @@ OTHER DEALINGS IN THE SOFTWARE.
 #include "ast.h"
 #include "error.h"
 #include "ssc.h"
+#include "type.h"
+#include "arena.h"
+
 
 /* construct a lexical coordinate from ast coordinate 
  * hate this but.. this is a cost to pay to make lex analysis and semantic check in two stages
@@ -43,7 +46,8 @@ static void ssc_function_definition(t_ast_function_definition*);
 static void ssc_declaration_specifiers(t_ast_declaration_specifier* spec);
 static void ssc_init_declarator_list(t_ast_list*);
 static void ssc_declarator(t_ast_declarator*);
-static t_type* ssc_pointer(t_ast_pointer*);
+/* return a reverse type list of {pointer, type qualifiers}*/
+static t_ast_list* ssc_pointer(t_ast_pointer*);
 static void ssc_direct_declarator(t_ast_direct_declarator*);
 static void ssc_suffix_declarators(t_ast_list*);
 static void ssc_initializer(t_ast_initializer*);
@@ -246,7 +250,32 @@ static void ssc_declarator(t_ast_declarator* declarator)
 
 	if (declarator->pointer)
 	{
-		//t_type* type = ssc_pointer(declarator->pointer);
+		t_ast_list* pointer_type_list = ssc_pointer(declarator->pointer);
+
+#if 0
+        t_type* type = NULL;
+
+        while (!HCC_AST_LIST_IS_END(pointer_type_list))
+        {
+            type = pointer_type_list->item;
+            pointer_type_list = pointer_type_list->next;
+            
+            if (type->code == TYPE_CONST)
+            {
+                printf("%s\n", "const");
+            }
+            else if (type->code == TYPE_VOLATILE)
+            {
+                printf("%s\n", "volatile");
+            }
+            else if (type->code == TYPE_PTR)
+            {
+                printf("%s\n", "pointer");
+            }
+        }
+#endif
+
+        (pointer_type_list);
 
 		/*
 		if (!declarator->type)
@@ -255,7 +284,7 @@ static void ssc_declarator(t_ast_declarator* declarator)
 		}
 		else
 		{
-			declarator->type->link = type;
+			declarator->type->link = type; 
 		}
 		*/
 	}
@@ -265,11 +294,55 @@ static void ssc_declarator(t_ast_declarator* declarator)
 	ssc_suffix_declarators(declarator->suffix_delcr_list);
 }
 
-static t_type* ssc_pointer(t_ast_pointer* pointer)
+static t_ast_list* ssc_pointer(t_ast_pointer* pointer)
 {
+    t_ast_list *type_list = make_ast_list_entry(), *list = type_list;
+    t_ast_list* qualifier_list = NULL;
+    t_ast_type_qualifier*  qualifier = NULL;
+    t_type* type = NULL; 
+
 	assert(pointer);
 
-	return NULL;
+    CALLOC(type, PERM);
+    type->code = TYPE_PTR;
+    HCC_AST_LIST_APPEND(type_list, type);
+
+    qualifier_list = pointer->type_qualifier_list;
+
+    while (!HCC_AST_LIST_IS_END(qualifier_list))
+    {
+        qualifier = qualifier_list->item;
+        qualifier_list = qualifier_list->next;
+
+        CALLOC(type, PERM);
+        if (qualifier->kind == AST_TYPE_CONST)  
+        {
+            type->code = TYPE_CONST;
+        }
+        else if (qualifier->kind == AST_TYPE_VOLATILE)
+        {
+            type->code = TYPE_VOLATILE;
+        }
+        else
+        {
+            assert(0); /* should not happen until adding RESTRICT etc C99 keywords */
+        }
+
+        HCC_AST_LIST_APPEND(type_list, type);
+    }
+
+    if (pointer->pointer)
+    {
+        /* tail recursion here */
+        t_ast_list* list = ssc_pointer(pointer->pointer);
+
+        assert(list);
+
+        type_list->item = list->item;
+        type_list->next = list->next;
+    }
+
+	return list;
 }
 
 static void ssc_direct_declarator(t_ast_direct_declarator* declarator)
