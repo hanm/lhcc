@@ -48,7 +48,6 @@ static void ssc_init_declarator_list(t_ast_list*);
 static void ssc_declarator(t_ast_declarator*);
 /* return a reverse type list of {pointer, type qualifiers}*/
 static t_ast_list* ssc_pointer(t_ast_pointer*);
-static void ssc_direct_declarator(t_ast_direct_declarator*);
 static void ssc_suffix_declarators(t_ast_list*);
 static void ssc_initializer(t_ast_initializer*);
 
@@ -246,6 +245,8 @@ static void ssc_init_declarator_list(t_ast_list* init_declarator_list)
 
 static void ssc_declarator(t_ast_declarator* declarator)
 {
+    t_ast_list* type_list = make_ast_list_entry();
+
 	assert(declarator);
 
 	if (declarator->pointer)
@@ -275,23 +276,22 @@ static void ssc_declarator(t_ast_declarator* declarator)
         }
 #endif
 
-        (pointer_type_list);
-
-		/*
-		if (!declarator->type)
-		{
-			declarator->type = type;
-		}
-		else
-		{
-			declarator->type->link = type; 
-		}
-		*/
+        /* concatenate two list */
+        type_list->item = pointer_type_list->item;
+        type_list->next = pointer_type_list->next;
 	}
 
-	ssc_direct_declarator(declarator->direct_declarator);
+    if (declarator->direct_declarator->declarator)
+    {
+        ssc_declarator(declarator->direct_declarator->declarator);
+
+        type_list->item = declarator->direct_declarator->declarator->type_list->item;
+        type_list->next = declarator->direct_declarator->declarator->type_list->next;
+    }
 
 	ssc_suffix_declarators(declarator->suffix_delcr_list);
+
+    declarator->type_list = type_list;
 }
 
 static t_ast_list* ssc_pointer(t_ast_pointer* pointer)
@@ -345,10 +345,6 @@ static t_ast_list* ssc_pointer(t_ast_pointer* pointer)
 	return list;
 }
 
-static void ssc_direct_declarator(t_ast_direct_declarator* declarator)
-{
-	assert(declarator);
-}
 
 static void ssc_suffix_declarators(t_ast_list* list)
 {
