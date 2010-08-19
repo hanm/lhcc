@@ -2006,6 +2006,14 @@ t_ast_suffix_declarator* suffix_declarator()
         }
         else
         {
+            /*
+            * identifier list - this would only happen if it's an old style function definition, something like
+            * 
+            * void foo(a, b) 
+            * char a; 
+            * int b; 
+            *{ } 
+            */
             if (cptk == TK_ID)
             {
 				HCC_AST_LIST_APPEND(ids, lexeme_value.string_value);
