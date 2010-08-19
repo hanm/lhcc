@@ -46,11 +46,16 @@ static void ssc_function_definition(t_ast_function_definition*);
 static void ssc_declaration_specifiers(t_ast_declaration_specifier* spec);
 static void ssc_init_declarator_list(t_ast_list*);
 static void ssc_declarator(t_ast_declarator*);
+
 /* return a reverse type list of {pointer, type qualifiers}*/
 static t_ast_list* ssc_pointer(t_ast_pointer*);
-static void ssc_suffix_declarators(t_ast_list*);
-static void ssc_initializer(t_ast_initializer*);
 
+/* return a reverse type list of {array, function traits} specified by the suffix declarator */
+static t_ast_list* ssc_suffix_declarators(t_ast_list*);
+static t_type* ssc_array_dec(t_ast_suffix_declarator*);
+static t_type* ssc_function_dec(t_ast_suffix_declarator*);
+
+static void ssc_initializer(t_ast_initializer*);
 static void ssc_outer_declaration(t_ast_declaration* declr);
 
 /*
@@ -66,6 +71,11 @@ static t_type* ssc_struct_union_specifier(t_ast_struct_or_union_specifier*);
 
 static t_type* ssc_enum_specifier(t_ast_enum_specifier* enum_specifier);
 static int ssc_enumerator(t_ast_enumerator* enumerator, int value, t_type* type, int scope);
+
+
+
+/*************************************************************************************************************/
+
 
 void static_semantic_check(t_ast_translation_unit* translation_unit)
 {
@@ -346,10 +356,65 @@ static t_ast_list* ssc_pointer(t_ast_pointer* pointer)
 }
 
 
-static void ssc_suffix_declarators(t_ast_list* list)
+static t_ast_list* ssc_suffix_declarators(t_ast_list* list)
 {
+    t_ast_list *type_list = make_ast_list_entry(), *ret_list = type_list;
+    t_type* type = NULL; 
+
 	assert(list);
+
+    while (!HCC_AST_LIST_IS_END(list))
+    {
+        t_ast_suffix_declarator* dec = list->item;
+        list = list->next;
+
+        if (dec->kind ==  AST_SUFFIX_DECLR_SUBSCRIPT)
+        {
+            type = ssc_array_dec(dec);
+        }
+        else
+        {
+            assert(dec->kind == AST_SUFFIX_DECLR_PARAMETER);
+
+            type = ssc_function_dec(dec);
+        }
+
+        assert(type);
+        
+        HCC_AST_LIST_APPEND(type_list, type);
+    }
+
+    return ret_list;
 }
+
+
+static t_type* ssc_array_dec(t_ast_suffix_declarator* dec)
+{
+    t_type* type = NULL;
+
+    assert(dec && dec->kind == AST_SUFFIX_DECLR_SUBSCRIPT);
+
+    CALLOC(type, PERM);
+    type->code = TYPE_ARRARY;
+    type->size = 0; /* [IMPORTANT] [TODO] hook up with ssc_const_expression to get real expression value */
+
+    return type;
+}
+
+
+static t_type* ssc_function_dec(t_ast_suffix_declarator* dec)
+{
+    t_type* type = NULL;
+
+    assert(dec && dec->kind == AST_SUFFIX_DECLR_PARAMETER);
+
+    CALLOC(type, PERM);
+    type->code = TYPE_FUNCTION;
+    /* [TODO] function prototyping hooking */
+
+    return type;
+}
+
 
 static void ssc_initializer(t_ast_initializer* initializer)
 {
