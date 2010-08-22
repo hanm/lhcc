@@ -410,19 +410,28 @@ t_ast_exp* ssc_const_expression(t_ast_exp* exp)
 	 * 1. type const
 	 * 2. exp kind
 	*/
+	assert(exp->kind != AST_EXP_IDENTIFIER_KIND);
+
 	if (exp->kind >= AST_EXP_CONST_FLOAT_KIND && 
 		exp->kind <= AST_EXP_CONST_UNSIGNED_LONG_LONG_KIND ||
-		exp->kind == AST_EXP_IDENTIFIER_KIND ||
 		exp->kind == AST_EXP_UNARY_KIND ||
 		exp->kind == AST_EXP_BINARY_KIND) /* TODO - 
-											  1. check expression type. this is not written yet.
-											  2. remove check type == AST_EXP_IDENTIFIER_KIND
-											  this is not neccessary after ssc_primary_expression is implemented.
-											  as once it's implemented, the expression type could be turned into
-											  something finely grained as constant type (instead of primary expression,
-											  which is really no help at all - consider it a syntactic sugar only...).
+											  remove the last two kinds after constant folding is implemented
 											  */
 	{
+#if 1
+		if (exp->kind == AST_EXP_BINARY_KIND)
+		{
+			int x;
+			x = 0;
+		}
+		else if (exp->kind == AST_EXP_UNARY_KIND)
+		{
+			int x;
+			x = 0;
+		}
+#endif
+
 		return exp;
 	}
 
