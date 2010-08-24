@@ -341,6 +341,30 @@
 					RelativePath=".\ast.h"
 					>
 				</File>
+			</Filter>
+			<Filter
+				Name="parser"
+				>
+				<File
+					RelativePath=".\cparser.c"
+					>
+				</File>
+				<File
+					RelativePath=".\cparser.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="utility"
+				>
+				<File
+					RelativePath=".\utility\print_type.c"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="semantic"
+				>
 				<File
 					RelativePath=".\ssc-declr.c"
 					>
@@ -355,18 +379,6 @@
 				</File>
 				<File
 					RelativePath=".\ssc.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="parser"
-				>
-				<File
-					RelativePath=".\cparser.c"
-					>
-				</File>
-				<File
-					RelativePath=".\cparser.h"
 					>
 				</File>
 			</Filter>

@@ -271,6 +271,8 @@ HCC_MEM_CHECK_START
 	
 	printf("running time is %f: \n", difftime(t2, t1));
 
+    /* hcc_utility_print_type_info(); */
+
 HCC_MEM_CHECK_END
 
 #else
