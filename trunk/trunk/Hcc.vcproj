@@ -382,6 +382,18 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="transform"
+				>
+				<File
+					RelativePath=".\cfold.c"
+					>
+				</File>
+				<File
+					RelativePath=".\transform.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
