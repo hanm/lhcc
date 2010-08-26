@@ -30,6 +30,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 #include "ast.h"
 #include "ssc.h"
 #include "error.h"
+#include "transform.h" 
 
 /* Define NULL pointer value */
 #ifndef NULL
@@ -40,7 +41,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 #endif
 #endif
 
-static t_ast_exp* scc_primary_expression(t_ast_exp* exp)
+static t_ast_exp* ssc_primary_expression(t_ast_exp* exp)
 {
     t_symbol* sym_id = NULL;
 
@@ -90,7 +91,7 @@ static t_ast_exp* scc_primary_expression(t_ast_exp* exp)
 	return exp;
 }
     
-static t_ast_exp* scc_postfix_expression(t_ast_exp* exp)
+static t_ast_exp* ssc_postfix_expression(t_ast_exp* exp)
 {
 	assert(exp != NULL);
 
@@ -163,14 +164,64 @@ static t_ast_exp* scc_postfix_expression(t_ast_exp* exp)
 	return exp;
 }
       
-static t_ast_exp* scc_unary_expression(t_ast_exp* exp)
+static t_ast_exp* ssc_unary_expression(t_ast_exp* exp)
 {
+    assert(exp);
+    
+    switch (exp->u.ast_unary_exp.op)
+    {
+    case AST_OP_ADDR :
+        {
+            break;
+        }
+    case AST_OP_DEREF :
+        {
+            break;
+        }
+    case AST_OP_POS :
+        {
+            break;
+        }
+    case AST_OP_NEGATE :
+        {
+            exp = const_folding(exp);
+            break;
+        }
+    case AST_OP_INVERT :
+        {
+            break;
+        }
+    case AST_OP_NOT :
+        {
+            break;
+        }
+    case AST_OP_INC :
+        {
+            break;
+        }
+    case AST_OP_DEC :
+        {
+            break;
+        }
+    default:
+        assert(0);
+    }
+
 	return exp;
 }
 
-static t_ast_exp* scc_cast_expression(t_ast_exp* exp)
+static t_ast_exp* ssc_cast_expression(t_ast_exp* exp)
 {
+    assert(exp);
+
 	return exp;
+}
+
+static t_ast_exp* ssc_sizeof_expression(t_ast_exp* exp)
+{
+    assert(exp);
+
+    return exp;
 }
 
 static t_ast_exp* ssc_multiplicative_expression(t_ast_exp* exp)
@@ -233,12 +284,12 @@ static t_ast_exp* ssc_assignment_expression(t_ast_exp* exp)
 	return exp;
 }
 
-static t_ast_exp* scc_comma_expression(t_ast_exp* exp)
+static t_ast_exp* ssc_comma_expression(t_ast_exp* exp)
 {
 	return exp;
 }
 
-static t_ast_exp* scc_binary_expression(t_ast_exp* exp)
+static t_ast_exp* ssc_binary_expression(t_ast_exp* exp)
 {
 	t_ast_exp* r = NULL;
 	
@@ -336,17 +387,17 @@ t_ast_exp* ssc_expression(t_ast_exp* exp)
 	{
 	case AST_EXP_BINARY_KIND :
 		{
-			r = scc_binary_expression(exp);
+			r = ssc_binary_expression(exp);
 			break;
 		}
 	case AST_EXP_UNARY_KIND :
 		{
-			r = scc_unary_expression(exp);
+			r = ssc_unary_expression(exp);
 			break;
 		}
 	case AST_EXP_IDENTIFIER_KIND :
 		{
-			r = scc_primary_expression(exp);
+			r = ssc_primary_expression(exp);
 			break;
 		}
 	case AST_EXP_FUNCTION_CALL_KIND :
@@ -354,13 +405,17 @@ t_ast_exp* ssc_expression(t_ast_exp* exp)
 	case AST_EXP_INDIR_KIND :
 	case AST_EXP_POSTOP_KIND :
 		{
-			r = scc_postfix_expression(exp);
+			r = ssc_postfix_expression(exp);
 			break;
 		}
 	case AST_EXP_CAST_KIND :
+        {
+            r = ssc_cast_expression(exp);
+            break;
+        }
 	case AST_EXP_SIZEOF_KIND :
 		{
-			r = scc_unary_expression(exp);
+            r = ssc_sizeof_expression(exp);
 			break;
 		}
 	case AST_EXP_CONDITION_KIND :
@@ -375,7 +430,7 @@ t_ast_exp* ssc_expression(t_ast_exp* exp)
 		}
 	case AST_EXP_COMMA_KIND :
 		{
-			r = scc_comma_expression(exp);
+			r = ssc_comma_expression(exp);
 			break;
 		}
 	case AST_EXP_CONST_FLOAT_KIND :
@@ -390,7 +445,7 @@ t_ast_exp* ssc_expression(t_ast_exp* exp)
 	case AST_EXP_LITERAL_STRING_KIND :
 	case AST_EXP_LITERAL_STRING_WIDE_KIND :
 		{
-			r = scc_primary_expression(exp);
+			r = ssc_primary_expression(exp);
 			break;
 		}
 	default:
@@ -410,7 +465,7 @@ t_ast_exp* ssc_const_expression(t_ast_exp* exp)
 	 * 1. type const
 	 * 2. exp kind
 	*/
-	assert(exp->kind != AST_EXP_IDENTIFIER_KIND);
+    assert(exp->kind != AST_EXP_IDENTIFIER_KIND && exp->kind != AST_EXP_UNARY_KIND);
 
 	if (exp->kind >= AST_EXP_CONST_FLOAT_KIND && 
 		exp->kind <= AST_EXP_CONST_UNSIGNED_LONG_LONG_KIND ||
@@ -421,11 +476,6 @@ t_ast_exp* ssc_const_expression(t_ast_exp* exp)
 	{
 #if 1
 		if (exp->kind == AST_EXP_BINARY_KIND)
-		{
-			int x;
-			x = 0;
-		}
-		else if (exp->kind == AST_EXP_UNARY_KIND)
 		{
 			int x;
 			x = 0;

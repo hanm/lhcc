@@ -287,10 +287,10 @@ typedef struct hcc_ast_exp
 
 	} u;
 
-    t_type* type;
+    t_type* type; /* default to int type for all newly allocated expressions on arena*/
 	
-	int has_lvalue;
-	int no_rvalue;
+	int has_lvalue; 
+	int no_rvalue; /* array variable is the only case that has rvalue but no lvalue */
 
 } t_ast_exp;
 
