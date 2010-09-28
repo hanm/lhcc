@@ -469,7 +469,6 @@ t_ast_exp* ssc_const_expression(t_ast_exp* exp)
 
 	if (exp->kind >= AST_EXP_CONST_FLOAT_KIND && 
 		exp->kind <= AST_EXP_CONST_UNSIGNED_LONG_LONG_KIND ||
-		exp->kind == AST_EXP_UNARY_KIND ||
 		exp->kind == AST_EXP_BINARY_KIND) /* TODO - 
 											  remove the last two kinds after constant folding is implemented
 											  */
