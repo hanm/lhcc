@@ -28,15 +28,14 @@ OTHER DEALINGS IN THE SOFTWARE.
 #include "hcc.h"
 #include "type.h"
 #include "transform.h"
+#include "ssc.h"
 
 #define CONST_EXPRESSION(exp) ((exp->kind >= AST_EXP_CONST_FLOAT_KIND \
     && exp->kind <= AST_EXP_CONST_UNSIGNED_LONG_LONG_KIND) == 1)
 
-
-
 static t_ast_exp* unary_expression_folding(t_ast_exp* exp)
 {
-    t_ast_exp* e = exp->u.ast_unary_exp.exp;
+    t_ast_exp* e = ssc_expression(exp->u.ast_unary_exp.exp);
 
     assert(exp && exp->kind == AST_EXP_UNARY_KIND);
 
@@ -58,14 +57,17 @@ static t_ast_exp* unary_expression_folding(t_ast_exp* exp)
             }
         case AST_OP_NEGATE : /* - */ 
             {
+                printf("%s%d\n", "type", e->type->code);
                 e->u.ast_const_exp.val.i = - e->u.ast_const_exp.val.i; /* [TODO] type selection and fields mapping here. */
             }
         case AST_OP_INVERT : /* ~ */
             {
+                printf("%s%d\n", "type", e->type->code);
                 e->u.ast_const_exp.val.i = ~ e->u.ast_const_exp.val.i; /* [TODO] type selection and fields mapping here. */
             }
         case AST_OP_NOT : /* ! */
             {
+                printf("%s%d\n", "type", e->type->code);
                 e->u.ast_const_exp.val.i = ! e->u.ast_const_exp.val.i; /* [TODO] type selection and fields mapping here. */
             }
         default:

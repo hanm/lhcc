@@ -38,6 +38,67 @@ OTHER DEALINGS IN THE SOFTWARE.
 #define ALLOCATE_GENERIC_AST_STMT t_ast_stmt* stmt; \
 	CALLOC(stmt, PERM)
 
+t_type* get_type_from_exp_kind(t_ast_exp_kind kind)
+{
+    t_type* t = NULL;
+
+    /* FIXME - for now only support derive types for constant expressions */
+    assert(kind == AST_EXP_CONST_FLOAT_KIND ||
+        kind == AST_EXP_CONST_DOUBLE_KIND ||
+        kind == AST_EXP_CONST_LONG_DOUBLE_KIND ||
+        kind == AST_EXP_CONST_INTEGER_KIND ||
+        kind == AST_EXP_CONST_LONG_INTEGER_KIND ||
+        kind == AST_EXP_CONST_LONG_LONG_KIND ||
+        kind == AST_EXP_CONST_UNSIGNED_INTEGER_KIND ||
+        kind == AST_EXP_CONST_UNSIGNED_LONG_INTEGER_KIND ||
+        kind == AST_EXP_CONST_UNSIGNED_LONG_LONG_KIND ||
+        kind == AST_EXP_LITERAL_STRING_KIND ||
+        kind == AST_EXP_LITERAL_STRING_WIDE_KIND);
+
+    if (kind == AST_EXP_CONST_INTEGER_KIND)
+    {
+        t = type_int; 
+    }
+    else if (kind == AST_EXP_CONST_LONG_INTEGER_KIND)
+    {
+        t = type_long;
+    }
+    else if (kind == AST_EXP_CONST_LONG_LONG_KIND)
+    {
+        t = type_longlong;
+    }
+    else if (kind == AST_EXP_CONST_UNSIGNED_INTEGER_KIND)
+    {
+        t = type_unsigned_int;
+    }
+    else if (kind == AST_EXP_CONST_UNSIGNED_LONG_INTEGER_KIND)
+    {
+        t = type_unsigned_long;
+    }
+    else if (kind == AST_EXP_CONST_UNSIGNED_LONG_LONG_KIND)
+    {
+        t = type_unsigned_longlong;
+    }
+    else if (kind == AST_EXP_CONST_FLOAT_KIND)
+    {
+        t = type_float;
+    }
+    else if (kind == AST_EXP_CONST_DOUBLE_KIND)
+    {
+        t = type_double;
+    }
+    else if (kind == AST_EXP_CONST_LONG_DOUBLE_KIND)
+    {
+        t = type_longdouble;
+    }
+    else
+    {
+        /* FIXME - this is wrong. string literals are array of chars. */
+        t = type_char;
+    }
+
+    return t;
+}
 
 t_ast_exp* make_ast_id_exp(char* name)
 {
@@ -69,6 +130,7 @@ t_ast_exp* make_ast_const_exp(t_ast_exp_val val, t_ast_exp_kind kind)
 
 	exp->kind = kind;
 	exp->u.ast_const_exp.val = val;
+    exp->type = get_type_from_exp_kind(kind);
 
 	return exp;
 }
