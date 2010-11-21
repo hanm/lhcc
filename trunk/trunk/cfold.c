@@ -58,12 +58,30 @@ static t_ast_exp* unary_expression_folding(t_ast_exp* exp)
         case AST_OP_NEGATE : /* - */ 
             {
                 printf("%s%d\n", "type", e->type->code);
-                e->u.ast_const_exp.val.i = - e->u.ast_const_exp.val.i; /* [TODO] type selection and fields mapping here. */
+
+                if (e->type == type_int)
+                {
+                    e->u.ast_const_exp.val.i = - e->u.ast_const_exp.val.i;
+                }
+                else if (e->type == type_long)
+                {
+                    e->u.ast_const_exp.val.l = - e->u.ast_const_exp.val.l;
+                }
+                else if (e->type == type_float)
+                {
+                    e->u.ast_const_exp.val.f = - e->u.ast_const_exp.val.f;
+                }
+                else if (e->type == type_double)
+                {
+                    e->u.ast_const_exp.val.d = - e->u.ast_const_exp.val.d;
+                }
+                
+                /* FIXME - more type checks and unsigned check */ 
             }
         case AST_OP_INVERT : /* ~ */
             {
                 printf("%s%d\n", "type", e->type->code);
-                e->u.ast_const_exp.val.i = ~ e->u.ast_const_exp.val.i; /* [TODO] type selection and fields mapping here. */
+                e->u.ast_const_exp.val.i = ~ e->u.ast_const_exp.val.i; /* [FIXME] precondition check, must be integer here */
             }
         case AST_OP_NOT : /* ! */
             {

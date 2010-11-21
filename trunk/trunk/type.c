@@ -349,7 +349,8 @@ t_type* make_record_type(t_type_kind kind, char* tag, int scope)
     else
     {
         symbol = find_symbol(tag, sym_table_types);
-        if (symbol && (symbol->scope == scope || symbol->scope == PARAM && scope == PARAM + 1))
+        if (symbol && 
+            (symbol->scope == scope || symbol->scope == PARAM && scope == PARAM + 1))
         {
             if (symbol->type->code == kind && !symbol->defined)
             {

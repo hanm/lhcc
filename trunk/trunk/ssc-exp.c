@@ -99,8 +99,10 @@ static t_ast_exp* ssc_postfix_expression(t_ast_exp* exp)
 	{
 	case AST_EXP_SUBSCRIPT_KIND :
 		{
-			t_ast_exp* main_exp = ssc_implicit_conversion(ssc_expression(exp->u.ast_subscript_exp.main), 1);
-			t_ast_exp* index_exp = ssc_implicit_conversion(ssc_expression(exp->u.ast_subscript_exp.index), 1);
+			t_ast_exp* main_exp = 
+                ssc_implicit_conversion(ssc_expression(exp->u.ast_subscript_exp.main), 1);
+			t_ast_exp* index_exp = 
+                ssc_implicit_conversion(ssc_expression(exp->u.ast_subscript_exp.index), 1);
 			t_type* type = NULL;
 
 			assert(main_exp && index_exp);
@@ -184,15 +186,17 @@ static t_ast_exp* ssc_unary_expression(t_ast_exp* exp)
         }
     case AST_OP_NEGATE :
         {
-            exp = const_folding(exp);
+            exp = const_folding(exp); /* more semantic check before constant folding. so does followers */
             break;
         }
     case AST_OP_INVERT :
         {
+            exp = const_folding(exp);
             break;
         }
     case AST_OP_NOT :
         {
+            exp = const_folding(exp);
             break;
         }
     case AST_OP_INC :
