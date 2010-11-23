@@ -186,6 +186,13 @@ static t_ast_exp* ssc_unary_expression(t_ast_exp* exp)
         }
     case AST_OP_NEGATE :
         {
+            if (!IS_ARITHMETIC_TYPE(
+                exp->u.ast_unary_exp.exp->type))
+            {
+                semantic_error("- operator shall have arithmetic type", &exp->coord);
+                return exp;
+            }
+
             exp = const_folding(exp); /* more semantic check before constant folding. so does followers */
             break;
         }
