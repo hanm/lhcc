@@ -63,8 +63,9 @@ static t_ast_exp* ssc_primary_expression(t_ast_exp* exp)
    
     if (sym_id == NULL)
     {
-       /* TODO - after declarations are parsed, check this id is in symbol table
+       /* FIXME - after declarations are parsed, check this id is in symbol table
         * For now leave the check otherwise too many false positives
+        * This should be an urgent fix otherwise it would break things a lot!
         */
         return exp;
     }

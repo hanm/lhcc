@@ -419,6 +419,7 @@ static t_type* ssc_function_dec(t_ast_suffix_declarator* dec)
 static void ssc_initializer(t_ast_initializer* initializer)
 {
 	assert(initializer);
+    /* FIXME - implement functionality */
 }
 
 /* http://www.mers.byu.edu/docs/standardC/declare.html */
@@ -462,7 +463,10 @@ static void ssc_outer_declaration(t_ast_declaration* declr)
 	ssc_declaration_specifiers(specifiers);
 
 	ssc_init_declarator_list(declr->init_declr_list);
-	/* [TODO] declarators and semantic checking goes here */
+	/* [FIXME] declarators and semantic checking goes here.
+     * need to construct actual types and add identifier into
+     * symbol table.
+    */
 }
 
 
