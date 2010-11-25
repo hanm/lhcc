@@ -44,7 +44,7 @@ static void ssc_function_definition(t_ast_function_definition*);
 
 /* static semantic check for declarations - prototypes */
 static void ssc_declaration_specifiers(t_ast_declaration_specifier* spec);
-static void ssc_init_declarator_list(t_ast_list*);
+static void ssc_init_declarator_list(t_ast_list*, t_type*);
 static void ssc_declarator(t_ast_declarator*);
 
 /* return a reverse type list of {pointer, type qualifiers}*/
@@ -71,6 +71,12 @@ static t_type* ssc_struct_union_specifier(t_ast_struct_or_union_specifier*);
 
 static t_type* ssc_enum_specifier(t_ast_enum_specifier* enum_specifier);
 static int ssc_enumerator(t_ast_enumerator* enumerator, int value, t_type* type, int scope);
+
+/*
+ * construct the type of a declarator based on the the base_type of the declarator's type spcifier
+ * and the reverse type list generated while doing semantic check of the declarator.
+ */
+static t_type* ssc_finalize_type(t_type* base_type, t_ast_list* reverse_type_list);
 
 
 
@@ -192,11 +198,6 @@ static void ssc_declaration_specifiers(t_ast_declaration_specifier* spec)
             }
         case AST_TYPE_SPECIFIER_TYPEDEF:
             {
-                t_symbol* sym = find_symbol(s->u.type_def, sym_table_identifiers);
-                assert(sym && sym->storage == TK_TYPEDEF);
-                spec->type = sym->type;
-                assert(!sym->type); /* TODO - this validation should be reverted later. */
-
                 h |= 0x01;
                 break;
             }
@@ -211,9 +212,9 @@ static void ssc_declaration_specifiers(t_ast_declaration_specifier* spec)
         }
     }
 
-    if ( h != 8)
+    if ( h != 8 && ((h & 0x01) == 0))
     {
-        /* enum, struct/union, typedef already validates their types in specific sub routines */
+        /* enum, struct/union already validates their types in specific sub routines */
         return;
     }
 
@@ -227,20 +228,34 @@ static void ssc_declaration_specifiers(t_ast_declaration_specifier* spec)
 	}
 
     spec->type = ssc_native_type_specifiers(g, &spec->coord, unsign, long_long);
+
+    if (h & 0x01)
+    {
+        /* special case for typedef - in parser the type of the symbol is not set
+         * now in semantic checking phase, set the actual type calculated with the
+         * specific entry in symbol table.
+        */
+        t_symbol* sym = find_symbol(s->u.type_def, sym_table_identifiers);
+        assert(sym && sym->storage == TK_TYPEDEF);
+        sym->type = spec->type;
+    }
+
+    assert(spec->type);
 }
 
-
-static void ssc_init_declarator_list(t_ast_list* init_declarator_list)
+static void ssc_init_declarator_list(t_ast_list* init_declarator_list, t_type* base_type)
 {
-	t_ast_init_declarator* init_declarator = NULL;
-
-	assert(init_declarator_list);
+    assert(init_declarator_list && base_type);
 
 	while (!HCC_AST_LIST_IS_END(init_declarator_list))
-	{
-		init_declarator = init_declarator_list->item;
+	{		
+        char* decl_id = NULL; /* declarator identifier */
+        t_type* type = NULL; /* finalized type for declarator */
+
+		t_ast_init_declarator* init_declarator = init_declarator_list->item;
 		init_declarator_list = init_declarator_list->next;
-		
+
+
 		assert(init_declarator);
 		//printf("declarator... %s\n", init_declarator->declarator->direct_declarator->id);
 		
@@ -250,6 +265,14 @@ static void ssc_init_declarator_list(t_ast_list* init_declarator_list)
 		{
 			ssc_initializer(init_declarator->initializer);
 		}
+        
+        (type, decl_id, base_type);
+        /*
+        type = ssc_finalize_type(base_type, init_declarator->declarator->type_list);
+
+        // FIXME - add it into symbol table.
+        
+        */
 	}
 }
 
@@ -462,11 +485,14 @@ static void ssc_outer_declaration(t_ast_declaration* declr)
 
 	ssc_declaration_specifiers(specifiers);
 
-	ssc_init_declarator_list(declr->init_declr_list);
+    ssc_init_declarator_list(declr->init_declr_list, specifiers->type);
 	/* [FIXME] declarators and semantic checking goes here.
      * need to construct actual types and add identifier into
      * symbol table.
     */
+
+    // FIXME - get base type from specifiers
+    // FIXME - construct type from the reverse type list of
 }
 
 
@@ -909,4 +935,36 @@ static void ssc_function_definition(t_ast_function_definition* func_def)
 	assert(func_def);
 
     ssc_compound_stmt(func_def->compound_stmt);
+}
+
+t_type* ssc_finalize_type(t_type* base_type, t_ast_list* reverse_type_list)
+{
+    assert(base_type && reverse_type_list);
+
+    while (!HCC_AST_LIST_IS_END(reverse_type_list))
+    {
+        t_type* type = reverse_type_list->item;
+        reverse_type_list = reverse_type_list->next;
+
+        switch (type->code)
+        {
+        case TYPE_CONST :
+        case TYPE_VOLATILE :
+        case TYPE_RESTRICT :
+            {
+                base_type = qualify_type(base_type, type->code);
+                break;
+            }
+        case TYPE_PTR :
+            {
+                base_type = pointer_type(base_type);
+                break;
+            }
+        /* FIXME - add more case states here like Array type. And assert on reaching default case !*/
+        default :
+            break;
+        }
+    }
+
+    return base_type;
 }
