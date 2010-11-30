@@ -69,7 +69,10 @@ t_type* type_unsigned_int64;
 static t_type* atomic_type(t_type* type, int code, int align, int size, t_symbol* symbol_link)
 {
 	struct type_entry* p;
-	unsigned long h = (code^((unsigned long)type>>3))& __HCC_TYPE_TABLE_HASHSIZE;
+    /* can't hash with type table size itself as it's possible that the result value is the table size leads
+     * to access the slots of table out of bound.
+    */
+	unsigned long h = (code^((unsigned long)type>>3))& (__HCC_TYPE_TABLE_HASHSIZE - 1);
 
 	assert(code >= 0 && align >= 0 && size >= 0);
 

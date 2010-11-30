@@ -267,12 +267,12 @@ static void ssc_init_declarator_list(t_ast_list* init_declarator_list, t_type* b
 		}
         
         (type, decl_id, base_type);
-        /*
+        
         type = ssc_finalize_type(base_type, init_declarator->declarator->type_list);
 
         // FIXME - add it into symbol table.
         
-        */
+        
 	}
 }
 
