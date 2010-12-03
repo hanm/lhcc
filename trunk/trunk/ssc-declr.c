@@ -248,6 +248,11 @@ static void ssc_declaration_specifiers(t_ast_declaration_specifier* spec)
 
 static void ssc_init_declarator_list(t_ast_list* init_declarator_list, t_type* base_type)
 {
+    if (!base_type)
+    {
+        __asm int 3;
+    }
+
     assert(init_declarator_list && base_type);
 
 	while (!HCC_AST_LIST_IS_END(init_declarator_list))
@@ -286,10 +291,9 @@ static void ssc_init_declarator_list(t_ast_list* init_declarator_list, t_type* b
 
 static void ssc_declarator(t_ast_declarator* declarator)
 {
-    t_ast_list* type_list = make_ast_list_entry();
-
 	assert(declarator);
 
+    /* check pointer declarator, if any */
 	if (declarator->pointer)
 	{
 		t_ast_list* pointer_type_list = ssc_pointer(declarator->pointer);
@@ -322,6 +326,7 @@ static void ssc_declarator(t_ast_declarator* declarator)
         declarator->type_list = pointer_type_list;
 	}
 
+    /* check declarator in direct declarator (recursively), if any */
     if (declarator->direct_declarator->declarator)
     {
         ssc_declarator(declarator->direct_declarator->declarator);
@@ -349,11 +354,21 @@ static void ssc_declarator(t_ast_declarator* declarator)
         }
     }
 
-    /* FIXME - get out the list and concatenate here!*/
-	ssc_suffix_declarators(declarator->suffix_delcr_list);
+    if (!HCC_AST_LIST_IS_END(declarator->suffix_delcr_list))
+    {
+        t_ast_list* list = ssc_suffix_declarators(declarator->suffix_delcr_list);
+        t_ast_list* type_list = declarator->type_list;
 
-    /* FIXME - assign correct list here */
-    declarator->type_list = type_list;
+        assert(list->item && type_list);
+
+        while (! HCC_AST_LIST_IS_END(type_list))
+        {
+            type_list = type_list->next;
+        }
+
+        type_list->item = list->item;
+        type_list->next = list->next;
+    }
 }
 
 static t_ast_list* ssc_pointer(t_ast_pointer* pointer)
