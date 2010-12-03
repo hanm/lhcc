@@ -31,6 +31,9 @@ OTHER DEALINGS IN THE SOFTWARE.
 #include "type.h"
 #include "arena.h"
 
+/*************************************************************************************************************/
+/******************************Prototypes Goes Here**********************************************************/
+/*************************************************************************************************************/
 
 /* construct a lexical coordinate from ast coordinate 
  * hate this but.. this is a cost to pay to make lex analysis and semantic check in two stages
@@ -45,6 +48,7 @@ static void ssc_function_definition(t_ast_function_definition*);
 /* static semantic check for declarations - prototypes */
 static void ssc_declaration_specifiers(t_ast_declaration_specifier* spec);
 static void ssc_init_declarator_list(t_ast_list*, t_type*);
+/* recirsively visiting declarators chain and construct a reverse type list */
 static void ssc_declarator(t_ast_declarator*);
 
 /* return a reverse type list of {pointer, type qualifiers}*/
@@ -78,10 +82,9 @@ static int ssc_enumerator(t_ast_enumerator* enumerator, int value, t_type* type,
  */
 static t_type* ssc_finalize_type(t_type* base_type, t_ast_list* reverse_type_list);
 
-
-
 /*************************************************************************************************************/
-
+/******************************Implementation Goes Here**********************************************************/
+/*************************************************************************************************************/
 
 void static_semantic_check(t_ast_translation_unit* translation_unit)
 {
@@ -272,6 +275,11 @@ static void ssc_init_declarator_list(t_ast_list* init_declarator_list, t_type* b
 
         // FIXME - add it into symbol table.
         
+        if (type == NULL)
+        {
+            __asm int 3;
+        }
+
         
 	}
 }
@@ -309,21 +317,42 @@ static void ssc_declarator(t_ast_declarator* declarator)
         }
 #endif
 
-        /* concatenate two list */
-        type_list->item = pointer_type_list->item;
-        type_list->next = pointer_type_list->next;
+        assert(pointer_type_list);
+
+        declarator->type_list = pointer_type_list;
 	}
 
     if (declarator->direct_declarator->declarator)
     {
         ssc_declarator(declarator->direct_declarator->declarator);
 
-        type_list->item = declarator->direct_declarator->declarator->type_list->item;
-        type_list->next = declarator->direct_declarator->declarator->type_list->next;
+        {
+            t_ast_list* list = declarator->type_list;
+
+            if (!list)
+            {
+                list = make_ast_list_entry();
+                declarator->type_list = list;
+            }
+            else
+            {
+                while (!HCC_AST_LIST_IS_END(list))
+                {
+                    list = list->next;
+                }
+            }
+
+            assert( !list->item && !list->next);
+
+            list->item = declarator->direct_declarator->declarator->type_list->item;
+            list->next = declarator->direct_declarator->declarator->type_list->next;
+        }
     }
 
+    /* FIXME - get out the list and concatenate here!*/
 	ssc_suffix_declarators(declarator->suffix_delcr_list);
 
+    /* FIXME - assign correct list here */
     declarator->type_list = type_list;
 }
 
