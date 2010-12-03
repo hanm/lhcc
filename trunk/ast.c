@@ -682,6 +682,8 @@ t_ast_declarator* make_ast_declarator(t_ast_pointer* pointer, t_ast_direct_decla
     d->direct_declarator = direct_declarator;
     d->suffix_delcr_list = list;
 
+    d->type_list = make_ast_list_entry();
+
     return d;
 }
 
