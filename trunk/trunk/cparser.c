@@ -2692,6 +2692,22 @@ t_ast_external_declaration* external_declaration()
             }
         }
         
+        if (cptk == TK_SEMICOLON)
+        {
+            /* stand alone external declaration, with int assumed as its type */
+            init_declrtor = make_ast_init_declarator(declrtor, NULL);
+            BINDING_COORDINATE(init_declrtor, saved_coord);
+            HCC_AST_LIST_APPEND(c_init_declr_list, init_declrtor);
+
+            declare = make_ast_declaration(declr_specifier, init_declr_list);
+            ext_declr = make_ast_external_declaration(func_def, declare);
+            BINDING_COORDINATE(declare, saved_coord);
+            BINDING_COORDINATE(ext_declr, saved_coord);
+
+            GET_NEXT_TOKEN;
+            return ext_declr;
+        }
+
         /* function body */
 		compound_stmt = compound_statement();
 		

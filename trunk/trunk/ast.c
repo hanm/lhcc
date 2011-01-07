@@ -802,7 +802,7 @@ t_ast_declaration* make_ast_declaration(t_ast_declaration_specifier* declr_speci
     t_ast_declaration* declr = NULL;
     CALLOC(declr, PERM);
 
-    assert(declr_specifier);
+    /* assert(declr_specifier); */
 
     declr->declr_specifiers = declr_specifier;
     declr->init_declr_list = init_declr_list;

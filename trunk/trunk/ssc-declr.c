@@ -126,7 +126,8 @@ static void ssc_declaration_specifiers(t_ast_declaration_specifier* spec)
 	int long_long = 0; /* long long type as a special case */
 	int unsign = 0;
 
-    assert(spec);   
+
+    if (!spec) return; 
 
     qualifiers = spec->type_qualifier_list;
     while(!HCC_AST_LIST_IS_END(qualifiers))
@@ -518,7 +519,7 @@ static void ssc_outer_declaration(t_ast_declaration* declr)
     assert(declr);
 
     specifiers = declr->declr_specifiers;
-    storage_specifier = specifiers->storage_specifier;
+    storage_specifier = specifiers == NULL ? NULL : specifiers->storage_specifier;
 
     if (storage_specifier && 
         (storage_specifier->kind == AST_STORAGE_AUTO ||
@@ -529,7 +530,7 @@ static void ssc_outer_declaration(t_ast_declaration* declr)
 
 	ssc_declaration_specifiers(specifiers);
 
-    ssc_init_declarator_list(declr->init_declr_list, specifiers->type);
+    ssc_init_declarator_list(declr->init_declr_list, specifiers == NULL ? type_int : specifiers->type);
 	/* [FIXME] declarators and semantic checking goes here.
      * need to construct actual types and add identifier into
      * symbol table.
