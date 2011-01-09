@@ -1482,14 +1482,12 @@ t_ast_stmt* compound_statement()
 	{
 		if (is_current_token_declaration_specifier_token())
 		{
-			if (cptk == TK_ID && peek_token() == TK_COLON)
-			{
-                HCC_AST_LIST_APPEND(c_stmt, statement());
-			}
-			else
-			{
-                declaration();
-            }
+            HCC_AST_LIST_APPEND(c_declr, declaration());
+        }
+        else if (cptk == TK_ID && peek_token() == TK_SEMICOLON)
+        {
+            /* free stand declaration (without specifiers) */
+            HCC_AST_LIST_APPEND(c_declr, declaration());
         }
 		else
 		{
