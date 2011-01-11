@@ -671,18 +671,20 @@ t_ast_direct_declarator* make_ast_direct_declarator(char* id, t_ast_declarator* 
     return d;
 }
 
-t_ast_declarator* make_ast_declarator(t_ast_pointer* pointer, t_ast_direct_declarator* direct_declarator, t_ast_list* list)
+t_ast_declarator* make_ast_declarator(t_ast_pointer* pointer, t_ast_direct_declarator* direct_declarator, t_ast_list* list, int scope)
 {
     t_ast_declarator* d = NULL;
     CALLOC(d, PERM);
 
-    assert(direct_declarator);
+    assert(direct_declarator && scope >= 0);
 
     d->pointer = pointer;
     d->direct_declarator = direct_declarator;
     d->suffix_delcr_list = list;
 
     d->type_list = make_ast_list_entry();
+
+    d->scope = scope;
 
     return d;
 }

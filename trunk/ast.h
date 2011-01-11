@@ -622,6 +622,9 @@ typedef struct hcc_ast_declarator
 	*/
 	t_ast_list* type_list;
 
+    /* scope level for symbol management */
+    int scope;
+
 } t_ast_declarator;
 
 typedef struct hcc_ast_direct_abstract_declarator
@@ -760,7 +763,7 @@ t_ast_pointer* make_ast_pointer(t_ast_list* list, t_ast_pointer* pointer);
 t_ast_suffix_declarator* make_ast_subscript_declarator(t_ast_exp* exp); 
 t_ast_suffix_declarator* make_ast_parameter_list_declarator(t_ast_param_type_list* param_type_list, t_ast_list* id_list);
 t_ast_direct_declarator* make_ast_direct_declarator(char* id, t_ast_declarator* declarator);
-t_ast_declarator* make_ast_declarator(t_ast_pointer* pointer, t_ast_direct_declarator* direct_declarator, t_ast_list* list);
+t_ast_declarator* make_ast_declarator(t_ast_pointer* pointer, t_ast_direct_declarator* direct_declarator, t_ast_list* list, int scope);
 t_ast_direct_abstract_declarator* make_ast_direct_abstract_declarator(t_ast_suffix_declarator* suffix_declr, t_ast_abstract_declarator* abstract_declr);
 t_ast_abstract_declarator* make_ast_abstract_declarator(t_ast_pointer* pointer, t_ast_direct_abstract_declarator* direct_abstract_declarator, t_ast_list* suffix_list);
 t_ast_struct_declarator* make_ast_struct_declarator(t_ast_declarator* declarator, t_ast_exp* const_exp);

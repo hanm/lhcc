@@ -2062,7 +2062,7 @@ t_ast_declarator* declarator(int storage_class)
 
 	dir_declr = direct_declarator(storage_class);
 
-	d = make_ast_declarator(ptr, dir_declr, suffix_list);
+    d = make_ast_declarator(ptr, dir_declr, suffix_list, symbol_scope);
     BINDING_COORDINATE(d, saved_coord);
 
     while (cptk == TK_LPAREN || cptk == TK_LBRACKET)
