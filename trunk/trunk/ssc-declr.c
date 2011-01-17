@@ -49,7 +49,7 @@ static void ssc_function_definition(t_ast_function_definition*);
 static void ssc_declaration_specifiers(t_ast_declaration_specifier* spec);
 static void ssc_init_declarator_list(t_ast_list*, t_type*);
 /* recirsively visiting declarators chain and construct a reverse type list */
-static void ssc_declarator(t_ast_declarator*);
+static void ssc_declarator(t_ast_declarator*, char** id);
 
 /* return a reverse type list of {pointer, type qualifiers}*/
 static t_ast_list* ssc_pointer(t_ast_pointer*);
@@ -264,11 +264,11 @@ static void ssc_init_declarator_list(t_ast_list* init_declarator_list, t_type* b
 		t_ast_init_declarator* init_declarator = init_declarator_list->item;
 		init_declarator_list = init_declarator_list->next;
 
-
 		assert(init_declarator);
-		//printf("declarator... %s\n", init_declarator->declarator->direct_declarator->id);
-		
-		ssc_declarator(init_declarator->declarator);
+		printf("declarator... %s\n", init_declarator->declarator->direct_declarator->id);
+        decl_id = init_declarator->declarator->direct_declarator->id;
+
+        ssc_declarator(init_declarator->declarator, &decl_id);
 		
 		if (init_declarator->initializer)
 		{
@@ -280,6 +280,7 @@ static void ssc_init_declarator_list(t_ast_list* init_declarator_list, t_type* b
         type = ssc_finalize_type(base_type, init_declarator->declarator->type_list);
 
         // FIXME - add it into symbol table.
+        // assert(decl_id);
         
         if (type == NULL)
         {
@@ -290,7 +291,7 @@ static void ssc_init_declarator_list(t_ast_list* init_declarator_list, t_type* b
 	}
 }
 
-static void ssc_declarator(t_ast_declarator* declarator)
+static void ssc_declarator(t_ast_declarator* declarator, char** id)
 {
 	assert(declarator);
 
@@ -330,7 +331,13 @@ static void ssc_declarator(t_ast_declarator* declarator)
     /* check declarator in direct declarator (recursively), if any */
     if (declarator->direct_declarator->declarator)
     {
-        ssc_declarator(declarator->direct_declarator->declarator);
+        /* direct_declarator
+	        : IDENTIFIER
+	        | '(' declarator ')'  
+          */
+        assert(declarator->direct_declarator->id == NULL);
+
+        ssc_declarator(declarator->direct_declarator->declarator, id);
 
         {
             t_ast_list* list = declarator->type_list;
@@ -353,6 +360,11 @@ static void ssc_declarator(t_ast_declarator* declarator)
             list->item = declarator->direct_declarator->declarator->type_list->item;
             list->next = declarator->direct_declarator->declarator->type_list->next;
         }
+    }
+    else
+    {
+        assert(declarator->direct_declarator->id != NULL);
+        *id = declarator->direct_declarator->id;
     }
 
     if (!HCC_AST_LIST_IS_END(declarator->suffix_delcr_list))
