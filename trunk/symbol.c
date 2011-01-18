@@ -117,7 +117,43 @@ t_symbol* add_symbol(char* name, t_symbol_table** table, int level, int arena)
     unsigned long h = (unsigned long)name&(TABLESIZE-1);  /*[tag] - to do need a better hashing*/
 
     assert(name != NULL && table != NULL && arena >= 0);
-    assert(level >= tb->level);
+
+    if (level < tb->level)
+    {
+        t_symbol_table* next;
+
+        for (;;)
+        {
+            next = tb;
+            tb = tb->previous;
+
+            if (tb == NULL)
+            {
+                t_symbol_table* new_tb = make_symbol_table(FUNC);
+                new_tb->level = level;
+                next->previous = new_tb;
+
+                tb = new_tb; 
+                /* must not alter the passed by reference table here!!*/
+                break;
+            }
+            else if (tb->level == level)
+            {
+                break;
+            }
+        }
+
+        CALLOC(p, arena);
+
+        p->symbol.name = (char *)name;
+        p->symbol.scope = level;
+        p->symbol.previous = tb->all_symbols;
+        tb->all_symbols = &p->symbol;
+        p->next = tb->buckets[h];
+        tb->buckets[h] = p;
+
+        return &p->symbol;
+    }
 
     /*
      * we need a new table with deeper level than current table passed in..
