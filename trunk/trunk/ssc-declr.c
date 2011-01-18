@@ -282,10 +282,10 @@ static void ssc_init_declarator_list(t_ast_list* init_declarator_list, t_type* b
         if (symbol == NULL || symbol->scope != init_declarator->declarator->scope)
         {
             /* FIXME - add to symbol table */
-            /*
-            symbol = add_symbol_ssc(decl_id, sym_table_identifiers, 
+            
+            symbol = add_symbol(decl_id, &sym_table_identifiers, 
                 init_declarator->declarator->scope, FUNC);
-            */
+            
         }
         else
         {
