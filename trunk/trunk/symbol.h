@@ -123,14 +123,6 @@ t_symbol* install_symbol(char* name, t_symbol_table* table);
  */
 t_symbol* add_symbol(char* name, t_symbol_table** table, int symbol_scope, int arena);
 
-/* add symbol to symbol table but doesn't change the symbol table
- * this function should only be called in semantic analysis files (ssc_***), and the purpose of using
- * it instead of using add_symbol is in semantic analysis, there is no enter/scope pairs so need 
- * to make sure we always look up symbol from root symbol table (otherwise if changing symbol table
- * is allowed we have to simulate the enter/exit symbol table in semantic analysis module..)
-*/
-t_symbol* add_symbol_ssc(char* name, t_symbol_table* table, int symbol_scope, int arena);
-
 /* search a symbol in symbol table of current and enclosing scope - if the symbol is not there then search previous chained symbol tables if any
  * (it doesn't make sense to search next chained symbol table constrained by C binding rules)
  * 

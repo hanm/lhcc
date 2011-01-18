@@ -258,8 +258,9 @@ static void ssc_init_declarator_list(t_ast_list* init_declarator_list, t_type* b
 
 	while (!HCC_AST_LIST_IS_END(init_declarator_list))
 	{		
-        char* decl_id = NULL; /* declarator identifier */
-        t_type* type = NULL; /* finalized type for declarator */
+        char* decl_id = NULL; /* name of the declarator */
+        t_type* type = NULL; /* finalized type for the declarator */
+        t_symbol* symbol = NULL; /* symbol entry for the declarator */
 
 		t_ast_init_declarator* init_declarator = init_declarator_list->item;
 		init_declarator_list = init_declarator_list->next;
@@ -270,17 +271,35 @@ static void ssc_init_declarator_list(t_ast_list* init_declarator_list, t_type* b
 
         ssc_declarator(init_declarator->declarator, &decl_id);
 		
+        /* FIXME - check type and declaration semantic rules */
+        
+        type = ssc_finalize_type(base_type, init_declarator->declarator->type_list);
+        
+        assert(decl_id);
+        
+        symbol = find_symbol(decl_id, sym_table_identifiers);
+
+        if (symbol == NULL || symbol->scope != init_declarator->declarator->scope)
+        {
+            /* FIXME - add to symbol table */
+            /*
+            symbol = add_symbol_ssc(decl_id, sym_table_identifiers, 
+                init_declarator->declarator->scope, FUNC);
+            */
+        }
+        else
+        {
+            /* FIXME - issue an error only for local declarations. */
+            // semantic_error("redefinition of variable", &init_declarator->coord);
+        }
+
 		if (init_declarator->initializer)
 		{
 			ssc_initializer(init_declarator->initializer);
 		}
         
-        (type, decl_id, base_type);
-        
-        type = ssc_finalize_type(base_type, init_declarator->declarator->type_list);
-
         // FIXME - add it into symbol table.
-        // assert(decl_id);
+        
         
         if (type == NULL)
         {
