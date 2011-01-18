@@ -155,6 +155,18 @@ t_symbol* add_symbol(char* name, t_symbol_table** table, int level, int arena)
 	return &p->symbol;
 }
 
+t_symbol* add_symbol_ssc(char* name, t_symbol_table* table, int symbol_scope, int arena)
+{
+    t_symbol_table* tmp = table;
+
+    if (symbol_scope < table->level)
+    {
+        int a = 0;
+        a = a + 1;
+    }
+    return add_symbol(name, &tmp, symbol_scope, arena);
+}
+
 t_symbol* install_symbol(char* name, t_symbol_table* table)
 {
     struct entry* p;
