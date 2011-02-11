@@ -27,7 +27,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 #include "atom.h"
 #include "arena.h"
-#include "Hcc.h"
+#include "hcc.h"
 #include <assert.h>
 #include <limits.h>
 #include <string.h>
