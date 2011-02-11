@@ -540,12 +540,20 @@ static int identify_float_value(char* number, char* begin)
         }
     }
 
+// FIXME - better cross platform handling.
+#ifdef _WIN32
     errno = 0;
     value = strtod(begin, NULL);
     if (errno == ERANGE)
     {
         warning("float value out of range!");
     }
+#else
+    if (!strtod(begin, NULL))
+    {
+        warning("float value out of range!");
+    }
+#endif
 
 #ifdef HCC_TRACE_ENABLE
     fprintf(stderr, "float value %f\n", value);
