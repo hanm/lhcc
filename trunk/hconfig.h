@@ -28,6 +28,10 @@ OTHER DEALINGS IN THE SOFTWARE.
 #ifndef __HCC_CONFIG_H
 #define __HCC_CONFIG_H
 
+#ifdef _MSC_VER
+#include <crtdbg.h>
+#endif
+
 //
 // global variables on compiler configurations and operation modes
 //
