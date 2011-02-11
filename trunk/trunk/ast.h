@@ -28,6 +28,8 @@ OTHER DEALINGS IN THE SOFTWARE.
 #ifndef __HCC_AST_H
 #define __HCC_AST_H
 
+#include "type.h"
+
 struct hcc_ast_exp;
 typedef struct hcc_ast_exp t_ast_exp;
 typedef struct hcc_ast_stmt t_ast_stmt;
@@ -36,8 +38,6 @@ typedef struct hcc_ast_declarator t_ast_declarator;
 typedef struct hcc_ast_abstract_declarator t_ast_abstract_declarator;
 typedef struct hcc_ast_all_declarator t_ast_all_declarator;
 typedef struct hcc_ast_type_name t_ast_type_name;
-
-typedef struct type t_type;
 
 typedef struct hcc_ast_list
 {
