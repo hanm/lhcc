@@ -28,6 +28,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 #ifndef __HCC_AST_H
 #define __HCC_AST_H
 
+struct hcc_ast_exp;
 typedef struct hcc_ast_exp t_ast_exp;
 typedef struct hcc_ast_stmt t_ast_stmt;
 
@@ -195,7 +196,7 @@ typedef union hcc_ast_exp_value
  * the embeded records represent the specific expression ast node, 
  * which is specified by expression kind enum
 */
-typedef struct hcc_ast_exp
+struct hcc_ast_exp
 {
 	t_ast_exp_kind kind;
 	t_ast_coord coord;
@@ -292,7 +293,7 @@ typedef struct hcc_ast_exp
 	int has_lvalue; 
 	int no_rvalue; /* array variable is the only case that has rvalue but no lvalue */
 
-} t_ast_exp;
+} ;
 
 t_ast_exp* make_ast_id_exp(char* name);
 t_ast_exp* make_ast_const_exp(t_ast_exp_val val, t_ast_exp_kind kind);
@@ -338,7 +339,7 @@ typedef enum hcc_ast_statement_kind
     AST_STMT_RETURN_KIND
 } t_ast_stmt_kind;
 
-typedef struct hcc_ast_stmt
+struct hcc_ast_stmt
 {
 	t_ast_stmt_kind kind;
 	t_ast_coord coord;
@@ -428,7 +429,7 @@ typedef struct hcc_ast_stmt
 
 	} u;
 
-} t_ast_stmt;
+} ;
 
 t_ast_stmt* make_ast_label_stmt(char* label_name, t_ast_stmt* stmt);
 t_ast_stmt* make_ast_expression_stmt(t_ast_exp* exp);
@@ -608,7 +609,7 @@ typedef struct hcc_ast_direct_declarator
     t_ast_declarator* declarator;
 } t_ast_direct_declarator;
 
-typedef struct hcc_ast_declarator
+struct hcc_ast_declarator
 {
     t_ast_coord coord;
 
@@ -625,7 +626,7 @@ typedef struct hcc_ast_declarator
     /* scope level for symbol management */
     int scope;
 
-} t_ast_declarator;
+} ;
 
 typedef struct hcc_ast_direct_abstract_declarator
 {
@@ -635,14 +636,14 @@ typedef struct hcc_ast_direct_abstract_declarator
     t_ast_suffix_declarator* suffix_declr;
 } t_ast_direct_abstract_declarator;
 
-typedef struct hcc_ast_abstract_declarator
+struct hcc_ast_abstract_declarator
 {
     t_ast_coord coord;
 
     t_ast_pointer* pointer;
     t_ast_direct_abstract_declarator* direct_abstract_declarator;
     t_ast_list* suffix_list;
-} t_ast_abstract_declarator;
+} ;
 
 typedef struct hcc_ast_struct_declarator
 {
@@ -660,13 +661,13 @@ typedef struct hcc_ast_struct_declaration
 	t_ast_list* struct_declarator_list;
 } t_ast_struct_declaration;
 
-typedef struct hcc_ast_type_name
+struct hcc_ast_type_name
 {
     t_ast_coord coord;
 
     t_ast_list* specifier_qualifier_list;
     t_ast_abstract_declarator* abstract_declarator;
-} t_ast_type_name;
+} ;
 
 typedef struct hcc_ast_initializer
 {
@@ -705,7 +706,7 @@ typedef struct hcc_ast_declaration
     t_ast_list* init_declr_list;
 } t_ast_declaration;
 
-typedef struct hcc_ast_all_declarator
+struct hcc_ast_all_declarator
 {
 	t_ast_coord coord;
 	
@@ -713,7 +714,7 @@ typedef struct hcc_ast_all_declarator
 	char* id;
 	t_ast_all_declarator* all_declr;
 	t_ast_list* suffix_declr_list;
-} t_ast_all_declarator;
+} ;
 
 typedef struct hcc_ast_function_definition
 {
